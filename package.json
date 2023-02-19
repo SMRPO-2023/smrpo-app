@@ -1,6 +1,6 @@
 {
-  "name": "spajza",
-  "version": "1.2.4",
+  "name": "app",
+  "version": "1.0.0",
   "private": true,
   "engines": {
     "node": "^16.3.2"
