@@ -1,15 +1,15 @@
 <template>
-  <b-container>
+  <b-container fluid>
     <b-row>
-      <b-col offset-md="2" md="8" cols="12" class="my-3">
+      <b-col offset-lg="2" lg="8" cols="12" class="my-3">
         <div class="text-center">
           <h1>Uporabniki</h1>
         </div>
         <table class="table table-hover mt-3 w-100">
           <thead>
           <tr>
-            <th scope="col">Up. ime</th>
-            <th scope="col" v-if="hideOnMinWidth">Email</th>
+            <th scope="col">Ime</th>
+            <th scope="col">Email</th>
             <th scope="col">Vloga</th>
             <th scope="col" class="d-none">Akcije</th>
           </tr>
@@ -19,8 +19,8 @@
             v-for="user of users"
             :key="user._id"
           >
-            <td>{{ user.username }}</td>
-            <td v-if="hideOnMinWidth">{{ user.email }}</td>
+            <td>{{ user.firstname }} {{ user.lastname }}</td>
+            <td>{{ user.email }}</td>
             <td>
               <b-dropdown
                 id="dropdown-right"
@@ -57,21 +57,10 @@ export default {
   data() {
     return {
       users: [],
-      innerWidth: 799,
     }
   },
   async created() {
     await this.getUsers();
-  },
-  mounted() {
-    window.addEventListener('resize', () => {
-      this.innerWidth = window.innerWidth
-    })
-  },
-  computed: {
-    hideOnMinWidth() {
-      return this.innerWidth > 800;
-    },
   },
   methods: {
     async getUsers() {
@@ -98,7 +87,6 @@ export default {
           console.error(reason)
           this.$toast.error('Napaka pri pridobivanju uporabnikov', { duration: 3000 });
         })
-
     }
   }
 }
