@@ -3,25 +3,13 @@ import * as jwt from 'jsonwebtoken';
 const unprotectedPaths = [
   '/login',
   '/registration',
-  '/registration/complete',
-  '/registration/verify',
+  '/registration/success',
   '/forgotten-password',
   '/change-password',
 ]
 
 const adminOnlyPaths = [
   '/users',
-  '/tags',
-  '/categories',
-  '/import',
-  '/edit',
-  '/add'
-]
-
-const keeperOnlyPaths = [
-  '/import',
-  '/edit',
-  '/add'
 ]
 
 export default function (context) {
@@ -40,12 +28,6 @@ export async function checkAuth(context) {
         adminOnlyPaths.find(path => decodeURI(context.route.path).startsWith(path)) &&
         decoded.role !== 'ADMIN'
       ) {
-        if (
-          keeperOnlyPaths.find(path => decodeURI(context.route.path).startsWith(path)) &&
-          decoded.role === 'KEEPER'
-        ) {
-          return;
-        }
         await window.$nuxt.$router.push('/')
       }
     } else {

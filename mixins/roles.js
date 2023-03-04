@@ -10,14 +10,6 @@ export default {
           text: "Uporabnik",
           value: "USER"
         },
-        {
-          text: "Gospodar",
-          value: "KEEPER"
-        },
-        {
-          text: "Nepotrjen",
-          value: "UNAPPROVED"
-        },
       ],
     }
   },
@@ -28,10 +20,6 @@ export default {
           return 'warning'
         case 'USER':
           return 'info'
-        case 'KEEPER':
-          return 'success'
-        case 'UNAPPROVED':
-          return 'secondary'
         default:
           return 'light'
       }

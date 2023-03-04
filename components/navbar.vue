@@ -23,11 +23,7 @@
       </b-dropdown-item>
     </b-dropdown>
 
-
-    <div v-if="user" class="ml-4">
-      <b-avatar variant="light">{{ user.username[0].toUpperCase() }}</b-avatar>
-    </div>
-
+    <div v-if="user" class="ml-4 text-white">{{ user.firstname }}</div>
 
     <b-collapse v-if="user" id="navbar-toggle-collapse" is-nav>
       <b-navbar-nav class="ml-auto">
@@ -48,16 +44,16 @@ export default {
     BIconChevronBarUp
   },
   async mounted() {
-    if (localStorage.getItem('userId')) {
-      await this.$store.dispatch('user/fetchUser', localStorage.getItem('userId'));
+    const userId = localStorage.getItem('userId');
+    const accessToken = localStorage.getItem('jwt');
+    if (userId && accessToken) {
+      await this.$store.dispatch('user/fetchUser', userId);
     }
   },
   computed: {
     ...mapGetters({
       user: 'user/getUser',
       isAdmin: 'user/isAdmin',
-      isKeeper: 'user/isKeeper',
-      isApproved: 'user/isApproved',
       isNormalUser: 'user/isNormalUser',
     }),
     ...mapActions(['user/unsetUser', 'user/fetchUser'])
