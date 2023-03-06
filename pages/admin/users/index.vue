@@ -2,8 +2,9 @@
   <b-container fluid>
     <b-row>
       <b-col offset-lg="2" lg="8" cols="12" class="my-3">
-        <div class="text-center">
-          <h1>Uporabniki</h1>
+        <div class="d-flex justify-content-between align-items-center">
+            <h1>Uporabniki</h1>
+            <b-button variant="primary" href="users/create" class="d-flex flex-column justify-content-center">Ustvari</b-button>
         </div>
         <table class="table table-hover mt-3 w-100">
           <thead>
@@ -64,7 +65,7 @@ export default {
   },
   methods: {
     async getUsers() {
-      this.$axios.$get('/users')
+      this.$axios.$get('admin/users')
       .then(res => {
         this.users = res;
       })
@@ -74,10 +75,10 @@ export default {
       })
     },
     updateRole(user, role) {
-      this.$axios.$put(`/users/${user._id}/role`, { role: role.value })
+      this.$axios.$put(`admin/users/${user.id}/role`, { role: role.value })
         .then(res => {
           for (const user of this.users) {
-            if (user._id === res._id) {
+            if (user.id === res.id) {
               user.role = res.role
               return;
             }

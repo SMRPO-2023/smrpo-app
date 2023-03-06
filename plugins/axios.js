@@ -16,10 +16,11 @@ const responseInterceptor = app => {
   app.$axios.interceptors.response.use(
     config => config,
     async error => {
+      console.error("API Response Error:", error)
       if (error.response.status === 401) {
         localStorage.removeItem('jwt')
         await app.store.dispatch('user/unsetUser')
-        await app.router.replace('/login')
+        await app.router.push('/login')
         return
       }
 

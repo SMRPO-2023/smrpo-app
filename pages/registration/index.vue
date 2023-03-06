@@ -38,7 +38,7 @@
               v-slot="v"
             >
               <b-form-group
-                id="input-group-1"
+                id="input-group-2"
                 label="Priimek"
                 label-for="lastname"
               >
@@ -47,27 +47,6 @@
                   id="lastname"
                   placeholder="Vnesi priimek"
                   v-model="form.lastname"
-                  :state="getValidationState(v)"
-                  aria-describedby="input-1-live-feedback"
-                />
-                <b-form-invalid-feedback id="input-1-live-feedback">{{
-                    v.errors[0]
-                  }}
-                </b-form-invalid-feedback>
-              </b-form-group>
-            </ValidationProvider>
-
-            <ValidationProvider name="elektronski naslov" :rules="{ required: true, email: true }" v-slot="v">
-              <b-form-group
-                id="input-group-5"
-                label="Elektronski naslov"
-                label-for="email"
-              >
-                <b-form-input
-                  type="text"
-                  id="email"
-                  placeholder="Elektronski naslov"
-                  v-model="form.email"
                   :state="getValidationState(v)"
                   aria-describedby="input-2-live-feedback"
                 />
@@ -78,17 +57,17 @@
               </b-form-group>
             </ValidationProvider>
 
-            <ValidationProvider name="geslo" :rules="{ required: true }" v-slot="v" vid="password">
+            <ValidationProvider name="elektronski naslov" :rules="{ required: true, email: true }" v-slot="v">
               <b-form-group
-                id="input-group-6"
-                label="Geslo"
-                label-for="password"
+                id="input-group-3"
+                label="Elektronski naslov"
+                label-for="email"
               >
                 <b-form-input
-                  type="password"
-                  id="password"
-                  placeholder="Geslo"
-                  v-model="form.password"
+                  type="text"
+                  id="email"
+                  placeholder="Elektronski naslov"
+                  v-model="form.email"
                   :state="getValidationState(v)"
                   aria-describedby="input-3-live-feedback"
                 />
@@ -99,8 +78,30 @@
               </b-form-group>
             </ValidationProvider>
 
+            <ValidationProvider name="geslo" :rules="{ required: true }" v-slot="v" vid="password">
+              <b-form-group
+                id="input-group-4"
+                label="Geslo"
+                label-for="password"
+              >
+                <b-form-input
+                  type="password"
+                  id="password"
+                  placeholder="Geslo"
+                  v-model="form.password"
+                  :state="getValidationState(v)"
+                  aria-describedby="input-4-live-feedback"
+                />
+                <b-form-invalid-feedback id="input-4-live-feedback">{{
+                    v.errors[0]
+                  }}
+                </b-form-invalid-feedback>
+              </b-form-group>
+            </ValidationProvider>
+
             <ValidationProvider name="potrditev gesla" :rules="{required: true, confirmed: 'password'}" v-slot="v">
               <b-form-group
+                id="input-group-5"
                 label="Ponovi geslo"
                 label-for="pass_repeat"
               >
@@ -110,9 +111,9 @@
                   placeholder="Geslo"
                   v-model="form.passwordRepeat"
                   :state="getValidationState(v)"
-                  aria-describedby="input-4-live-feedback"
+                  aria-describedby="input-5-live-feedback"
                 />
-                <b-form-invalid-feedback id="input-4-live-feedback">{{
+                <b-form-invalid-feedback id="input-5-live-feedback">{{
                     v.errors[0]
                   }}
                 </b-form-invalid-feedback>
@@ -176,11 +177,14 @@ export default {
       .catch(error => {
         const status = error?.response?.status;
         const data = error?.response?.data;
+        // some instances of errors return main message along with array of detailed shorter messages
         if (status && status === 400) {
           if (data && data.message instanceof Array) {
             this.responseErrors = data.message;
           }
           this.error = "Napačni podatki za registracijo"
+        } else {
+          this.error = data?.message;
         }
         this.error = data?.message;
         this.$toast.error("Napaka pri registraciji", { duration: 3000 })
