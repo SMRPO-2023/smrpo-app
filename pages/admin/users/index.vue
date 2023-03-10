@@ -12,15 +12,12 @@
             <th scope="col">Ime</th>
             <th scope="col">Email</th>
             <th scope="col">Vloga</th>
-            <th scope="col" class="d-none">Akcije</th>
+            <th scope="col"></th>
           </tr>
           </thead>
           <tbody>
-          <tr
-            v-for="user of users"
-            :key="user._id"
-          >
-            <td>{{ user.firstname }} {{ user.lastname }}</td>
+          <tr v-for="user of users" :key="user.id">
+            <td><nuxt-link :to="{ path: `users/${user.id}`}">{{ user.firstname }} {{ user.lastname }}</nuxt-link></td>
             <td>{{ user.email }}</td>
             <td>
               <b-dropdown
@@ -40,7 +37,9 @@
                 </b-dropdown-item>
               </b-dropdown>
             </td>
-            <td class="d-none">Akcije</td>
+            <td>
+              <b-icon icon="x-lg" @click="deleteUser(user)" class="center-and-clickable"></b-icon>
+            </td>
           </tr>
           </tbody>
         </table>
@@ -51,9 +50,13 @@
 
 <script>
 import roles from "@/mixins/roles";
+import { BIcon } from 'bootstrap-vue'
 
 export default {
   name: "users",
+  components: {
+    BIcon,
+  },
   mixins: [roles],
   data() {
     return {
@@ -88,11 +91,46 @@ export default {
           console.error(reason)
           this.$toast.error('Napaka pri pridobivanju uporabnikov', { duration: 3000 });
         })
+    },
+    async deleteUser(user) {
+      let confirmed = false
+      try {
+        confirmed = await this.$bvModal.msgBoxConfirm('Ali ste prepričani, da želite izbrisati uporabnika?', {
+          title: 'Izbris',
+          cancelTitle: 'Prekliči',
+          okTitle: 'Potrdi'
+        })
+      } catch(error) {
+        console.error(error);
+      }
+
+      if (!confirmed) return;
+
+      this.$axios.$delete(`admin/users/${user.id}`)
+      .then(res => {
+          this.users = this.users.filter(u => u.id !== user.id)
+      })
+      .catch(reason => {
+        console.error(reason)
+        this.$toast.error('Napaka pri brisanju uporabnika', { duration: 3000 });
+      })
     }
   }
 }
 </script>
 
 <style scoped>
+.center-and-clickable {
+  vertical-align: middle;
+  text-align: center;
+  cursor: pointer;
+}
 
+tbody > tr:hover > td > a {
+  text-decoration: underline;
+}
+
+td > a {
+  color: black;
+}
 </style>
