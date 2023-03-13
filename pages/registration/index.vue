@@ -31,6 +31,7 @@
 
             <ValidationProvider
               name="ime"
+              :rules="{ alpha: true }"
               v-slot="v"
             >
               <b-form-group
@@ -54,6 +55,7 @@
 
             <ValidationProvider
               name="priimek"
+              :rules="{ alpha: true }"
               v-slot="v"
             >
               <b-form-group
@@ -111,7 +113,7 @@
                 label-for="password"
               >
                 <b-form-input
-                  type="password"
+                  :type="passwordType"
                   id="password"
                   placeholder="Geslo"
                   v-model="form.password"
@@ -140,7 +142,7 @@
                 label-for="pass_repeat"
               >
                 <b-form-input
-                  type="password"
+                  :type="passwordType"
                   id="pass_repeat"
                   placeholder="Geslo"
                   v-model="form.passwordRepeat"
@@ -152,6 +154,16 @@
                 </b-form-invalid-feedback>
               </b-form-group>
             </ValidationProvider>
+
+            <b-form-checkbox
+              id="checkbox-1"
+              name="checkbox-1"
+              v-model="passwordType"
+              value="text"
+              unchecked-value="password"
+            >
+              Pokaži geslo
+            </b-form-checkbox>
 
             <div v-if="error" class="text-center text-danger">{{ error }}</div>
             <ul v-if="responseErrors.length > 0" class="text-danger">
@@ -179,6 +191,7 @@ export default {
     return {
       error: null,
       responseErrors: [],
+      passwordType: "password",
       form: {
         username: null,
         firstname: null,

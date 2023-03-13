@@ -29,7 +29,7 @@
               </b-form-group>
             </ValidationProvider>
 
-            <ValidationProvider name="ime" v-slot="v">
+            <ValidationProvider name="ime" :rules="{ alpha: true }" v-slot="v">
               <b-form-group label="Ime" label-for="firstname">
                 <b-form-input type="text" id="firstname" placeholder="Vnesi ime" v-model="form.firstname"
                   :state="getValidationState(v)" aria-describedby="input-2-live-feedback" />
@@ -40,7 +40,7 @@
               </b-form-group>
             </ValidationProvider>
 
-            <ValidationProvider name="priimek" v-slot="v">
+            <ValidationProvider name="priimek" :rules="{ alpha: true }" v-slot="v">
               <b-form-group label="Priimek" label-for="lastname">
                 <b-form-input type="text" id="lastname" placeholder="Vnesi priimek" v-model="form.lastname"
                   :state="getValidationState(v)" aria-describedby="input-3-live-feedback" />
@@ -64,7 +64,7 @@
 
             <ValidationProvider name="geslo" :rules="{ required: true, min: 12, max: 128 }" v-slot="v" vid="password">
               <b-form-group label="Geslo" label-for="password">
-                <b-form-input type="password" id="password" placeholder="Geslo" v-model="form.password"
+                <b-form-input :type="passwordType" id="password" placeholder="Geslo" v-model="form.password"
                   :state="getValidationState(v)" aria-describedby="input-5-live-feedback" />
                 <b-form-invalid-feedback id="input-5-live-feedback">{{
                   v.errors[0]
@@ -75,7 +75,7 @@
 
             <ValidationProvider name="potrditev gesla" :rules="{ required: true, confirmed: 'password' }" v-slot="v">
               <b-form-group label="Ponovi geslo" label-for="pass_repeat">
-                <b-form-input type="password" id="pass_repeat" placeholder="Geslo" v-model="form.passwordRepeat"
+                <b-form-input :type="passwordType" id="pass_repeat" placeholder="Geslo" v-model="form.passwordRepeat"
                   :state="getValidationState(v)" aria-describedby="input-6-live-feedback" />
                 <b-form-invalid-feedback id="input-6-live-feedback">{{
                   v.errors[0]
@@ -83,6 +83,16 @@
                 </b-form-invalid-feedback>
               </b-form-group>
             </ValidationProvider>
+
+            <b-form-checkbox
+              id="checkbox-1"
+              name="checkbox-1"
+              v-model="passwordType"
+              value="text"
+              unchecked-value="password"
+            >
+              Pokaži geslo
+            </b-form-checkbox>
 
             <div v-if="error" class="text-center text-danger">{{ error }}</div>
             <ul v-if="responseErrors.length > 0" class="text-danger">
@@ -107,6 +117,7 @@ export default {
     return {
       error: null,
       responseErrors: [],
+      passwordType: "password",
       form: {
         role: null,
         username: null,
@@ -128,7 +139,7 @@ export default {
       return dirty || validated ? valid : null;
     },
     async onSubmit() {
-      await this.$axios.$post('admin/users', {
+      await this.$axios.$post('admin/users/create-user', {
         username: this.form.username,
         firstname: this.form.firstname,
         lastname: this.form.lastname,

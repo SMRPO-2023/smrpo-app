@@ -9,7 +9,9 @@ export default {
   router: {
     middleware: [
       'auth'
-    ]
+    ],
+    linkActiveClass: 'active',
+    linkExactActiveClass: 'exact-active',
   },
 
   loading: false,

@@ -91,6 +91,11 @@
             Pokaži gesla
           </b-form-checkbox>
 
+          <div v-if="error" class="text-center text-danger">{{ error }}</div>
+          <ul v-if="responseErrors.length > 0" class="text-danger">
+            <li v-for="err of responseErrors">{{ err }}</li>
+          </ul>
+
           <b-button type="submit" class="btn-primary mt-2">Spremeni geslo</b-button>
         </div>
       </b-form>
@@ -117,6 +122,8 @@ export default {
       },
       show_pass: [],
       success: false,
+      error: null,
+      responseErrors: [],
     }
   },
   computed: {
@@ -134,24 +141,63 @@ export default {
           oldPassword: this.form.old_pass,
           newPassword: this.form.new_pass
         })
-          .then(async res => {
-            if (!res.success) {
+        .then(async res => {
+          this.error = null;
+          this.responseErrors = [];
+          
+          if (!res.success) {
+          } else {
+            this.$toast.success("Geslo uspešno spremenjeno", { duration: 3000 })
+          }
+        })
+        .catch((error) => {
+          const status = error?.response?.status;
+          const data = error?.response?.data;
+          // some instances of errors return main message along with array of detailed shorter messages
+          if (status && status === 400) {
+            if (data && data.message instanceof Array) {
+              this.responseErrors = data.message;
+              this.error = "Napaka pri posodabljanju gesla";
             } else {
-              this.$toast.success("Geslo uspešno spremenjeno", { duration: 3000 })
+              this.responseErrors = [];
+              this.error = data.message;
             }
-          })
+          } else {
+            this.error = data.message;
+            this.responseErrors = [];
+          }
+          this.$toast.error("Napaka pri posodabljanju gesla", { duration: 3000 });
+        });
       } else {
         await this.$axios.$post('/users/ext-change-password', {
           newPassword: this.form.new_pass,
           token: this.$route.query.token,
           userId: this.$route.query.userId,
         })
-          .then(async res => {
-            if (res.success) {
-              this.success = true
-              this.$toast.success("Geslo uspešno spremenjeno", { duration: 3000 })
+        .then(async res => {
+          if (res.success) {
+            this.success = true
+            this.$toast.success("Geslo uspešno spremenjeno", { duration: 3000 })
+          }
+        })
+        .catch((error) => {
+          const status = error?.response?.status;
+          const data = error?.response?.data;
+          // some instances of errors return main message along with array of detailed shorter messages
+          if (status && status === 400) {
+            if (data && data.message instanceof Array) {
+              this.responseErrors = data.message;
+              this.error = "Napaka pri posodabljanju gesla";
+            } else {
+              this.responseErrors = [];
+              this.error = data.message;
             }
-          })
+          } else {
+            this.error = data.message;
+            this.responseErrors = [];
+          }
+          this.$toast.error("Napaka pri posodabljanju gesla", { duration: 3000 });
+        });
       }
     }
   }

@@ -1,7 +1,7 @@
 <template>
-  <b-container>
+  <b-container fluid>
     <b-row>
-      <b-col offset-md="3" md="6" cols="12" class="my-3">
+      <b-col v-if="user" offset-lg="2" lg="8" cols="12" class="my-3">
         <h1>Tvoj profil</h1>
 
         <div class="mt-3"><b>Uporabniško ime:</b> {{ user.username }}</div>

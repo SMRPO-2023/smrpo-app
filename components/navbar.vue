@@ -1,48 +1,40 @@
 <template>
-  <b-navbar toggleable type="dark" variant="dark" class="fixed-top">
+  <b-navbar toggleable="md" type="dark" variant="dark" class="fixed-top">
     <nuxt-link class="navbar-brand py-0" href="/" :to="`/`">
       <div class="d-flex justify-content-center align-content-center">
         <div class="ml-3" style="line-height: 2.25rem">SMRPO projekt</div>
       </div>
     </nuxt-link>
-    <div class="mr-auto"></div>
+    
+    <b-navbar-toggle v-if="user" target="nav-collapse"></b-navbar-toggle>
 
-    <b-dropdown v-if="user" id="dropdown-1" right class="">
-      <template #button-content>
-        <span class="mr-2">Meni</span>
-      </template>
-      <b-dropdown-item v-if="isAdmin" class="text-body" :to="`/admin/users`">
-        Uporabniki
-      </b-dropdown-item>
-      <b-dropdown-divider></b-dropdown-divider>
-      <b-dropdown-item class="text-body" :to="`/profile`">
-        Profil
-      </b-dropdown-item>
-      <b-dropdown-item @click="logout">
-        Odjava
-      </b-dropdown-item>
-    </b-dropdown>
+    <b-collapse v-if="user" id="nav-collapse" is-nav>
+      <b-navbar-nav>
+        <b-nav-item v-if="isAdmin" :to="'/admin/users'">Uporabniki</b-nav-item>
+        <b-nav-item :to="'/projects'">Projekti</b-nav-item>
+        <b-nav-item :to="'/stories'">Zgodbe</b-nav-item>
+        <b-nav-item :to="'/sprints'">Sprinti</b-nav-item>
+      </b-navbar-nav>
 
-    <div v-if="user" class="ml-4 text-white">{{ user.firstname }}</div>
-
-    <b-collapse v-if="user" id="navbar-toggle-collapse" is-nav>
+      <!-- Right aligned nav items -->
       <b-navbar-nav class="ml-auto">
+        <b-nav-item-dropdown right>
+          <template #button-content>
+            <em>{{ user.firstname }}</em>
+          </template>
+          <b-dropdown-item :to="`/profile`">Profil</b-dropdown-item>
+          <b-dropdown-item @click="logout">Odjava</b-dropdown-item>
+        </b-nav-item-dropdown>
       </b-navbar-nav>
     </b-collapse>
   </b-navbar>
 </template>
 
 <script>
-import { BIcon, BIconChevronBarDown, BIconChevronBarUp } from 'bootstrap-vue'
 import {mapActions, mapGetters} from "vuex";
 
 export default {
   name: "navbar",
-  components: {
-    BIcon,
-    BIconChevronBarDown,
-    BIconChevronBarUp
-  },
   async mounted() {
     const userId = localStorage.getItem('userId');
     const accessToken = localStorage.getItem('jwt');
@@ -70,26 +62,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.coin-amount-icon {
-  vertical-align: bottom;
-  font-size: 28px !important;
-  color: goldenrod;
-}
-.coin-amount {
-  font-weight: 600;
-  font-size: 18px !important;
-}
-.link {
-  color: #c7c7c7;
-  //margin-right: auto;
-  margin-left: 12px;
-}
-.link:hover {
-  color: #808080;
-}
-.link-color {
-  line-height: 20px;
-  font-size: 16px;
-  color: #c7c7c7;
-}
 </style>

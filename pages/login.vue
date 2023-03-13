@@ -49,12 +49,15 @@
 
               <br />
 
-              <input
-                @click="switchVisibility"
-                type="checkbox"
-                class="checkmark mr-1"
-              />
-              <a>Pokaži geslo</a>
+              <b-form-checkbox
+                id="checkbox-1"
+                name="checkbox-1"
+                v-model="passwordType"
+                value="text"
+                unchecked-value="password"
+              >
+                Pokaži geslo
+              </b-form-checkbox>
 
               <div class="text-center mt-4">
                 <b-button type="submit" variant="success" class="w-50">
@@ -94,10 +97,6 @@ export default {
     };
   },
   methods: {
-    switchVisibility() {
-      this.passwordType =
-        this.passwordType === "password" ? "text" : "password";
-    },
     getValidationState({ dirty, validated, valid = null }) {
       return dirty || validated ? valid : null;
     },

@@ -1,9 +1,7 @@
 <template>
   <b-container fluid>
-    <b-breadcrumb :items="items"></b-breadcrumb>
-
     <b-row>
-      <b-col offset-lg="2" lg="8" cols="12">
+      <b-col offset-lg="2" lg="8" cols="12" class="my-3">
         <h1>Uredi uporabnika</h1>
 
         <ValidationObserver ref="observer" v-slot="{ handleSubmit }">
@@ -31,7 +29,7 @@
               </b-form-group>
             </ValidationProvider>
 
-            <ValidationProvider name="ime" v-slot="v">
+            <ValidationProvider name="ime" :rules="{ alpha: true }" v-slot="v">
               <b-form-group label="Ime" label-for="firstname">
                 <b-form-input type="text" id="firstname" placeholder="Vnesi ime" v-model="form.firstname"
                   :state="getValidationState(v)" aria-describedby="input-2-live-feedback" />
@@ -42,7 +40,7 @@
               </b-form-group>
             </ValidationProvider>
 
-            <ValidationProvider name="priimek" v-slot="v">
+            <ValidationProvider name="priimek" :rules="{ alpha: true }" v-slot="v">
               <b-form-group label="Priimek" label-for="lastname">
                 <b-form-input type="text" id="lastname" placeholder="Vnesi priimek" v-model="form.lastname"
                   :state="getValidationState(v)" aria-describedby="input-3-live-feedback" />
@@ -72,7 +70,7 @@
             <b-collapse id="collapse-password">
               <ValidationProvider name="geslo" v-slot="v" vid="password">
                 <b-form-group label="Geslo" label-for="password">
-                  <b-form-input type="password" id="password" placeholder="Geslo" v-model="form.password"
+                  <b-form-input :type="passwordType" id="password" placeholder="Geslo" v-model="form.password"
                     :state="getValidationState(v)" aria-describedby="input-5-live-feedback" />
                   <b-form-invalid-feedback id="input-5-live-feedback">{{
                     v.errors[0]
@@ -83,7 +81,7 @@
 
               <ValidationProvider name="potrditev gesla" :rules="{ confirmed: 'password' }" v-slot="v">
                 <b-form-group label="Ponovi geslo" label-for="pass_repeat">
-                  <b-form-input type="password" id="pass_repeat" placeholder="Geslo" v-model="form.passwordRepeat"
+                  <b-form-input :type="passwordType" id="pass_repeat" placeholder="Geslo" v-model="form.passwordRepeat"
                     :state="getValidationState(v)" aria-describedby="input-6-live-feedback" />
                   <b-form-invalid-feedback id="input-6-live-feedback">{{
                     v.errors[0]
@@ -91,6 +89,16 @@
                   </b-form-invalid-feedback>
                 </b-form-group>
               </ValidationProvider>
+
+              <b-form-checkbox
+                id="checkbox-1"
+                name="checkbox-1"
+                v-model="passwordType"
+                value="text"
+                unchecked-value="password"
+              >
+                Pokaži geslo
+              </b-form-checkbox>
             </b-collapse>
 
             <div v-if="error" class="text-center text-danger">{{ error }}</div>
@@ -123,6 +131,7 @@ export default {
       error: null,
       responseErrors: [],
       user: null,
+      passwordType: "password",
       form: {
         role: null,
         username: null,
@@ -137,20 +146,6 @@ export default {
         { value: 'USER', text: 'Navadni uporabnik' },
         { value: 'ADMIN', text: 'Administrator' },
       ],
-      items: [
-          {
-            text: 'Admin',
-            href: '/'
-          },
-          {
-            text: 'Uporabniki',
-            href: '/admin/users'
-          },
-          {
-            text: 'Uredi',
-            active: true
-          }
-        ]
     }
   },
   async mounted() {
@@ -189,6 +184,7 @@ export default {
       .then(res => {
         this.error = null;
         this.responseErrors = [];
+        this.$toast.success("Uporabnik uspešno posodobljen", { duration: 3000 })
       })
       .catch(error => {
         const status = error?.response?.status;
@@ -197,9 +193,13 @@ export default {
         if (status && status === 400) {
           if (data && data.message instanceof Array) {
             this.responseErrors = data.message;
+            this.error = "Napaka pri posodabljanju uporabnika"
+          } else {
+            this.responseErrors = [];
+            this.error = data.message;
           }
-          this.error = "Napačni podatki za uporabnika"
         } else {
+          this.responseErrors = [];
           this.error = data?.message;
         }
         this.$toast.error("Napaka pri posodabljanju uporabnika", { duration: 3000 })
