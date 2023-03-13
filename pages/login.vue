@@ -12,7 +12,7 @@
             <b-form @submit.stop.prevent="handleSubmit(onSubmit)">
               <ValidationProvider
                 name="elektronski naslov"
-                :rules="{ required: true, email: true }"
+                :rules="{ required: true }"
                 v-slot="v"
               >
                 <b-input

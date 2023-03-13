@@ -130,9 +130,9 @@ export default {
     },
     async onSubmit() {
       if (this.type === 'int') {
-        await this.$axios.$post('/auth/change-password', {
-          old_pass: this.form.old_pass,
-          new_pass: this.form.new_pass
+        await this.$axios.$post('/users/change-password', {
+          oldPassword: this.form.old_pass,
+          newPassword: this.form.new_pass
         })
           .then(async res => {
             if (!res.success) {
@@ -141,8 +141,8 @@ export default {
             }
           })
       } else {
-        await this.$axios.$post('/auth/ext-change-password', {
-          new_pass: this.form.new_pass,
+        await this.$axios.$post('/users/ext-change-password', {
+          newPassword: this.form.new_pass,
           token: this.$route.query.token,
           userId: this.$route.query.userId,
         })
