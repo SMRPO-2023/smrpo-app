@@ -25,9 +25,8 @@
                   :state="getValidationState(v)"
                   aria-describedby="input-1-live-feedback"
                 />
-                <b-form-invalid-feedback id="input-1-live-feedback">{{
-                    v.errors[0]
-                  }}
+                <b-form-invalid-feedback id="input-1-live-feedback"
+                  >{{ v.errors[0] }}
                 </b-form-invalid-feedback>
               </b-form-group>
             </ValidationProvider>
@@ -50,14 +49,17 @@
                   :state="getValidationState(v)"
                   aria-describedby="input-2-live-feedback"
                 />
-                <b-form-invalid-feedback id="input-2-live-feedback">{{
-                    v.errors[0]
-                  }}
+                <b-form-invalid-feedback id="input-2-live-feedback"
+                  >{{ v.errors[0] }}
                 </b-form-invalid-feedback>
               </b-form-group>
             </ValidationProvider>
 
-            <ValidationProvider name="elektronski naslov" :rules="{ required: true, email: true }" v-slot="v">
+            <ValidationProvider
+              name="elektronski naslov"
+              :rules="{ required: true, email: true }"
+              v-slot="v"
+            >
               <b-form-group
                 id="input-group-3"
                 label="Elektronski naslov"
@@ -71,14 +73,18 @@
                   :state="getValidationState(v)"
                   aria-describedby="input-3-live-feedback"
                 />
-                <b-form-invalid-feedback id="input-3-live-feedback">{{
-                    v.errors[0]
-                  }}
+                <b-form-invalid-feedback id="input-3-live-feedback"
+                  >{{ v.errors[0] }}
                 </b-form-invalid-feedback>
               </b-form-group>
             </ValidationProvider>
 
-            <ValidationProvider name="geslo" :rules="{ required: true }" v-slot="v" vid="password">
+            <ValidationProvider
+              name="geslo"
+              :rules="{ required: true, min: 12, max: 128 }"
+              v-slot="v"
+              vid="password"
+            >
               <b-form-group
                 id="input-group-4"
                 label="Geslo"
@@ -92,14 +98,22 @@
                   :state="getValidationState(v)"
                   aria-describedby="input-4-live-feedback"
                 />
-                <b-form-invalid-feedback id="input-4-live-feedback">{{
-                    v.errors[0]
-                  }}
+                <b-form-invalid-feedback id="input-4-live-feedback"
+                  >{{ v.errors[0] }}
                 </b-form-invalid-feedback>
               </b-form-group>
             </ValidationProvider>
 
-            <ValidationProvider name="potrditev gesla" :rules="{required: true, confirmed: 'password'}" v-slot="v">
+            <ValidationProvider
+              name="potrditev gesla"
+              :rules="{
+                required: true,
+                confirmed: 'password',
+                min: 12,
+                max: 128,
+              }"
+              v-slot="v"
+            >
               <b-form-group
                 id="input-group-5"
                 label="Ponovi geslo"
@@ -113,9 +127,8 @@
                   :state="getValidationState(v)"
                   aria-describedby="input-5-live-feedback"
                 />
-                <b-form-invalid-feedback id="input-5-live-feedback">{{
-                    v.errors[0]
-                  }}
+                <b-form-invalid-feedback id="input-5-live-feedback"
+                  >{{ v.errors[0] }}
                 </b-form-invalid-feedback>
               </b-form-group>
             </ValidationProvider>
@@ -126,7 +139,9 @@
             </ul>
 
             <div class="text-center">
-              <b-button type="submit" variant="primary" class="w-50 mt-3">Vpiši se</b-button>
+              <b-button type="submit" variant="primary" class="w-50 mt-3"
+                >Vpiši se</b-button
+              >
             </div>
           </b-form>
         </ValidationObserver>
@@ -151,44 +166,45 @@ export default {
         password: null,
         passwordRepeat: null,
       },
-    }
+    };
   },
   methods: {
     ...mapMutations(["user/setUser", "user/setToken"]),
     ...mapActions(["user/fetchUser", "user/unsetUser"]),
 
-    getValidationState({dirty, validated, valid = null}) {
+    getValidationState({ dirty, validated, valid = null }) {
       return dirty || validated ? valid : null;
     },
     async onSubmit() {
-      await this.$axios.$post('/auth/signup', {
-        firstname: this.form.firstname,
-        lastname: this.form.lastname,
-        email: this.form.email,
-        password: this.form.password
-      })
-      .then(async res => {
-        localStorage.setItem('jwt', res?.accessToken)
-        localStorage.setItem('userId', res?.userId)
-        await this.$store.commit('user/setToken', res?.accessToken)
-        await this.$store.dispatch('user/fetchUser', res?.userId)
-        await this.$router.replace({ path: '/registration/success'})
-      })
-      .catch(error => {
-        const status = error?.response?.status;
-        const data = error?.response?.data;
-        // some instances of errors return main message along with array of detailed shorter messages
-        if (status && status === 400) {
-          if (data && data.message instanceof Array) {
-            this.responseErrors = data.message;
+      await this.$axios
+        .$post("/auth/signup", {
+          firstname: this.form.firstname,
+          lastname: this.form.lastname,
+          email: this.form.email,
+          password: this.form.password,
+        })
+        .then(async (res) => {
+          localStorage.setItem("jwt", res?.accessToken);
+          localStorage.setItem("userId", res?.userId);
+          await this.$store.commit("user/setToken", res?.accessToken);
+          await this.$store.dispatch("user/fetchUser", res?.userId);
+          await this.$router.replace({ path: "/registration/success" });
+        })
+        .catch((error) => {
+          const status = error?.response?.status;
+          const data = error?.response?.data;
+          // some instances of errors return main message along with array of detailed shorter messages
+          if (status && status === 400) {
+            if (data && data.message instanceof Array) {
+              this.responseErrors = data.message;
+            }
+            this.error = "Napačni podatki za registracijo";
+          } else {
+            this.error = data?.message;
           }
-          this.error = "Napačni podatki za registracijo"
-        } else {
           this.error = data?.message;
-        }
-        this.error = data?.message;
-        this.$toast.error("Napaka pri registraciji", { duration: 3000 })
-      })
+          this.$toast.error("Napaka pri registraciji", { duration: 3000 });
+        });
     },
     async onReset() {
       this.form = {
@@ -199,10 +215,8 @@ export default {
         passwordRepeat: null,
       };
     },
-  }
-}
+  },
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
