@@ -51,6 +51,7 @@
 <script>
 import roles from "@/mixins/roles";
 import { BIcon } from 'bootstrap-vue'
+import { mapGetters } from "vuex";
 
 export default {
   name: "users",
@@ -66,6 +67,11 @@ export default {
   async created() {
     await this.getUsers();
   },
+  computed: {
+    ...mapGetters({
+      currentUser: 'user/getUser',
+    })
+  },
   methods: {
     async getUsers() {
       this.$axios.$get('admin/users')
@@ -80,6 +86,9 @@ export default {
     updateRole(user, role) {
       this.$axios.$put(`admin/users/${user.id}/role`, { role: role.value })
         .then(res => {
+          if (this.isSelf(user)) {
+            this.logout();
+          }
           for (const user of this.users) {
             if (user.id === res.id) {
               user.role = res.role
@@ -108,12 +117,25 @@ export default {
 
       this.$axios.$delete(`admin/users/${user.id}`)
       .then(res => {
-          this.users = this.users.filter(u => u.id !== user.id)
+        if (this.isSelf(user)) {
+          this.logout();
+        }
+        this.users = this.users.filter(u => u.id !== user.id)
       })
       .catch(reason => {
         console.error(reason)
         this.$toast.error('Napaka pri brisanju uporabnika', { duration: 3000 });
       })
+    },
+    isSelf(updatedUser) {
+      if (!this.currentUser || !updatedUser) return false;
+      return this.currentUser.username === updatedUser.username;
+    },
+    async logout() {
+      localStorage.removeItem('jwt');
+      localStorage.removeItem('userId');
+      await this.$store.dispatch('user/unsetUser');
+      await this.$router.replace('/login')
     }
   }
 }

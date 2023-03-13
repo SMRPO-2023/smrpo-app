@@ -20,7 +20,18 @@
               </b-form-group>
             </ValidationProvider>
 
-            <ValidationProvider name="ime" :rules="{ required: true, min: 1 }" v-slot="v">
+            <ValidationProvider name="username" :rules="{ required: true, min: 3 }" v-slot="v">
+              <b-form-group label="Uporabniško ime" label-for="username">
+                <b-form-input type="text" id="username" placeholder="Vnesi uporabniško ime" v-model="form.username"
+                  :state="getValidationState(v)" aria-describedby="input-1_1-live-feedback" />
+                <b-form-invalid-feedback id="input-1_1-live-feedback">{{
+                  v.errors[0]
+                }}
+                </b-form-invalid-feedback>
+              </b-form-group>
+            </ValidationProvider>
+
+            <ValidationProvider name="ime" v-slot="v">
               <b-form-group label="Ime" label-for="firstname">
                 <b-form-input type="text" id="firstname" placeholder="Vnesi ime" v-model="form.firstname"
                   :state="getValidationState(v)" aria-describedby="input-2-live-feedback" />
@@ -31,7 +42,7 @@
               </b-form-group>
             </ValidationProvider>
 
-            <ValidationProvider name="priimek" :rules="{ required: true, min: 1 }" v-slot="v">
+            <ValidationProvider name="priimek" v-slot="v">
               <b-form-group label="Priimek" label-for="lastname">
                 <b-form-input type="text" id="lastname" placeholder="Vnesi priimek" v-model="form.lastname"
                   :state="getValidationState(v)" aria-describedby="input-3-live-feedback" />
@@ -114,6 +125,7 @@ export default {
       user: null,
       form: {
         role: null,
+        username: null,
         firstname: null,
         lastname: null,
         email: null,
@@ -152,6 +164,7 @@ export default {
 
         this.form.role = res.role;
         this.form.email = res.email;
+        this.form.username = res.username;
         this.form.firstname = res.firstname;
         this.form.lastname = res.lastname;
       })
@@ -166,6 +179,7 @@ export default {
     },
     async onSubmit() {
       await this.$axios.$put(`admin/users/${this.user.id}`, {
+        username: this.form.username,
         firstname: this.form.firstname,
         lastname: this.form.lastname,
         email: this.form.email,

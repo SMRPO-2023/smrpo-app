@@ -9,7 +9,7 @@ const unprotectedPaths = [
 ]
 
 const adminOnlyPaths = [
-  '/users',
+  '/admin', // match any admin route
 ]
 
 export default function (context) {
