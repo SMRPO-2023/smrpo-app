@@ -24,7 +24,7 @@
           <tbody>
             <tr v-for="project of projects" :key="project.id">
               <td>
-                <nuxt-link :to="{ path: `project/${project.id}` }">{{
+                <nuxt-link :to="{ path: `projects/${project.id}` }">{{
                   project.title
                 }}</nuxt-link>
               </td>
