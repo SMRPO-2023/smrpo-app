@@ -4,28 +4,28 @@ export default {
       roles: [
         {
           text: "Administrator",
-          value: "ADMIN"
+          value: "ADMIN",
         },
         {
-          text: "Uporabnik",
-          value: "USER"
+          text: "User",
+          value: "USER",
         },
       ],
-    }
+    };
   },
   methods: {
     getVariantForRole(role) {
-      switch(role) {
-        case 'ADMIN':
-          return 'warning'
-        case 'USER':
-          return 'info'
+      switch (role) {
+        case "ADMIN":
+          return "warning";
+        case "USER":
+          return "info";
         default:
-          return 'light'
+          return "light";
       }
     },
     getNameForRole(role) {
-      return this.roles.find(r => r.value === role).text
+      return this.roles.find((r) => r.value === role).text;
     },
-  }
-}
+  },
+};

@@ -6,19 +6,19 @@
           class="d-flex flex-column flex-nowrap justify-content-center align-content-center h-100 loginContainer"
         >
           <div class="text-center p-4">
-            <h1>Prijava</h1>
+            <h1>Login</h1>
           </div>
           <ValidationObserver ref="observer" v-slot="{ handleSubmit }">
             <b-form @submit.stop.prevent="handleSubmit(onSubmit)">
               <ValidationProvider
-                name="elektronski naslov"
+                name="email address"
                 :rules="{ required: true }"
                 v-slot="v"
               >
                 <b-input
                   type="text"
                   id="email"
-                  placeholder="Elektronski naslov"
+                  placeholder="Email address"
                   v-model="form.email"
                   :state="getValidationState(v)"
                   aria-describedby="input-3-live-feedback"
@@ -29,7 +29,7 @@
               </ValidationProvider>
               <br />
               <ValidationProvider
-                name="geslo"
+                name="password"
                 :rules="{ required: true }"
                 v-slot="v"
                 vid="password"
@@ -37,7 +37,7 @@
                 <b-input
                   :type="passwordType"
                   id="password"
-                  placeholder="Geslo"
+                  placeholder="Password"
                   v-model="form.password"
                   :state="getValidationState(v)"
                   aria-describedby="input-4-live-feedback"
@@ -56,24 +56,24 @@
                 value="text"
                 unchecked-value="password"
               >
-                Pokaži geslo
+                Show password
               </b-form-checkbox>
 
               <div class="text-center mt-4">
                 <b-button type="submit" variant="success" class="w-50">
                   <b-spinner v-if="loading" small></b-spinner>
-                  Prijava
+                  Submit
                 </b-button>
               </div>
             </b-form>
           </ValidationObserver>
 
-<!--          <div class="text-center mt-4">-->
-<!--            <nuxt-link to="/registration">Nimaš računa?</nuxt-link>-->
-<!--          </div>-->
-<!--          <div class="text-center mt-4">-->
-<!--            <nuxt-link to="/forgotten-password">Pozabljeno geslo?</nuxt-link>-->
-<!--          </div>-->
+          <!--          <div class="text-center mt-4">-->
+          <!--            <nuxt-link to="/registration">Nimaš računa?</nuxt-link>-->
+          <!--          </div>-->
+          <!--          <div class="text-center mt-4">-->
+          <!--            <nuxt-link to="/forgotten-password">Pozabljeno geslo?</nuxt-link>-->
+          <!--          </div>-->
         </div>
       </b-col>
     </b-row>
@@ -117,8 +117,8 @@ export default {
         })
         .catch((reason) => {
           console.error(reason);
-          this.error = "Napačni prijavni podatki";
-          this.$toast.error("Napaka pri prijavi", { duration: 3000 });
+          this.error = "Wrong login information";
+          this.$toast.error("Wrong login information", { duration: 3000 });
         });
 
       this.loading = false;

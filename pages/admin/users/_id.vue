@@ -2,90 +2,150 @@
   <b-container fluid>
     <b-row>
       <b-col offset-lg="2" lg="8" cols="12" class="my-3">
-        <h1>Uredi uporabnika</h1>
+        <h1>Edit user</h1>
 
         <ValidationObserver ref="observer" v-slot="{ handleSubmit }">
           <b-form @submit.stop.prevent="handleSubmit(onSubmit)" class="mt-4">
-
-            <ValidationProvider name="role" :rules="{ required: true }" v-slot="v">
-              <b-form-group label="Sistemske pravice" label-for="role">
-                <b-form-select id="role" v-model="form.role" :options="roles"
-                  :state="getValidationState(v)" aria-describedby="input-1-live-feedback"></b-form-select>
-                <b-form-invalid-feedback id="input-1-live-feedback">{{
-                  v.errors[0]
-                }}
+            <ValidationProvider
+              name="System role"
+              :rules="{ required: true }"
+              v-slot="v"
+            >
+              <b-form-group label="System role" label-for="role">
+                <b-form-select
+                  id="role"
+                  v-model="form.role"
+                  :options="roles"
+                  :state="getValidationState(v)"
+                  aria-describedby="input-1-live-feedback"
+                ></b-form-select>
+                <b-form-invalid-feedback id="input-1-live-feedback"
+                  >{{ v.errors[0] }}
                 </b-form-invalid-feedback>
               </b-form-group>
             </ValidationProvider>
 
-            <ValidationProvider name="username" :rules="{ required: true, min: 3 }" v-slot="v">
-              <b-form-group label="Uporabniško ime" label-for="username">
-                <b-form-input type="text" id="username" placeholder="Vnesi uporabniško ime" v-model="form.username"
-                  :state="getValidationState(v)" aria-describedby="input-1_1-live-feedback" />
-                <b-form-invalid-feedback id="input-1_1-live-feedback">{{
-                  v.errors[0]
-                }}
+            <ValidationProvider
+              name="username"
+              :rules="{ required: true, min: 3 }"
+              v-slot="v"
+            >
+              <b-form-group label="Username" label-for="username">
+                <b-form-input
+                  type="text"
+                  id="username"
+                  placeholder="Enter username"
+                  v-model="form.username"
+                  :state="getValidationState(v)"
+                  aria-describedby="input-1_1-live-feedback"
+                />
+                <b-form-invalid-feedback id="input-1_1-live-feedback"
+                  >{{ v.errors[0] }}
                 </b-form-invalid-feedback>
               </b-form-group>
             </ValidationProvider>
 
-            <ValidationProvider name="ime" :rules="{ alpha: true }" v-slot="v">
-              <b-form-group label="Ime" label-for="firstname">
-                <b-form-input type="text" id="firstname" placeholder="Vnesi ime" v-model="form.firstname"
-                  :state="getValidationState(v)" aria-describedby="input-2-live-feedback" />
-                <b-form-invalid-feedback id="input-2-live-feedback">{{
-                  v.errors[0]
-                }}
+            <ValidationProvider
+              name="first name"
+              :rules="{ alpha: true }"
+              v-slot="v"
+            >
+              <b-form-group label="First name" label-for="firstname">
+                <b-form-input
+                  type="text"
+                  id="firstname"
+                  placeholder="Enter firstname"
+                  v-model="form.firstname"
+                  :state="getValidationState(v)"
+                  aria-describedby="input-2-live-feedback"
+                />
+                <b-form-invalid-feedback id="input-2-live-feedback"
+                  >{{ v.errors[0] }}
                 </b-form-invalid-feedback>
               </b-form-group>
             </ValidationProvider>
 
-            <ValidationProvider name="priimek" :rules="{ alpha: true }" v-slot="v">
-              <b-form-group label="Priimek" label-for="lastname">
-                <b-form-input type="text" id="lastname" placeholder="Vnesi priimek" v-model="form.lastname"
-                  :state="getValidationState(v)" aria-describedby="input-3-live-feedback" />
-                <b-form-invalid-feedback id="input-3-live-feedback">{{
-                  v.errors[0]
-                }}
+            <ValidationProvider
+              name="lastname"
+              :rules="{ alpha: true }"
+              v-slot="v"
+            >
+              <b-form-group label="Lastname" label-for="lastname">
+                <b-form-input
+                  type="text"
+                  id="lastname"
+                  placeholder="Enter lastname"
+                  v-model="form.lastname"
+                  :state="getValidationState(v)"
+                  aria-describedby="input-3-live-feedback"
+                />
+                <b-form-invalid-feedback id="input-3-live-feedback"
+                  >{{ v.errors[0] }}
                 </b-form-invalid-feedback>
               </b-form-group>
             </ValidationProvider>
 
-            <ValidationProvider name="elektronski naslov" :rules="{ required: true, email: true }" v-slot="v">
-              <b-form-group label="Elektronski naslov" label-for="email">
-                <b-form-input type="text" id="email" placeholder="Elektronski naslov" v-model="form.email"
-                  :state="getValidationState(v)" aria-describedby="input-4-live-feedback" />
-                <b-form-invalid-feedback id="input-4-live-feedback">{{
-                  v.errors[0]
-                }}
+            <ValidationProvider
+              name="Email address"
+              :rules="{ required: true, email: true }"
+              v-slot="v"
+            >
+              <b-form-group label="Email address" label-for="email">
+                <b-form-input
+                  type="text"
+                  id="email"
+                  placeholder="Email address"
+                  v-model="form.email"
+                  :state="getValidationState(v)"
+                  aria-describedby="input-4-live-feedback"
+                />
+                <b-form-invalid-feedback id="input-4-live-feedback"
+                  >{{ v.errors[0] }}
                 </b-form-invalid-feedback>
               </b-form-group>
             </ValidationProvider>
 
-            <div v-b-toggle.collapse-password class="mt-4 d-flex align-items-baseline">
-              <h4>Posodobi geslo</h4>
+            <div
+              v-b-toggle.collapse-password
+              class="mt-4 d-flex align-items-baseline"
+            >
+              <h4>Change password</h4>
               <b-icon icon="caret-down-fill" class="ml-2"></b-icon>
             </div>
 
             <b-collapse id="collapse-password">
-              <ValidationProvider name="geslo" v-slot="v" vid="password">
-                <b-form-group label="Geslo" label-for="password">
-                  <b-form-input :type="passwordType" id="password" placeholder="Geslo" v-model="form.password"
-                    :state="getValidationState(v)" aria-describedby="input-5-live-feedback" />
-                  <b-form-invalid-feedback id="input-5-live-feedback">{{
-                    v.errors[0]
-                  }}
+              <ValidationProvider name="password" v-slot="v" vid="password">
+                <b-form-group label="Password" label-for="password">
+                  <b-form-input
+                    :type="passwordType"
+                    id="password"
+                    placeholder="Password"
+                    v-model="form.password"
+                    :state="getValidationState(v)"
+                    aria-describedby="input-5-live-feedback"
+                  />
+                  <b-form-invalid-feedback id="input-5-live-feedback"
+                    >{{ v.errors[0] }}
                   </b-form-invalid-feedback>
                 </b-form-group>
               </ValidationProvider>
 
-              <ValidationProvider name="potrditev gesla" :rules="{ confirmed: 'password' }" v-slot="v">
-                <b-form-group label="Ponovi geslo" label-for="pass_repeat">
-                  <b-form-input :type="passwordType" id="pass_repeat" placeholder="Geslo" v-model="form.passwordRepeat"
-                    :state="getValidationState(v)" aria-describedby="input-6-live-feedback" />
-                  <b-form-invalid-feedback id="input-6-live-feedback">{{
-                    v.errors[0]
-                  }}
+              <ValidationProvider
+                name="repeat password"
+                :rules="{ confirmed: 'password' }"
+                v-slot="v"
+              >
+                <b-form-group label="Repeat password" label-for="pass_repeat">
+                  <b-form-input
+                    :type="passwordType"
+                    id="pass_repeat"
+                    placeholder="Repeat password"
+                    v-model="form.passwordRepeat"
+                    :state="getValidationState(v)"
+                    aria-describedby="input-6-live-feedback"
+                  />
+                  <b-form-invalid-feedback id="input-6-live-feedback"
+                    >{{ v.errors[0] }}
                   </b-form-invalid-feedback>
                 </b-form-group>
               </ValidationProvider>
@@ -97,7 +157,7 @@
                 value="text"
                 unchecked-value="password"
               >
-                Pokaži geslo
+                Show password
               </b-form-checkbox>
             </b-collapse>
 
@@ -107,21 +167,22 @@
             </ul>
 
             <div class="text-center">
-              <b-button type="submit" variant="primary" class="w-50 mt-3">Shrani</b-button>
+              <b-button type="submit" variant="primary" class="w-50 mt-3"
+                >Save</b-button
+              >
             </div>
-
           </b-form>
         </ValidationObserver>
       </b-col>
     </b-row>
   </b-container>
 </template>
-  
+
 <script>
-import { BIcon } from 'bootstrap-vue'
+import { BIcon } from "bootstrap-vue";
 
 export default {
-  name: 'edit-user',
+  name: "edit-user",
   components: {
     BIcon,
   },
@@ -142,18 +203,19 @@ export default {
         passwordRepeat: null,
       },
       roles: [
-        { value: null, text: 'Izberite sistemske pravice' },
-        { value: 'USER', text: 'Navadni uporabnik' },
-        { value: 'ADMIN', text: 'Administrator' },
+        { value: null, text: "Choose system role" },
+        { value: "USER", text: "User" },
+        { value: "ADMIN", text: "Administrator" },
       ],
-    }
+    };
   },
   async mounted() {
     this.id = this.$route.params.id;
     if (!this.id) return;
 
-    this.$axios.$get(`admin/users/${this.id}`)
-      .then(res => {
+    this.$axios
+      .$get(`admin/users/${this.id}`)
+      .then((res) => {
         this.user = res;
         if (!res) return;
 
@@ -163,50 +225,60 @@ export default {
         this.form.firstname = res.firstname;
         this.form.lastname = res.lastname;
       })
-      .catch(reason => {
-        console.error(reason)
-        this.$toast.error('Napaka pri pridobivanju uporabnika', { duration: 3000 });
-      })
+      .catch((reason) => {
+        console.error(reason);
+        this.$toast.error(
+          "An error has occurred, while getting user informaiton",
+          {
+            duration: 3000,
+          }
+        );
+      });
   },
   methods: {
     getValidationState({ dirty, validated, valid = null }) {
       return dirty || validated ? valid : null;
     },
     async onSubmit() {
-      await this.$axios.$put(`admin/users/${this.user.id}`, {
-        username: this.form.username,
-        firstname: this.form.firstname,
-        lastname: this.form.lastname,
-        email: this.form.email,
-        password: this.form.password,
-        role: this.form.role
-      })
-      .then(res => {
-        this.error = null;
-        this.responseErrors = [];
-        this.$toast.success("Uporabnik uspešno posodobljen", { duration: 3000 })
-      })
-      .catch(error => {
-        const status = error?.response?.status;
-        const data = error?.response?.data;
-        // some instances of errors return main message along with array of detailed shorter messages
-        if (status && status === 400) {
-          if (data && data.message instanceof Array) {
-            this.responseErrors = data.message;
-            this.error = "Napaka pri posodabljanju uporabnika"
+      await this.$axios
+        .$put(`admin/users/${this.user.id}`, {
+          username: this.form.username,
+          firstname: this.form.firstname,
+          lastname: this.form.lastname,
+          email: this.form.email,
+          password: this.form.password,
+          role: this.form.role,
+        })
+        .then((res) => {
+          this.error = null;
+          this.responseErrors = [];
+          this.$toast.success("User information successfully updated", {
+            duration: 3000,
+          });
+        })
+        .catch((error) => {
+          const status = error?.response?.status;
+          const data = error?.response?.data;
+          // some instances of errors return main message along with array of detailed shorter messages
+          if (status && status === 400) {
+            if (data && data.message instanceof Array) {
+              this.responseErrors = data.message;
+              this.error = "An error has occurred, while updating user";
+            } else {
+              this.responseErrors = [];
+              this.error = data.message;
+            }
           } else {
             this.responseErrors = [];
-            this.error = data.message;
+            this.error = data?.message;
           }
-        } else {
-          this.responseErrors = [];
-          this.error = data?.message;
-        }
-        this.$toast.error("Napaka pri posodabljanju uporabnika", { duration: 3000 })
-      })
-    }
+          this.$toast.error("An error has occurred, while updating user", {
+            duration: 3000,
+          });
+        });
+    },
   },
-}
+};
 </script>
 
 <style scoped></style>
