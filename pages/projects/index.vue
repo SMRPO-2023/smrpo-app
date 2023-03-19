@@ -18,6 +18,7 @@
               <th scope="col">Documentation</th>
               <th scope="col">Project owner</th>
               <th scope="col">Scrum master</th>
+              <th scope="col">Users</th>
               <th scope="col"></th>
             </tr>
           </thead>
@@ -30,11 +31,25 @@
               </td>
               <td>{{ project.documentation }}</td>
               <td>
-                <!--<tr v-for="developer of developers" :key="developer.id">
-                  <td v-if="developer">{{ developer }}</td>
-                </tr>-->
+                <span v-if="getUserById(project.projectOwnerId)">{{
+                  getUserById(project.projectOwnerId).username
+                }}</span>
               </td>
-              <td></td>
+              <td>
+                <span v-if="getUserById(project.scrumMasterId)">{{
+                  getUserById(project.scrumMasterId).username
+                }}</span>
+              </td>
+              <td>
+                <tr
+                  v-for="projectUsers of getProjectDevelopers(project.id)"
+                  :key="projectUsers.id"
+                >
+                  {{
+                    projectUsers.username
+                  }}
+                </tr>
+              </td>
               <td>
                 <b-icon
                   icon="x-lg"
@@ -60,11 +75,13 @@ export default {
   },
   data() {
     return {
+      users: [],
       projects: [],
-      developers: [],
+      projectDevelopers: [],
     };
   },
   async created() {
+    await this.getUsers();
     await this.getProjects();
   },
   methods: {
@@ -73,16 +90,29 @@ export default {
         .$get("/project")
         .then((res) => {
           this.projects = res;
-          //this.projects.forEach((project) => this.getDevelopers(project.id));
+          this.projects.forEach((project) => this.getDeveloper(project.id));
         })
         .catch((reason) => {
           console.error(reason);
-          this.$toast.error("An error has occurred, while getting users.", {
+          this.$toast.error("An error has occurred, while getting projects.", {
             duration: 3000,
           });
         });
     },
-    getDevelopers: function (id) {
+    async getUsers() {
+      this.$axios
+        .$get("admin/users")
+        .then((res) => {
+          this.users = res;
+        })
+        .catch((reason) => {
+          console.error(reason);
+          this.$toast.error("An error has occurred, while getting users", {
+            duration: 3000,
+          });
+        });
+    },
+    getDeveloper: function (id) {
       this.$axios
         .$get(`/project-developers`, {
           params: {
@@ -91,19 +121,46 @@ export default {
         })
         .then((res) => {
           if (Object.keys(res).length !== 0) {
-            developers = [];
-            res.forEach((developer) => developers.push(developer.id));
-            this.developers.push(this.developers);
+            //this.developers = [];
+            //res.forEach((developer) => developers.push(developer.id));
+            this.projectDevelopers.push(res);
           } else {
-            this.developers.push("");
+            this.projectDevelopers.push("");
           }
         })
         .catch((reason) => {
           console.error(reason);
-          this.$toast.error("An error has occurred, while getting projects.", {
-            duration: 3000,
-          });
+          this.$toast.error(
+            "An error has occurred, while getting developers.",
+            {
+              duration: 3000,
+            }
+          );
         });
+    },
+    getProjectDevelopers: function (projectId) {
+      this.projectDeveloperObjects = [];
+      this.projectDevelopers.forEach((project) => {
+        if (project != "") {
+          project.forEach((user) => {
+            if (user.projectId == projectId) {
+              this.projectDeveloperObjects.push(this.getUserById(user.userId));
+            }
+          });
+        }
+      });
+      console.log(this.projectDeveloperObjects);
+      return this.projectDeveloperObjects;
+    },
+    getUserById: function (id) {
+      this.foundUser = null;
+      this.users.forEach((user) => {
+        if (user.id == id) {
+          this.foundUser = user;
+        }
+      });
+
+      return this.foundUser;
     },
     async deleteProject(project) {
       let confirmed = false;
