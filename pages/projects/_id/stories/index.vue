@@ -6,7 +6,7 @@
           <h1 class="mb-0">Stories</h1>
           <b-button
             variant="primary"
-            href="projects/create"
+            href="stories/create"
             class="d-flex flex-column justify-content-center"
             >Create</b-button
           >
@@ -29,15 +29,15 @@
                   #{{ story.id }} - {{ story.title }}
                 </nuxt-link>
               </td>
-              <td>{{ story.description }}</td>
+              <td>{{ story.description | limit(100) }}</td>
               <td>
                 <b-dropdown
-                  v-if="canChange(story)"
                   id="dropdown-right"
                   size="sm"
                   right
                   :text="getNameForPriority(story.priority)"
                   :variant="getVariantForPriority(story.priority)"
+                  :disabled="!canChange(story)"
                 >
                   <b-dropdown-item
                     v-for="priority of priorities"
@@ -48,14 +48,11 @@
                     {{ priority.text }}
                   </b-dropdown-item>
                 </b-dropdown>
-                <b-badge v-else :variant="getVariantForPriority(story.priority)">
-                  {{ getNameForPriority(story.priority) }}
-                </b-badge>
               </td>
               <td>
-                <b-badge :variant="getVariantForImplemented(story.implemented)">
+                <b-button size="sm" :variant="getVariantForImplemented(story.implemented)" disabled>
                   {{ getNameForImplemented(story.implemented) }}
-                </b-badge>
+                </b-button>
               </td>
               <td>
                 <nuxt-link 
@@ -104,7 +101,7 @@ export default {
       sprints: [],
     };
   },
-  async created() {
+  created() {
     this.getProject();
   },
   methods: {
