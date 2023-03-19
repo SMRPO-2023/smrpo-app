@@ -24,6 +24,8 @@
           </template>
           <b-dropdown-item :to="`/profile`">Profile</b-dropdown-item>
           <b-dropdown-item @click="logout">Logout</b-dropdown-item>
+          <b-dropdown-divider v-if="user.lastLogin"></b-dropdown-divider>
+          <b-dropdown-text v-if="user.lastLogin" style="width: 240px;"><small>Last login: <b>{{ formatDateTime(user.lastLogin) }}</b></small></b-dropdown-text>
         </b-nav-item-dropdown>
       </b-navbar-nav>
     </b-collapse>
@@ -31,10 +33,12 @@
 </template>
 
 <script>
+import datetime from "@/mixins/datetime";
 import { mapActions, mapGetters } from "vuex";
 
 export default {
   name: "navbar",
+  mixins: [datetime],
   async mounted() {
     const userId = localStorage.getItem("userId");
     const accessToken = localStorage.getItem("jwt");

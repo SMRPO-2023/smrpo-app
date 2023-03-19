@@ -47,7 +47,7 @@
 
             <ValidationProvider
               name="firstname"
-              :rules="{ alpha: true }"
+              :rules="{ alpha_spaces: true }"
               v-slot="v"
             >
               <b-form-group label="Firstname" label-for="firstname">
@@ -67,7 +67,7 @@
 
             <ValidationProvider
               name="lastname"
-              :rules="{ alpha: true }"
+              :rules="{ alpha_spaces: true }"
               v-slot="v"
             >
               <b-form-group label="Lastname" label-for="lastname">
