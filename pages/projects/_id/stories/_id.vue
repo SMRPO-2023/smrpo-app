@@ -2,7 +2,7 @@
   <b-container fluid>
     <b-row>
       <b-col offset-lg="2" lg="8" cols="12" class="my-3">
-        <h1>New user story</h1>
+        <h1>Edit user story</h1>
 
         <ValidationObserver ref="observer" v-slot="{ handleSubmit }">
           <b-form @submit.stop.prevent="handleSubmit(onSubmit)" class="mt-4">
@@ -146,7 +146,7 @@
 
             <div class="text-center">
               <b-button type="submit" variant="primary" class="w-50 mt-3"
-                >Create</b-button
+                >Save</b-button
               >
             </div>
           </b-form>
@@ -161,7 +161,7 @@ import { mapGetters } from "vuex";
 import priorities from "@/mixins/priorities";
 
 export default {
-  name: "create-user-story",
+  name: "edit-user-story",
   mixins: [priorities],
   computed: {
     ...mapGetters({
@@ -170,6 +170,7 @@ export default {
   },
   data() {
     return {
+      id: null,
       error: null,
       responseErrors: [],
       sprintsOptions: [{ value: null, text: "Choose sprint" }],
@@ -189,17 +190,33 @@ export default {
     this.getSprints();
   },
   mounted() {
-    this.prioritiesOptions = this.prioritiesOptions.concat(this.priorities)
+    this.id = +this.$route.params.id;
+    this.prioritiesOptions = this.prioritiesOptions.concat(this.priorities);
+    this.getUserStory();
   },
   methods: {
     getValidationState({ dirty, validated, valid = null }) {
       return dirty || validated ? valid : null;
     },
     async onSubmit() {
-      if (!this.projectId) return;
+      let confirmed = false;
+      try {
+        confirmed = await this.$bvModal.msgBoxConfirm(
+          "Are you sure you want to update this user story?",
+          {
+            title: "Update",
+            cancelTitle: "Cancel",
+            okTitle: "Confirm",
+          }
+        );
+      } catch (error) {
+        console.error(error);
+      }
+
+      if (!confirmed || !this.projectId || !this.id) return;
 
       await this.$axios
-        .$post("user-stories", {
+        .$patch(`user-stories/${this.id}`, {
           title: this.form.title,
           description: this.form.description,
           priority: this.form.priority,
@@ -210,7 +227,11 @@ export default {
           projectId: this.projectId
         })
         .then(async (res) => {
-          await this.$router.replace(`/projects/${this.projectId}/stories`);
+          this.error = null;
+          this.responseErrors = [];
+          this.$toast.success("User story successfully updated", {
+            duration: 3000,
+          });
         })
         .catch((error) => {
           const status = error?.response?.status;
@@ -219,12 +240,16 @@ export default {
           if (status && status === 400) {
             if (data && data.message instanceof Array) {
               this.responseErrors = data.message;
+              this.error = "An error has occurred, while updating the user story";
+            } else {
+              this.responseErrors = [];
+              this.error = data.message;
             }
-            this.error = "Wrong input, while creating user story";
           } else {
+            this.responseErrors = [];
             this.error = data?.message;
           }
-          this.$toast.error("An error has occurred, while creating user story", {
+          this.$toast.error("An error has occurred, while updating the user story", {
             duration: 3000,
           });
         });
@@ -238,6 +263,33 @@ export default {
         if (!res) return;
         const sprints = res.sprints.map(s => ({value: s.id, text: s.name}));
         this.sprintsOptions = this.sprintsOptions.concat(sprints);
+      });
+    },
+    async getUserStory() {
+      if (!this.projectId || !this.id) return;
+
+      await this.$axios
+      .$get(`user-stories/${this.id}`)
+      .then((res) => {
+        if (!res) return Promise.reject("No data");
+        
+        this.form.title = res.title;
+        this.form.description = res.description;
+        this.form.priority = res.priority;
+        this.form.points = res.points;
+        this.form.implemented = res.implemented;
+        this.form.businessValue = res.businessValue;
+        this.form.sprintId = res.sprintId;
+        this.form.projectId = res.projectId;
+      })
+      .catch((reason) => {
+        console.error(reason);
+        this.$toast.error(
+          "An error has occurred, while getting user story information",
+          {
+            duration: 3000,
+          }
+        );
       });
     },
   },

@@ -25,9 +25,13 @@
           <tbody>
             <tr v-for="story of stories" :key="story.id">
               <td>
-                <nuxt-link :to="{ path: `stories/${story.id}` }">
+                <nuxt-link 
+                  v-if="canChange(story)" 
+                  :to="{ path: `stories/${story.id}` }"
+                >
                   #{{ story.id }} - {{ story.title }}
                 </nuxt-link>
+                <span v-else>#{{ story.id }} - {{ story.title }}</span>
               </td>
               <td>{{ story.description | limit(100) }}</td>
               <td>
@@ -50,7 +54,11 @@
                 </b-dropdown>
               </td>
               <td>
-                <b-button size="sm" :variant="getVariantForImplemented(story.implemented)" disabled>
+                <b-button 
+                  size="sm" 
+                  :variant="getVariantForImplemented(story.implemented)" 
+                  disabled
+                >
                   {{ getNameForImplemented(story.implemented) }}
                 </b-button>
               </td>
@@ -64,6 +72,7 @@
               </td>
               <td>
                 <b-icon
+                  v-if="canChange(story)"
                   icon="x-lg"
                   @click="deleteStory(story)"
                   class="center-and-clickable"
@@ -102,7 +111,7 @@ export default {
     };
   },
   created() {
-    this.getProject();
+    this.getProjectWithData();
   },
   methods: {
     canChange(story) {
@@ -115,7 +124,7 @@ export default {
       if (!sprintId || !this.sprints || !this.sprints.length) return null;
       return this.sprints.find(s => s.id === sprintId)?.name;
     },
-    async getProject() {
+    async getProjectWithData() {
       if (!this.projectId) return;
 
       await this.$axios
@@ -123,7 +132,7 @@ export default {
       .then((res) => {
         if (!res) return;
         this.project = res;
-        this.stories = this.project.UserStory;
+        this.stories = this.project.UserStory.sort((a,b) => this.canChange(b) - this.canChange(a));
         this.sprints = this.project.sprints;
       });
     },
