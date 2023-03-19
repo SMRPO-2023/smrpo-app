@@ -2,10 +2,6 @@ import * as jwt from 'jsonwebtoken';
 
 const unprotectedPaths = [
   '/login',
-  '/registration',
-  '/registration/success',
-  '/forgotten-password',
-  '/change-password',
 ]
 
 const adminOnlyPaths = [

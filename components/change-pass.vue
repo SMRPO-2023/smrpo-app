@@ -1,13 +1,8 @@
 <template>
   <div>
-    <div v-if="success">
-      <span class="d-block mt-3"><b>Password changed successfully</b></span>
-      <span class="d-block mt-3"
-        >Go to <nuxt-link to="login">login page</nuxt-link>.</span
-      >
-    </div>
-    <div v-else>
-      <span class="d-block mt-3"><b>Change password</b></span>
+    <div>
+      <h4>Change password</h4>
+
       <ValidationObserver ref="observer" v-slot="{ handleSubmit }">
         <b-form
           class="w-100 mt-3"
@@ -43,7 +38,7 @@
 
             <ValidationProvider
               name="new password"
-              :rules="{ required: true }"
+              :rules="{ required: true, min: 12, max: 128 }"
               v-slot="v"
               vid="password"
             >
@@ -155,12 +150,9 @@ export default {
             this.error = null;
             this.responseErrors = [];
 
-            if (!res.success) {
-            } else {
-              this.$toast.success("Password changed successfully", {
-                duration: 3000,
-              });
-            }
+            this.$toast.success("Password changed successfully", {
+              duration: 3000,
+            });
           })
           .catch((error) => {
             const status = error?.response?.status;
@@ -193,12 +185,9 @@ export default {
             userId: this.$route.query.userId,
           })
           .then(async (res) => {
-            if (res.success) {
-              this.success = true;
-              this.$toast.success("Password changed successfully", {
-                duration: 3000,
-              });
-            }
+            this.$toast.success("Password changed successfully", {
+              duration: 3000,
+            });
           })
           .catch((error) => {
             const status = error?.response?.status;

@@ -112,6 +112,9 @@ export default {
               return;
             }
           }
+          this.$toast.success("User role successfully updated", {
+            duration: 3000,
+          });
         })
         .catch((reason) => {
           console.error(reason);
@@ -144,6 +147,9 @@ export default {
             this.logout();
           }
           this.users = this.users.filter((u) => u.id !== user.id);
+          this.$toast.success("User successfully removed", {
+            duration: 3000,
+          });
         })
         .catch((reason) => {
           console.error(reason);

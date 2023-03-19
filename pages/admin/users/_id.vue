@@ -46,8 +46,8 @@
             </ValidationProvider>
 
             <ValidationProvider
-              name="first name"
-              :rules="{ alpha: true }"
+              name="firstname"
+              :rules="{ alpha_spaces: true }"
               v-slot="v"
             >
               <b-form-group label="First name" label-for="firstname">
@@ -67,7 +67,7 @@
 
             <ValidationProvider
               name="lastname"
-              :rules="{ alpha: true }"
+              :rules="{ alpha_spaces: true }"
               v-slot="v"
             >
               <b-form-group label="Lastname" label-for="lastname">
@@ -104,17 +104,27 @@
                 </b-form-invalid-feedback>
               </b-form-group>
             </ValidationProvider>
-
+            
             <div
-              v-b-toggle.collapse-password
               class="mt-4 d-flex align-items-baseline"
+              :class="editPassword ? null : 'collapsed'"
+              :aria-expanded="editPassword ? 'true' : 'false'"
+              aria-controls="collapse-password"
+              style="cursor: pointer;"
+              @click="editPassword = !editPassword"
             >
               <h4>Change password</h4>
-              <b-icon icon="caret-down-fill" class="ml-2"></b-icon>
+              <b-icon v-if="!editPassword" icon="caret-down-fill" class="ml-2"></b-icon>
+              <b-icon v-if="editPassword" icon="caret-up-fill" class="ml-2"></b-icon>
             </div>
 
-            <b-collapse id="collapse-password">
-              <ValidationProvider name="password" v-slot="v" vid="password">
+            <b-collapse id="collapse-password" v-model="editPassword">
+              <ValidationProvider 
+                name="password" 
+                :rules="{ required: editPassword, min: 12, max: 128 }" 
+                v-slot="v" 
+                vid="password"
+              >
                 <b-form-group label="Password" label-for="password">
                   <b-form-input
                     :type="passwordType"
@@ -132,7 +142,7 @@
 
               <ValidationProvider
                 name="repeat password"
-                :rules="{ confirmed: 'password' }"
+                :rules="{ required: editPassword, confirmed: 'password' }"
                 v-slot="v"
               >
                 <b-form-group label="Repeat password" label-for="pass_repeat">
@@ -193,6 +203,7 @@ export default {
       responseErrors: [],
       user: null,
       passwordType: "password",
+      editPassword: false,
       form: {
         role: null,
         username: null,
@@ -240,6 +251,22 @@ export default {
       return dirty || validated ? valid : null;
     },
     async onSubmit() {
+      let confirmed = false;
+      try {
+        confirmed = await this.$bvModal.msgBoxConfirm(
+          "Are you sure you want to update this user's information?",
+          {
+            title: "Update",
+            cancelTitle: "Cancel",
+            okTitle: "Confirm",
+          }
+        );
+      } catch (error) {
+        console.error(error);
+      }
+
+      if (!confirmed) return;
+
       await this.$axios
         .$put(`admin/users/${this.user.id}`, {
           username: this.form.username,

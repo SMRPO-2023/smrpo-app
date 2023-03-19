@@ -8,7 +8,7 @@
         <div class="mt-1"><b>Email:</b> {{ user.email }}</div>
         <div class="mt-1"><b>Role</b>: {{ user.role }}</div>
 
-        <ChangePass type="int" class="mt-3" />
+        <change-pass type="int" class="mt-3" />
       </b-col>
     </b-row>
   </b-container>

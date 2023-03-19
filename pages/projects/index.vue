@@ -183,6 +183,9 @@ export default {
         .$delete(`/project/${project.id}`)
         .then((res) => {
           this.projects = this.projects.filter((p) => p.id !== project.id);
+          this.$toast.success("Project successfully removed", {
+            duration: 3000,
+          });
         })
         .catch((reason) => {
           console.error(reason);

@@ -8,7 +8,7 @@
           <b-form @submit.stop.prevent="handleSubmit(onSubmit)" class="mt-4">
             <ValidationProvider
               name="title"
-              :rules="{ alpha: true }"
+              :rules="{ required: true }"
               v-slot="v"
             >
               <b-form-group label="Title" label-for="title">
@@ -28,7 +28,6 @@
 
             <ValidationProvider
               name="documentation"
-              :rules="{ alpha: true }"
               v-slot="v"
             >
               <b-form-group label="Documentation" label-for="documentation">
