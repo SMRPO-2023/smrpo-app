@@ -2,7 +2,7 @@
   <b-container fluid>
     <b-row>
       <b-col offset-lg="2" lg="8" cols="12" class="my-3">
-        <h1>Edit user</h1>
+        <h1>Edit project</h1>
 
         <ValidationObserver ref="observer" v-slot="{ handleSubmit }">
           <b-form @submit.stop.prevent="handleSubmit(onSubmit)" class="mt-4">
@@ -124,8 +124,9 @@ export default {
   },
   async mounted() {
     this.id = this.$route.params.id;
-    this.getUsers();
     if (!this.id) return;
+
+    this.getUsers();
 
     this.$axios
       .$get(`project/${this.id}`)
@@ -141,7 +142,7 @@ export default {
       .catch((reason) => {
         console.error(reason);
         this.$toast.error(
-          "An error has occurred, while getting user informaiton",
+          "An error has occurred, while getting user information",
           {
             duration: 3000,
           }

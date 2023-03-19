@@ -239,7 +239,7 @@ export default {
       .catch((reason) => {
         console.error(reason);
         this.$toast.error(
-          "An error has occurred, while getting user informaiton",
+          "An error has occurred, while getting user information",
           {
             duration: 3000,
           }

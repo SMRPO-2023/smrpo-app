@@ -3,7 +3,7 @@
     <b-row>
       <b-col offset-lg="2" lg="8" cols="12" class="my-3">
         <div class="d-flex justify-content-between align-items-center">
-          <h1>Users</h1>
+          <h1 class="mb-0">Users</h1>
           <b-button
             variant="primary"
             href="users/create"
@@ -99,7 +99,23 @@ export default {
           });
         });
     },
-    updateRole(user, role) {
+    async updateRole(user, role) {
+      let confirmed = false;
+      try {
+        confirmed = await this.$bvModal.msgBoxConfirm(
+          "Are you sure you want to change this user's role?",
+          {
+            title: "Change role",
+            cancelTitle: "Cancel",
+            okTitle: "Confirm",
+          }
+        );
+      } catch (error) {
+        console.error(error);
+      }
+
+      if (!confirmed) return;
+
       this.$axios
         .$put(`admin/users/${user.id}/role`, { role: role.value })
         .then((res) => {
@@ -118,7 +134,7 @@ export default {
         })
         .catch((reason) => {
           console.error(reason);
-          this.$toast.error("An error has occurred, while getting users", {
+          this.$toast.error("An error has occurred, while updating the user's role", {
             duration: 3000,
           });
         });
