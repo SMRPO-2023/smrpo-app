@@ -246,17 +246,4 @@ export default {
 </script>
 
 <style scoped>
-.center-and-clickable {
-  vertical-align: middle;
-  text-align: center;
-  cursor: pointer;
-}
-
-tbody > tr:hover > td > a {
-  text-decoration: underline;
-}
-
-td > a {
-  color: black;
-}
 </style>

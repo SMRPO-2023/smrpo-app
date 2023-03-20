@@ -20,6 +20,7 @@ export default {
 @import '../node_modules/bootstrap/scss/functions';
 @import '../node_modules/bootstrap/scss/variables';
 @import '../node_modules/bootstrap/scss/mixins';
+// button styles
 .btn-icon {
   cursor: pointer;
 
@@ -28,5 +29,20 @@ export default {
     border-color: #0062cc;
     box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
   }
+}
+
+// table styles
+.center-and-clickable {
+  vertical-align: middle;
+  text-align: center;
+  cursor: pointer;
+}
+
+tbody > tr:hover > td > a {
+  text-decoration: underline;
+}
+
+td > a {
+  color: black !important;
 }
 </style>
