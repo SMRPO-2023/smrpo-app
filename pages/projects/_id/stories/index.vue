@@ -1,88 +1,114 @@
 <template>
-<div>
-  <div class="d-flex justify-content-between align-items-center">
-    <h1 class="mb-0">Stories</h1>
-    <b-button
-      :disabled="!hasPermission()"
-      variant="primary"
-      href="stories/create"
-      class="d-flex flex-column justify-content-center"
-      >Create</b-button
-    >
-  </div>
-  <table class="table table-hover mt-3 w-100">
-    <thead>
-      <tr>
-        <th scope="col">Title</th>
-        <th scope="col">Description</th>
-        <th scope="col">Business value</th>
-        <th scope="col">Priority</th>
-        <th scope="col">Implemented</th>
-        <th scope="col">Sprint</th>
-        <th scope="col"></th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="story of stories" :key="story.id">
-        <td>
-          <nuxt-link 
-            v-if="canChange(story)" 
-            :to="{ path: `stories/${story.id}` }"
-          >
-            #{{ story.id }} - {{ story.title }}
-          </nuxt-link>
-          <span v-else>#{{ story.id }} - {{ story.title }}</span>
-        </td>
-        <td>{{ story.description | limit(100) }}</td>
-        <td>{{ story.businessValue }}</td>
-        <td>
-          <b-dropdown
-            id="dropdown-right"
-            size="sm"
-            right
-            :text="getNameForPriority(story.priority)"
-            :variant="getVariantForPriority(story.priority)"
-            :disabled="!canChange(story)"
-          >
-            <b-dropdown-item
-              v-for="priority of priorities"
-              :value="priority.value"
-              :key="priority.value"
-              @click="updatePriority(story, priority)"
+  <div>
+    <div class="d-flex justify-content-between align-items-center">
+      <h1 class="mb-0">Stories</h1>
+
+      <b-button
+        :disabled="!hasPermission()"
+        variant="primary"
+        href="stories/create"
+        class="d-flex flex-column justify-content-center"
+        >Create</b-button
+      >
+    </div>
+    <div class="d-flex float-right pb-3 pt-3">
+      <b-button-group>
+        <b-button variant="info" @click="showAll()">All</b-button>
+        <b-button variant="success" @click="showRealized()">Realized</b-button>
+
+        <b-button variant="warning" @click="showOnSprint()">On sprint</b-button>
+        <b-button variant="danger" @click="showUnrealized()"
+          >Unrealized</b-button
+        >
+      </b-button-group>
+    </div>
+    <table class="table table-hover mt-3 w-100">
+      <thead>
+        <tr>
+          <th scope="col">Title</th>
+          <th scope="col">Description</th>
+          <th scope="col">Business value</th>
+          <th scope="col">Priority</th>
+          <th scope="col">Implemented</th>
+          <th scope="col">Sprint</th>
+          <th scope="col">Criteria</th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="story of stories" :key="story.id">
+          <td>
+            <nuxt-link
+              v-if="canChange(story)"
+              :to="{ path: `stories/${story.id}` }"
             >
-              {{ priority.text }}
-            </b-dropdown-item>
-          </b-dropdown>
-        </td>
-        <td>
-          <b-button 
-            size="sm" 
-            :variant="getVariantForImplemented(story.implemented)" 
-            disabled
-          >
-            {{ getNameForImplemented(story.implemented) }}
-          </b-button>
-        </td>
-        <td>
-          <nuxt-link 
-            v-if="story.sprintId" 
-            :to="{ path: `/projects/${projectId}/sprints/${story.sprintId}` }"
-          >
-            {{ findSprintName(story.sprintId) }}
-          </nuxt-link>
-        </td>
-        <td>
-          <b-icon
-            v-if="canChange(story)"
-            icon="x-lg"
-            @click="deleteStory(story)"
-            class="center-and-clickable"
-          ></b-icon>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+              #{{ story.id }} - {{ story.title }}
+            </nuxt-link>
+            <span v-else>#{{ story.id }} - {{ story.title }}</span>
+          </td>
+          <td>{{ story.description | limit(100) }}</td>
+          <td>{{ story.businessValue }}</td>
+
+          <td>
+            <b-dropdown
+              id="dropdown-right"
+              size="sm"
+              right
+              :text="getNameForPriority(story.priority)"
+              :variant="getVariantForPriority(story.priority)"
+              :disabled="!canChange(story)"
+            >
+              <b-dropdown-item
+                v-for="priority of priorities"
+                :value="priority.value"
+                :key="priority.value"
+                @click="updatePriority(story, priority)"
+              >
+                {{ priority.text }}
+              </b-dropdown-item>
+            </b-dropdown>
+          </td>
+          <td>
+            <b-button
+              size="sm"
+              :variant="getVariantForImplemented(!story.implemented)"
+              disabled
+            >
+              {{ getNameForImplemented(story.implemented) }}
+            </b-button>
+          </td>
+          <td>
+            <nuxt-link
+              v-if="story.sprintId"
+              :to="{ path: `/projects/${projectId}/sprints/${story.sprintId}` }"
+            >
+              {{ findSprintName(story.sprintId) }}
+            </nuxt-link>
+          </td>
+          <td>
+            <tr v-for="criteria of story.acceptanceCriteria" :key="criteria.id">
+              <b-button
+                size="sm"
+                class="m-1"
+                :variant="getVariantForImplemented(!criteria.completed)"
+              >
+                {{ criteria.completed }}
+              </b-button>
+            </tr>
+          </td>
+
+          <td>
+            <b-icon
+              v-if="canChange(story)"
+              icon="x-lg"
+              @click="deleteStory(story)"
+              class="center-and-clickable"
+            ></b-icon>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </template>
 
 <script>
@@ -99,40 +125,120 @@ export default {
   computed: {
     ...mapGetters({
       currentUser: "user/getUser",
-      projectId: "route-id/getProjectId"
+      projectId: "route-id/getProjectId",
     }),
   },
   data() {
     return {
       project: null,
       stories: [],
+      allStories: [],
+      storiesRealized: [],
+      storiesUnrealizedSprint: [],
+      storiesUnrealized: [],
       sprints: [],
     };
   },
   created() {
     this.getProjectWithData();
+    this.getProjectStories();
+    this.getRealizedStories();
+    this.getUnrealizedSprint();
+    this.getUnrealized();
   },
   methods: {
+    showAll() {
+      this.stories = this.allStories;
+    },
+    showOnSprint() {
+      this.stories = this.storiesUnrealizedSprint;
+    },
+    showUnrealized() {
+      this.stories = this.storiesUnrealized;
+    },
+    showRealized() {
+      this.stories = this.storiesRealized;
+    },
     canChange(story) {
-      return this.hasPermission() && !story.implemented && story.sprintId === null;
+      return (
+        this.hasPermission() && !story.implemented && story.sprintId === null
+      );
     },
     hasPermission() {
       if (!this.currentUser || !this.project) return false;
-      return this.currentUser.id === this.project.projectOwnerId || this.currentUser.id === this.project.scrumMasterId;
+      return (
+        this.currentUser.id === this.project.projectOwnerId ||
+        this.currentUser.id === this.project.scrumMasterId
+      );
     },
     findSprintName(sprintId) {
       if (!sprintId || !this.sprints || !this.sprints.length) return null;
-      return this.sprints.find(s => s.id === sprintId)?.name;
+      return this.sprints.find((s) => s.id === sprintId)?.name;
+    },
+    async getUnrealizedSprint() {
+      if (!this.projectId) return;
+
+      await this.$axios
+        .$get(`user-stories/unrealized-with-sprint`, {
+          params: {
+            "project-id": this.projectId,
+          },
+        })
+        .then((res) => {
+          if (!res) return;
+          this.storiesUnrealizedSprint = res;
+        });
+    },
+    async getUnrealized() {
+      if (!this.projectId) return;
+
+      await this.$axios
+        .$get(`user-stories/unrealized-without-sprint`, {
+          params: {
+            "project-id": this.projectId,
+          },
+        })
+        .then((res) => {
+          if (!res) return;
+          this.storiesUnrealized = res;
+        });
+    },
+    async getRealizedStories() {
+      if (!this.projectId) return;
+
+      await this.$axios
+        .$get(`user-stories/realized`, {
+          params: {
+            "project-id": this.projectId,
+          },
+        })
+        .then((res) => {
+          if (!res) return;
+          this.storiesRealized = res;
+        });
+    },
+    async getProjectStories() {
+      if (!this.projectId) return;
+
+      await this.$axios
+        .$get(`user-stories`, {
+          params: {
+            "project-id": this.projectId,
+          },
+        })
+        .then((res) => {
+          if (!res) return;
+          this.allStories = res;
+          this.stories = res;
+        });
     },
     async getProjectWithData() {
       if (!this.projectId) return;
 
-      await this.$axios
-      .$get(`project/${this.projectId}`)
-      .then((res) => {
+      await this.$axios.$get(`project/${this.projectId}`).then((res) => {
         if (!res) return;
         this.project = res;
-        this.stories = this.project.UserStory.sort((a,b) => this.canChange(b) - this.canChange(a));
+
         this.sprints = this.project.sprints;
       });
     },
@@ -154,7 +260,10 @@ export default {
       if (!confirmed) return;
 
       this.$axios
-        .$patch(`user-stories/${story.id}`, { ...story, priority: priority.value })
+        .$patch(`user-stories/${story.id}`, {
+          ...story,
+          priority: priority.value,
+        })
         .then((res) => {
           for (const story of this.stories) {
             if (story.id === res.id) {
@@ -168,9 +277,12 @@ export default {
         })
         .catch((reason) => {
           console.error(reason);
-          this.$toast.error("An error has occurred, while updating the story's priority", {
-            duration: 3000,
-          });
+          this.$toast.error(
+            "An error has occurred, while updating the story's priority",
+            {
+              duration: 3000,
+            }
+          );
         });
     },
     async deleteStory(story) {
@@ -193,21 +305,23 @@ export default {
       this.$axios
         .$delete(`user-stories/${story.id}`)
         .then((res) => {
-          this.stories = this.stories.filter(s => s.id !== story.id);
+          this.stories = this.stories.filter((s) => s.id !== story.id);
           this.$toast.success("Story successfully removed", {
             duration: 3000,
           });
         })
         .catch((reason) => {
           console.error(reason);
-          this.$toast.error("An error has occurred, while deleting the user story", {
-            duration: 3000,
-          });
+          this.$toast.error(
+            "An error has occurred, while deleting the user story",
+            {
+              duration: 3000,
+            }
+          );
         });
     },
-  }
-}
+  },
+};
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
