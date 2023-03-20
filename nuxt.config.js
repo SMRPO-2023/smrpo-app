@@ -20,7 +20,6 @@ export default {
   ssr: false,
 
   env: {
-    TENT_ID: '61ed89c91ee6e6c74ee985d5',
     ...CONFIG
   },
 
