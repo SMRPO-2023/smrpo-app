@@ -1,30 +1,28 @@
 <template>
-  <b-container fluid>
-    <b-row>
-      <b-col offset-lg="2" lg="8" cols="12" class="my-3">
-        <h1>Edit project</h1>
+<div>
+  <h1>Edit project</h1>
 
-        <ValidationObserver ref="observer" v-slot="{ handleSubmit }">
-          <b-form @submit.stop.prevent="handleSubmit(onSubmit)" class="mt-4">
-            <ValidationProvider
-              name="title"
-              :rules="{ required: true }"
-              v-slot="v"
-            >
-              <b-form-group label="Title" label-for="title">
-                <b-form-input
-                  type="text"
-                  id="title"
-                  placeholder="Enter title"
-                  v-model="form.title"
-                  :state="getValidationState(v)"
-                  aria-describedby="input-2-live-feedback"
-                />
-                <b-form-invalid-feedback id="input-2-live-feedback"
-                  >{{ v.errors[0] }}
-                </b-form-invalid-feedback>
-              </b-form-group>
-            </ValidationProvider>
+  <ValidationObserver ref="observer" v-slot="{ handleSubmit }">
+    <b-form @submit.stop.prevent="handleSubmit(onSubmit)" class="mt-4">
+      <ValidationProvider
+        name="title"
+        :rules="{ required: true }"
+        v-slot="v"
+      >
+        <b-form-group label="Title" label-for="title">
+          <b-form-input
+            type="text"
+            id="title"
+            placeholder="Enter title"
+            v-model="form.title"
+            :state="getValidationState(v)"
+            aria-describedby="input-2-live-feedback"
+          />
+          <b-form-invalid-feedback id="input-2-live-feedback"
+            >{{ v.errors[0] }}
+          </b-form-invalid-feedback>
+        </b-form-group>
+      </ValidationProvider>
 
             <ValidationProvider name="documentation" v-slot="v">
               <b-form-group label="Documentation" label-for="documentation">
@@ -140,16 +138,14 @@
               <li v-for="err of responseErrors">{{ err }}</li>
             </ul>
 
-            <div class="text-center">
-              <b-button type="submit" variant="primary" class="w-50 mt-3"
-                >Save</b-button
-              >
-            </div>
-          </b-form>
-        </ValidationObserver>
-      </b-col>
-    </b-row>
-  </b-container>
+      <div class="text-center">
+        <b-button type="submit" variant="primary" class="w-50 mt-3"
+          >Save</b-button
+        >
+      </div>
+    </b-form>
+  </ValidationObserver>
+</div>
 </template>
 
 <script>

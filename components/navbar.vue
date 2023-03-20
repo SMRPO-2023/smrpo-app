@@ -11,15 +11,7 @@
     <b-collapse v-if="user" id="nav-collapse" is-nav>
       <b-navbar-nav>
         <b-nav-item v-if="isAdmin" :to="'/admin/users'">Users</b-nav-item>
-        <b-nav-item v-if="!projectId" :to="'/projects'">Projects</b-nav-item>
-
-        <b-nav-item-dropdown v-if="projectId" text="Projects" right>
-          <b-dropdown-item :to="'/projects'" :exact="true">All projects</b-dropdown-item>
-          <b-dropdown-item :to="{ path: `/projects/${projectId}` }" :exact="true">Edit</b-dropdown-item>
-          <b-dropdown-divider></b-dropdown-divider>
-          <b-dropdown-item :to="{ path: `/projects/${projectId}/stories` }">Stories</b-dropdown-item>
-          <b-dropdown-item :to="{ path: `/projects/${projectId}/sprints` }">Sprints</b-dropdown-item>
-        </b-nav-item-dropdown>
+        <b-nav-item :to="'/projects'">Projects</b-nav-item>
       </b-navbar-nav>
 
       <!-- Right aligned nav items -->
@@ -58,7 +50,6 @@ export default {
       user: "user/getUser",
       isAdmin: "user/isAdmin",
       isNormalUser: "user/isNormalUser",
-      projectId: "route-id/getProjectId"
     }),
     ...mapActions(["user/unsetUser", "user/fetchUser"]),
   },

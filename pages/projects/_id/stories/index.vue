@@ -1,89 +1,85 @@
 <template>
-  <b-container fluid>
-    <b-row>
-      <b-col offset-lg="2" lg="8" cols="12" class="my-3">
-        <div class="d-flex justify-content-between align-items-center">
-          <h1 class="mb-0">Stories</h1>
-          <b-button
-            variant="primary"
-            href="stories/create"
-            class="d-flex flex-column justify-content-center"
-            >Create</b-button
+<div>
+  <div class="d-flex justify-content-between align-items-center">
+    <h1 class="mb-0">Stories</h1>
+    <b-button
+      variant="primary"
+      href="stories/create"
+      class="d-flex flex-column justify-content-center"
+      >Create</b-button
+    >
+  </div>
+  <table class="table table-hover mt-3 w-100">
+    <thead>
+      <tr>
+        <th scope="col">Title</th>
+        <th scope="col">Description</th>
+        <th scope="col">Priority</th>
+        <th scope="col">Implemented</th>
+        <th scope="col">Sprint</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="story of stories" :key="story.id">
+        <td>
+          <nuxt-link 
+            v-if="canChange(story)" 
+            :to="{ path: `stories/${story.id}` }"
           >
-        </div>
-        <table class="table table-hover mt-3 w-100">
-          <thead>
-            <tr>
-              <th scope="col">Title</th>
-              <th scope="col">Description</th>
-              <th scope="col">Priority</th>
-              <th scope="col">Implemented</th>
-              <th scope="col">Sprint</th>
-              <th scope="col"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="story of stories" :key="story.id">
-              <td>
-                <nuxt-link 
-                  v-if="canChange(story)" 
-                  :to="{ path: `stories/${story.id}` }"
-                >
-                  #{{ story.id }} - {{ story.title }}
-                </nuxt-link>
-                <span v-else>#{{ story.id }} - {{ story.title }}</span>
-              </td>
-              <td>{{ story.description | limit(100) }}</td>
-              <td>
-                <b-dropdown
-                  id="dropdown-right"
-                  size="sm"
-                  right
-                  :text="getNameForPriority(story.priority)"
-                  :variant="getVariantForPriority(story.priority)"
-                  :disabled="!canChange(story)"
-                >
-                  <b-dropdown-item
-                    v-for="priority of priorities"
-                    :value="priority.value"
-                    :key="priority.value"
-                    @click="updatePriority(story, priority)"
-                  >
-                    {{ priority.text }}
-                  </b-dropdown-item>
-                </b-dropdown>
-              </td>
-              <td>
-                <b-button 
-                  size="sm" 
-                  :variant="getVariantForImplemented(story.implemented)" 
-                  disabled
-                >
-                  {{ getNameForImplemented(story.implemented) }}
-                </b-button>
-              </td>
-              <td>
-                <nuxt-link 
-                  v-if="story.sprintId" 
-                  :to="{ path: `/projects/${projectId}/sprints/${story.sprintId}` }"
-                >
-                  {{ findSprintName(story.sprintId) }}
-                </nuxt-link>
-              </td>
-              <td>
-                <b-icon
-                  v-if="canChange(story)"
-                  icon="x-lg"
-                  @click="deleteStory(story)"
-                  class="center-and-clickable"
-                ></b-icon>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </b-col>
-    </b-row>
-  </b-container>
+            #{{ story.id }} - {{ story.title }}
+          </nuxt-link>
+          <span v-else>#{{ story.id }} - {{ story.title }}</span>
+        </td>
+        <td>{{ story.description | limit(100) }}</td>
+        <td>
+          <b-dropdown
+            id="dropdown-right"
+            size="sm"
+            right
+            :text="getNameForPriority(story.priority)"
+            :variant="getVariantForPriority(story.priority)"
+            :disabled="!canChange(story)"
+          >
+            <b-dropdown-item
+              v-for="priority of priorities"
+              :value="priority.value"
+              :key="priority.value"
+              @click="updatePriority(story, priority)"
+            >
+              {{ priority.text }}
+            </b-dropdown-item>
+          </b-dropdown>
+        </td>
+        <td>
+          <b-button 
+            size="sm" 
+            :variant="getVariantForImplemented(story.implemented)" 
+            disabled
+          >
+            {{ getNameForImplemented(story.implemented) }}
+          </b-button>
+        </td>
+        <td>
+          <nuxt-link 
+            v-if="story.sprintId" 
+            :to="{ path: `/projects/${projectId}/sprints/${story.sprintId}` }"
+          >
+            {{ findSprintName(story.sprintId) }}
+          </nuxt-link>
+        </td>
+        <td>
+          <b-icon
+            v-if="canChange(story)"
+            icon="x-lg"
+            @click="deleteStory(story)"
+            class="center-and-clickable"
+          ></b-icon>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 </template>
 
 <script>
