@@ -90,7 +90,7 @@
               <tbody>
                 <tr v-for="developer of projectDevelopers" :key="developer.id">
                   <td>
-                    {{ users[developer].text }}
+                    {{ getUserById(developer).username }}
                   </td>
 
                   <td>
@@ -155,6 +155,7 @@ export default {
       error: null,
       id: null,
       users: [],
+      allUsers: [],
       usersId: [],
       responseErrors: [],
       passwordType: "password",
@@ -172,6 +173,16 @@ export default {
     await this.getUsers();
   },
   methods: {
+    getUserById: function (id) {
+      this.foundUser = null;
+      this.allUsers.forEach((user) => {
+        if (user.id == id) {
+          this.foundUser = user;
+        }
+      });
+
+      return this.foundUser;
+    },
     addMemberRequest: function (userId) {
       this.$axios
         .$post(`/project-developers`, {
@@ -213,6 +224,7 @@ export default {
       this.$axios
         .$get("admin/users")
         .then((res) => {
+          this.allUsers = res;
           this.users.push({ value: 0, text: "Choose user" }),
             res.forEach((user) => {
               this.users.push({ value: user.id, text: user.username });
