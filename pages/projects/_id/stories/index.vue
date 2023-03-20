@@ -14,6 +14,7 @@
       <tr>
         <th scope="col">Title</th>
         <th scope="col">Description</th>
+        <th scope="col">Business value</th>
         <th scope="col">Priority</th>
         <th scope="col">Implemented</th>
         <th scope="col">Sprint</th>
@@ -32,6 +33,7 @@
           <span v-else>#{{ story.id }} - {{ story.title }}</span>
         </td>
         <td>{{ story.description | limit(100) }}</td>
+        <td>{{ story.businessValue }}</td>
         <td>
           <b-dropdown
             id="dropdown-right"

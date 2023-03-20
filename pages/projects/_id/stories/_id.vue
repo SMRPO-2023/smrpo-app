@@ -71,7 +71,7 @@
       <!-- Points -->
       <ValidationProvider
         name="points"
-        :rules="{ required: true, numeric: true, min: 1 }"
+        :rules="{ required: true, numeric: true, min_value: 0.1, max_value: 20 }"
         v-slot="v"
       >
         <b-form-group label="Points" label-for="points">
@@ -92,10 +92,12 @@
       <!-- Business value -->
       <ValidationProvider
         name="businessValue"
+        :rules="{ numeric: true, min_value: 1, max_value: 10 }"
         v-slot="v"
       >
         <b-form-group label="Business value" label-for="businessValue">
-          <b-form-textarea
+          <b-form-input
+            type="number"
             id="businessValue"
             placeholder="Enter business value"
             v-model="form.businessValue"
