@@ -5,6 +5,7 @@
         <div class="d-flex justify-content-between align-items-center">
           <h1 class="mb-0">Projects</h1>
           <b-button
+            v-if="isAdmin"
             variant="primary"
             href="projects/create"
             class="d-flex flex-column justify-content-center"
@@ -18,8 +19,8 @@
               <th scope="col">Documentation</th>
               <th scope="col">Project owner</th>
               <th scope="col">Scrum master</th>
-              <th scope="col">Members</th>
-              <th scope="col"></th>
+              <th scope="col" v-if="isAdmin">Members</th>
+              <th scope="col" v-if="isAdmin"></th>
             </tr>
           </thead>
           <tbody>
@@ -31,25 +32,16 @@
               </td>
               <td>{{ project.documentation }}</td>
               <td>
-                <span v-if="getUserById(project.projectOwnerId)">{{
-                  getUserById(project.projectOwnerId).username
+                <span v-if="project.projectOwner">{{
+                  project.projectOwner.username
                 }}</span>
               </td>
               <td>
-                <span v-if="getUserById(project.scrumMasterId)">{{
-                  getUserById(project.scrumMasterId).username
+                <span v-if="project.scrumMaster">{{
+                  project.scrumMaster.username
                 }}</span>
               </td>
-              <td>
-                <!--
-                <tr
-                  v-for="projectUsers of getProjectDevelopers(project.id)"
-                  :key="projectUsers.id"
-                >
-                  {{
-                    projectUsers.username
-                  }}
-                </tr>-->
+              <td v-if="isAdmin">
                 <tr>
                   <b-button
                     variant="primary"
@@ -59,7 +51,7 @@
                   >
                 </tr>
               </td>
-              <td>
+              <td v-if="isAdmin">
                 <b-icon
                   icon="x-lg"
                   @click="deleteProject(project)"
@@ -102,6 +94,7 @@
 
 <script>
 import { BIcon } from "bootstrap-vue";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
   name: "projects",
@@ -117,8 +110,18 @@ export default {
     };
   },
   async created() {
-    await this.getUsers();
+    if (this.isAdmin) {
+      await this.getUsers();
+    }
     await this.getProjects();
+  },
+  computed: {
+    ...mapGetters({
+      user: "user/getUser",
+      isAdmin: "user/isAdmin",
+      isNormalUser: "user/isNormalUser",
+    }),
+    ...mapActions(["user/unsetUser", "user/fetchUser"]),
   },
   methods: {
     async showUsers(projectId) {
@@ -245,5 +248,4 @@ export default {
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
