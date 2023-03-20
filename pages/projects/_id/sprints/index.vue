@@ -3,6 +3,7 @@
   <div class="d-flex justify-content-between align-items-center">
     <h1 class="mb-0">Sprints</h1>
     <b-button
+      :disabled="!isScrumMaster()"
       variant="primary"
       href="sprints/create"
       class="d-flex flex-column justify-content-center"
