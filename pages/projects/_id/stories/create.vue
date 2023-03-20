@@ -148,9 +148,14 @@
       </ul>
 
       <div class="text-center">
-        <b-button type="submit" variant="primary" class="w-50 mt-3"
-          >Create</b-button
+        <b-button 
+          :disabled="!hasPermission()" 
+          type="submit" 
+          variant="primary" 
+          class="w-50 mt-3"
         >
+          Create
+        </b-button>
       </div>
     </b-form>
   </ValidationObserver>
@@ -166,11 +171,13 @@ export default {
   mixins: [priorities],
   computed: {
     ...mapGetters({
+      currentUser: "user/getUser",
       projectId: "route-id/getProjectId"
     }),
   },
   data() {
     return {
+      project: null,
       error: null,
       responseErrors: [],
       sprintsOptions: [{ value: null, text: "Choose sprint" }],
@@ -187,12 +194,16 @@ export default {
     };
   },
   created() {
-    this.getSprints();
+    this.getProjectWithData();
   },
   mounted() {
     this.prioritiesOptions = this.prioritiesOptions.concat(this.priorities)
   },
   methods: {
+    hasPermission() {
+      if (!this.currentUser || !this.project) return false;
+      return this.currentUser.id === this.project.projectOwnerId || this.currentUser.id === this.project.scrumMasterId;
+    },
     getValidationState({ dirty, validated, valid = null }) {
       return dirty || validated ? valid : null;
     },
@@ -230,13 +241,14 @@ export default {
           });
         });
     },
-    async getSprints() {
+    async getProjectWithData() {
       if (!this.projectId) return;
 
       await this.$axios
       .$get(`project/${this.projectId}`)
       .then((res) => {
         if (!res) return;
+        this.project = res;
         const sprints = res.sprints.map(s => ({value: s.id, text: s.name}));
         this.sprintsOptions = this.sprintsOptions.concat(sprints);
       });

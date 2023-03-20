@@ -3,6 +3,7 @@
   <div class="d-flex justify-content-between align-items-center">
     <h1 class="mb-0">Stories</h1>
     <b-button
+      :disabled="!hasPermission()"
       variant="primary"
       href="stories/create"
       class="d-flex flex-column justify-content-center"
@@ -113,10 +114,11 @@ export default {
   },
   methods: {
     canChange(story) {
+      return this.hasPermission() && !story.implemented && story.sprintId === null;
+    },
+    hasPermission() {
       if (!this.currentUser || !this.project) return false;
-      const permissions = this.currentUser.id === this.project.projectOwnerId ||
-        this.currentUser.id === this.project.scrumMasterId;
-      return permissions && !story.implemented && story.sprintId === null;
+      return this.currentUser.id === this.project.projectOwnerId || this.currentUser.id === this.project.scrumMasterId;
     },
     findSprintName(sprintId) {
       if (!sprintId || !this.sprints || !this.sprints.length) return null;
