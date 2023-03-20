@@ -15,7 +15,7 @@
                 <b-form-select
                   id="role"
                   v-model="form.role"
-                  :options="roles"
+                  :options="rolesOptions"
                   :state="getValidationState(v)"
                   aria-describedby="input-1-live-feedback"
                 ></b-form-select>
@@ -174,8 +174,11 @@
 </template>
 
 <script>
+import roles from "@/mixins/roles";
+
 export default {
   name: "create-user",
+  mixins: [roles],
   data() {
     return {
       error: null,
@@ -190,12 +193,11 @@ export default {
         password: null,
         passwordRepeat: null,
       },
-      roles: [
-        { value: null, text: "Choose system role" },
-        { value: "USER", text: "User" },
-        { value: "ADMIN", text: "Administrator" },
-      ],
+      rolesOptions: [{ value: null, text: "Choose system role" }],
     };
+  },
+  mounted() {
+    this.rolesOptions = this.rolesOptions.concat(this.roles)
   },
   methods: {
     getValidationState({ dirty, validated, valid = null }) {

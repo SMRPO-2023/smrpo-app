@@ -3,7 +3,7 @@
     <b-row>
       <b-col offset-lg="2" lg="8" cols="12" class="my-3">
         <div class="d-flex justify-content-between align-items-center">
-          <h1>Projects</h1>
+          <h1 class="mb-0">Projects</h1>
           <b-button
             variant="primary"
             href="projects/create"

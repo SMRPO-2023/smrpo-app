@@ -181,9 +181,9 @@ export default {
   },
   async mounted() {
     this.id = this.$route.params.id;
-    this.getUsers();
     if (!this.id) return;
     this.getProject();
+    this.getUsers();
   },
   methods: {
     async removeMember(id) {
