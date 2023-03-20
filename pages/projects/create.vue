@@ -18,9 +18,9 @@
                   placeholder="Enter title"
                   v-model="form.title"
                   :state="getValidationState(v)"
-                  aria-describedby="input-2-live-feedback"
+                  aria-describedby="input-1-live-feedback"
                 />
-                <b-form-invalid-feedback id="input-2-live-feedback"
+                <b-form-invalid-feedback id="input-1-live-feedback"
                   >{{ v.errors[0] }}
                 </b-form-invalid-feedback>
               </b-form-group>
@@ -34,9 +34,9 @@
                   placeholder="Enter documentation"
                   v-model="form.documentation"
                   :state="getValidationState(v)"
-                  aria-describedby="input-3-live-feedback"
+                  aria-describedby="input-1-live-feedback"
                 />
-                <b-form-invalid-feedback id="input-3-live-feedback"
+                <b-form-invalid-feedback id="input-1-live-feedback"
                   >{{ v.errors[0] }}
                 </b-form-invalid-feedback>
               </b-form-group>
@@ -153,6 +153,7 @@ export default {
   data() {
     return {
       error: null,
+      responseErrors: [],
       id: null,
       users: [],
       allUsers: [],
@@ -195,6 +196,7 @@ export default {
         })
         .catch((reason) => {
           console.error(reason);
+
           this.$toast.error("An error has occurred, while adding new member.", {
             duration: 3000,
           });
@@ -261,12 +263,20 @@ export default {
               this.responseErrors = data.message;
             }
             this.error = "Wrong input, while creating project.";
+            this.error = data.message;
+            this.responseErrors = data.message;
+          } else if (status && status === 409) {
+            this.$toast.error("Project with the same title already exists.", {
+              duration: 3000,
+            });
           } else {
-            this.error = data?.message;
+            this.$toast.error(
+              "An error has occurred, while creating projectttt.",
+              {
+                duration: 3000,
+              }
+            );
           }
-          this.$toast.error("An error has occurred, while creating project.", {
-            duration: 3000,
-          });
         });
     },
   },
