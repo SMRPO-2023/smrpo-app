@@ -1,5 +1,5 @@
 module.exports = {
   HOST: '0.0.0.0',
-  PORT: 3100,
-  API_URL: 'https://api.com'
+  PORT: 3200,
+  API_URL: 'https://smrpo-api.kanglca.com'
 }
