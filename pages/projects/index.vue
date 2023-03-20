@@ -18,7 +18,7 @@
               <th scope="col">Documentation</th>
               <th scope="col">Project owner</th>
               <th scope="col">Scrum master</th>
-              <th scope="col">Users</th>
+              <th scope="col">Members</th>
               <th scope="col"></th>
             </tr>
           </thead>
@@ -41,6 +41,7 @@
                 }}</span>
               </td>
               <td>
+                <!--
                 <tr
                   v-for="projectUsers of getProjectDevelopers(project.id)"
                   :key="projectUsers.id"
@@ -48,6 +49,14 @@
                   {{
                     projectUsers.username
                   }}
+                </tr>-->
+                <tr>
+                  <b-button
+                    variant="primary"
+                    class="d-flex align-item-left w-20 mt-2"
+                    @click="showUsers(project.id)"
+                    >Members</b-button
+                  >
                 </tr>
               </td>
               <td>
@@ -62,6 +71,32 @@
         </table>
       </b-col>
     </b-row>
+    <b-modal ref="user-modal" id="user-modal" hide-footer>
+      <template #modal-title> Members</template>
+      <div class="d-block d-flex">
+        <table class="table table-hover mt-3 w-100">
+          <thead>
+            <tr>
+              <th scope="col">Username</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="projectUsers of getProjectDevelopers(currentProjectId)"
+              :key="projectUsers.id"
+            >
+              <td>
+                {{ projectUsers.username }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <b-button class="mt-3" block @click="$bvModal.hide('user-modal')"
+        >Close</b-button
+      >
+    </b-modal>
   </b-container>
 </template>
 
@@ -78,6 +113,7 @@ export default {
       users: [],
       projects: [],
       projectDevelopers: [],
+      currentProjectId: null,
     };
   },
   async created() {
@@ -85,6 +121,11 @@ export default {
     await this.getProjects();
   },
   methods: {
+    async showUsers(projectId) {
+      this.currentProjectId = projectId;
+      console.log(this.currentProjectId);
+      this.$refs["user-modal"].show();
+    },
     async getProjects() {
       this.$axios
         .$get("/project")

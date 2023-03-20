@@ -2,7 +2,7 @@
   <b-container fluid>
     <b-row>
       <b-col offset-lg="2" lg="8" cols="12" class="my-3">
-        <h1>Edit user</h1>
+        <h1>Edit project</h1>
 
         <ValidationObserver ref="observer" v-slot="{ handleSubmit }">
           <b-form @submit.stop.prevent="handleSubmit(onSubmit)" class="mt-4">
@@ -26,10 +26,7 @@
               </b-form-group>
             </ValidationProvider>
 
-            <ValidationProvider
-              name="documentation"
-              v-slot="v"
-            >
+            <ValidationProvider name="documentation" v-slot="v">
               <b-form-group label="Documentation" label-for="documentation">
                 <b-form-input
                   type="text"
@@ -46,7 +43,7 @@
             </ValidationProvider>
             <ValidationProvider
               name="project owner"
-              :rules="{ required: true }"
+              :rules="{ required: false }"
               v-slot="v"
             >
               <b-form-group label="Project owner" label-for="owner">
@@ -64,7 +61,7 @@
             </ValidationProvider>
             <ValidationProvider
               name="scrum master"
-              :rules="{ required: true }"
+              :rules="{ required: false }"
               v-slot="v"
             >
               <b-form-group label="Scrum master" label-for="owner">
@@ -81,6 +78,63 @@
               </b-form-group>
             </ValidationProvider>
 
+            <br />
+            <h5>Project members</h5>
+            <table class="table table-hover mt-3 w-25">
+              <thead>
+                <td>
+                  <tr>
+                    Username
+                  </tr>
+                </td>
+              </thead>
+              <tbody>
+                <tr v-for="developer of projectDevelopers" :key="developer.id">
+                  <td>
+                    {{ developer.user.username }}
+                  </td>
+
+                  <td>
+                    <b-icon
+                      icon="x-lg"
+                      @click="removeMember(developer.id)"
+                      class="center-and-clickable"
+                    ></b-icon>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <br />
+            <h5>Add member</h5>
+            <ValidationProvider
+              name="scrum master"
+              :rules="{ required: false }"
+              v-slot="v"
+            >
+              <b-form-group label-for="owner">
+                <b-form-select
+                  id="addMember"
+                  v-model="form.member"
+                  :options="users"
+                  :state="getValidationState(v)"
+                  aria-describedby="input-1-live-feedback"
+                  class="w-25"
+                ></b-form-select>
+                <b-form-invalid-feedback id="input-1-live-feedback"
+                  >{{ v.errors[0] }}
+                </b-form-invalid-feedback>
+              </b-form-group>
+            </ValidationProvider>
+            <div class="text-center">
+              <b-button
+                variant="primary"
+                class="d-flex align-item-left w-20 mt-3"
+                @click="addMember"
+                >Add</b-button
+              >
+            </div>
+            <br />
             <div v-if="error" class="text-center text-danger">{{ error }}</div>
             <ul v-if="responseErrors.length > 0" class="text-danger">
               <li v-for="err of responseErrors">{{ err }}</li>
@@ -113,12 +167,15 @@ export default {
       responseErrors: [],
       user: null,
       users: [],
+      allUsers: [],
+      projectDevelopers: [],
       passwordType: "password",
       form: {
         title: null,
         documentation: null,
         projectOwnerId: null,
         scrumMasterId: null,
+        member: null,
       },
     };
   },
@@ -126,37 +183,101 @@ export default {
     this.id = this.$route.params.id;
     this.getUsers();
     if (!this.id) return;
-
-    this.$axios
-      .$get(`project/${this.id}`)
-      .then((res) => {
-        this.user = res;
-        if (!res) return;
-
-        this.form.title = res.title;
-        this.form.documentation = res.documentation;
-        this.form.projectOwnerId = res.projectOwnerId;
-        this.form.scrumMasterId = res.scrumMasterId;
-      })
-      .catch((reason) => {
-        console.error(reason);
-        this.$toast.error(
-          "An error has occurred, while getting user informaiton",
-          {
-            duration: 3000,
-          }
-        );
-      });
+    this.getProject();
   },
   methods: {
+    async removeMember(id) {
+      let confirmed = false;
+      try {
+        confirmed = await this.$bvModal.msgBoxConfirm(
+          "Are you sure you want to remove this member?",
+          {
+            title: "Remove",
+            cancelTitle: "Cancel",
+            okTitle: "Confirm",
+          }
+        );
+      } catch (error) {
+        console.error(error);
+      }
+
+      if (!confirmed) return;
+
+      this.$axios
+        .$delete(`/project-developers/${id}`)
+        .then((res) => {
+          this.projectDevelopers = this.projectDevelopers.filter(
+            (p) => p.id !== id
+          );
+          this.$toast.success("Member secuessfully removed", {
+            duration: 3000,
+          });
+        })
+        .catch((reason) => {
+          console.error(reason);
+          this.$toast.error("An error has occurred, while removing member.", {
+            duration: 3000,
+          });
+        });
+    },
+    addMember: function () {
+      this.$axios
+        .$post(`/project-developers`, {
+          userId: this.form.member,
+          projectId: parseInt(this.id),
+        })
+        .then((res) => {
+          this.error = null;
+          this.responseErrors = [];
+          this.getProject();
+          this.$toast.success("New member added", {
+            duration: 3000,
+          });
+        })
+        .catch((reason) => {
+          console.error(reason);
+          this.$toast.error("An error has occurred, while adding new member.", {
+            duration: 3000,
+          });
+        });
+    },
     getValidationState({ dirty, validated, valid = null }) {
       return dirty || validated ? valid : null;
+    },
+    async getProject() {
+      this.$axios
+        .$get(`project/${this.id}`)
+        .then((res) => {
+          this.user = res;
+          if (!res) return;
+
+          this.form.title = res.title;
+          this.form.documentation = res.documentation;
+          if (res.projectOwner !== null) {
+            this.form.projectOwnerId = res.projectOwner.id;
+          }
+          if (res.scrumMaster !== null) {
+            this.form.scrumMasterId = res.scrumMaster.id;
+          }
+          this.projectDevelopers = res.developers;
+        })
+        .catch((reason) => {
+          console.error(reason);
+          this.$toast.error(
+            "An error has occurred, while getting user informaiton",
+            {
+              duration: 3000,
+            }
+          );
+        });
     },
     async onSubmit() {
       await this.$axios
         .$put(`project/${this.user.id}`, {
           title: this.form.title,
           documentation: this.form.documentation,
+          projectOwnerId: this.form.projectOwnerId,
+          scrumMasterId: this.form.scrumMasterId,
         })
         .then((res) => {
           this.error = null;
@@ -194,6 +315,7 @@ export default {
             res.forEach((user) => {
               this.users.push({ value: user.id, text: user.username });
             });
+          this.allUsers = res;
         })
         .catch((reason) => {
           console.error(reason);
@@ -206,4 +328,18 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.center-and-clickable {
+  vertical-align: middle;
+  text-align: center;
+  cursor: pointer;
+}
+
+tbody > tr:hover > td > a {
+  text-decoration: underline;
+}
+
+td > a {
+  color: black;
+}
+</style>

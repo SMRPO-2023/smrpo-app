@@ -26,10 +26,7 @@
               </b-form-group>
             </ValidationProvider>
 
-            <ValidationProvider
-              name="documentation"
-              v-slot="v"
-            >
+            <ValidationProvider name="documentation" v-slot="v">
               <b-form-group label="Documentation" label-for="documentation">
                 <b-form-input
                   type="text"
@@ -80,6 +77,63 @@
                 </b-form-invalid-feedback>
               </b-form-group>
             </ValidationProvider>
+            <br />
+            <h5>Project members</h5>
+            <table class="table table-hover mt-3 w-25">
+              <thead>
+                <td>
+                  <tr>
+                    Username
+                  </tr>
+                </td>
+              </thead>
+              <tbody>
+                <tr v-for="developer of projectDevelopers" :key="developer.id">
+                  <td>
+                    {{ users[developer].text }}
+                  </td>
+
+                  <td>
+                    <b-icon
+                      icon="x-lg"
+                      @click="removeMember(developer.id)"
+                      class="center-and-clickable"
+                    ></b-icon>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <br />
+            <h5>Add member</h5>
+            <ValidationProvider
+              name="scrum master"
+              :rules="{ required: false }"
+              v-slot="v"
+            >
+              <b-form-group label-for="owner">
+                <b-form-select
+                  id="addMember"
+                  v-model="form.member"
+                  :options="users"
+                  :state="getValidationState(v)"
+                  aria-describedby="input-1-live-feedback"
+                  class="w-25"
+                ></b-form-select>
+                <b-form-invalid-feedback id="input-1-live-feedback"
+                  >{{ v.errors[0] }}
+                </b-form-invalid-feedback>
+              </b-form-group>
+            </ValidationProvider>
+            <div class="text-center">
+              <b-button
+                variant="primary"
+                class="d-flex align-item-left w-20 mt-3"
+                @click="addMember"
+                >Add</b-button
+              >
+            </div>
+            <br />
 
             <div class="text-center">
               <b-button type="submit" variant="primary" class="w-50 mt-3"
@@ -99,15 +153,18 @@ export default {
   data() {
     return {
       error: null,
+      id: null,
       users: [],
       usersId: [],
       responseErrors: [],
       passwordType: "password",
+      projectDevelopers: [],
       form: {
         title: null,
         documentation: null,
         projectOwnerId: null,
         scrumMasterId: null,
+        member: 0,
       },
     };
   },
@@ -115,6 +172,40 @@ export default {
     await this.getUsers();
   },
   methods: {
+    addMemberRequest: function (userId) {
+      this.$axios
+        .$post(`/project-developers`, {
+          userId: userId,
+          projectId: parseInt(this.id),
+        })
+        .then((res) => {
+          this.error = null;
+          this.responseErrors = [];
+        })
+        .catch((reason) => {
+          console.error(reason);
+          this.$toast.error("An error has occurred, while adding new member.", {
+            duration: 3000,
+          });
+        });
+    },
+    removeMember: function (id) {
+      this.index = this.projectDevelopers.indexOf(id);
+      this.projectDevelopers.splice(this.index, 1);
+    },
+    addMember: function () {
+      if (this.form.member == 0) {
+        this.$toast.error("Please choose a member.", {
+          duration: 3000,
+        });
+      } else if (!this.projectDevelopers.includes(this.form.member)) {
+        this.projectDevelopers.push(this.form.member);
+      } else {
+        this.$toast.error("This user is already a member", {
+          duration: 3000,
+        });
+      }
+    },
     getValidationState({ dirty, validated, valid = null }) {
       return dirty || validated ? valid : null;
     },
@@ -122,7 +213,7 @@ export default {
       this.$axios
         .$get("admin/users")
         .then((res) => {
-          this.users.push({ value: null, text: "Choose user" }),
+          this.users.push({ value: 0, text: "Choose user" }),
             res.forEach((user) => {
               this.users.push({ value: user.id, text: user.username });
             });
@@ -143,6 +234,10 @@ export default {
           scrumMasterId: this.form.scrumMasterId,
         })
         .then(async (res) => {
+          this.id = res.id;
+          this.projectDevelopers.forEach((developerId) =>
+            this.addMemberRequest(developerId)
+          );
           await this.$router.replace("/projects");
         })
         .catch((error) => {
