@@ -217,7 +217,7 @@ export default {
           priority: this.form.priority,
           points: +this.form.points,
           implemented: this.form.implemented,
-          businessValue: this.form.businessValue,
+          businessValue: this.form.businessValue ? +this.form.businessValue : null,
           sprintId: this.form.sprintId,
           projectId: this.projectId
         })
