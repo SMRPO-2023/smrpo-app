@@ -225,11 +225,12 @@ export default {
       await this.$axios
         .$get(`user-stories`, {
           params: {
-            projectid: this.projectId,
+            "project-id": this.projectId,
           },
         })
         .then((res) => {
           if (!res) return;
+
           this.allStories = res;
           this.stories = res;
         });
