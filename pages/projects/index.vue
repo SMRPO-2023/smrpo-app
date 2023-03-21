@@ -5,7 +5,7 @@
         <div class="d-flex justify-content-between align-items-center">
           <h1 class="mb-0">Projects</h1>
           <b-button
-            v-if="isAdmin"
+            :disabled="!isAdmin"
             variant="primary"
             href="projects/create"
             class="d-flex flex-column justify-content-center"
