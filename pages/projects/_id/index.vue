@@ -1,155 +1,158 @@
 <template>
-<div>
-  <h1>Edit project</h1>
+  <div>
+    <h1>Edit project</h1>
 
-  <ValidationObserver ref="observer" v-slot="{ handleSubmit }">
-    <b-form @submit.stop.prevent="handleSubmit(onSubmit)" class="mt-4">
-      <ValidationProvider
-        name="title"
-        :rules="{ required: true }"
-        v-slot="v"
-      >
-        <b-form-group label="Title" label-for="title">
-          <b-form-input
-            type="text"
-            id="title"
-            placeholder="Enter title"
-            v-model="form.title"
-            :state="getValidationState(v)"
-            aria-describedby="input-2-live-feedback"
-          />
-          <b-form-invalid-feedback id="input-2-live-feedback"
-            >{{ v.errors[0] }}
-          </b-form-invalid-feedback>
-        </b-form-group>
-      </ValidationProvider>
+    <ValidationObserver ref="observer" v-slot="{ handleSubmit }">
+      <b-form @submit.stop.prevent="handleSubmit(onSubmit)" class="mt-4">
+        <ValidationProvider name="title" :rules="{ required: true }" v-slot="v">
+          <b-form-group label="Title" label-for="title">
+            <b-form-input
+              type="text"
+              id="title"
+              placeholder="Enter title"
+              v-model="form.title"
+              :state="getValidationState(v)"
+              aria-describedby="input-2-live-feedback"
+            />
+            <b-form-invalid-feedback id="input-2-live-feedback"
+              >{{ v.errors[0] }}
+            </b-form-invalid-feedback>
+          </b-form-group>
+        </ValidationProvider>
 
-            <ValidationProvider name="documentation" v-slot="v">
-              <b-form-group label="Documentation" label-for="documentation">
-                <b-form-input
-                  type="text"
-                  id="documentation"
-                  placeholder="documentation"
-                  v-model="form.documentation"
-                  :state="getValidationState(v)"
-                  aria-describedby="input-3-live-feedback"
-                />
-                <b-form-invalid-feedback id="input-3-live-feedback"
-                  >{{ v.errors[0] }}
-                </b-form-invalid-feedback>
-              </b-form-group>
-            </ValidationProvider>
-            <ValidationProvider
-              name="project owner"
-              :rules="{ required: false }"
-              v-slot="v"
-            >
-              <b-form-group label="Project owner" label-for="owner">
-                <b-form-select
-                  id="projectOwner"
-                  v-model="form.projectOwnerId"
-                  :options="users"
-                  :state="getValidationState(v)"
-                  aria-describedby="input-1-live-feedback"
-                ></b-form-select>
-                <b-form-invalid-feedback id="input-1-live-feedback"
-                  >{{ v.errors[0] }}
-                </b-form-invalid-feedback>
-              </b-form-group>
-            </ValidationProvider>
-            <ValidationProvider
-              name="scrum master"
-              :rules="{ required: false }"
-              v-slot="v"
-            >
-              <b-form-group label="Scrum master" label-for="owner">
-                <b-form-select
-                  id="scrumOwner"
-                  v-model="form.scrumMasterId"
-                  :options="users"
-                  :state="getValidationState(v)"
-                  aria-describedby="input-1-live-feedback"
-                ></b-form-select>
-                <b-form-invalid-feedback id="input-1-live-feedback"
-                  >{{ v.errors[0] }}
-                </b-form-invalid-feedback>
-              </b-form-group>
-            </ValidationProvider>
-
-            <br />
-            <h5>Project members</h5>
-            <table class="table table-hover mt-3 w-25">
-              <thead>
-                <td>
-                  <tr>
-                    Username
-                  </tr>
-                </td>
-              </thead>
-              <tbody>
-                <tr v-for="developer of projectDevelopers" :key="developer.id">
-                  <td>
-                    {{ developer.user.username }}
-                  </td>
-
-                  <td>
-                    <b-icon
-                      icon="x-lg"
-                      @click="removeMember(developer.id)"
-                      class="center-and-clickable"
-                    ></b-icon>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-
-            <br />
-            <h5>Add member</h5>
-            <ValidationProvider
-              name="scrum master"
-              :rules="{ required: false }"
-              v-slot="v"
-            >
-              <b-form-group label-for="owner">
-                <b-form-select
-                  id="addMember"
-                  v-model="form.member"
-                  :options="users"
-                  :state="getValidationState(v)"
-                  aria-describedby="input-1-live-feedback"
-                  class="w-25"
-                ></b-form-select>
-                <b-form-invalid-feedback id="input-1-live-feedback"
-                  >{{ v.errors[0] }}
-                </b-form-invalid-feedback>
-              </b-form-group>
-            </ValidationProvider>
-            <div class="text-center">
-              <b-button
-                variant="primary"
-                class="d-flex align-item-left w-20 mt-3"
-                @click="addMember"
-                >Add</b-button
-              >
-            </div>
-            <br />
-            <div v-if="error" class="text-center text-danger">{{ error }}</div>
-            <ul v-if="responseErrors.length > 0" class="text-danger">
-              <li v-for="err of responseErrors">{{ err }}</li>
-            </ul>
-
-      <div class="text-center">
-        <b-button type="submit" variant="primary" class="w-50 mt-3"
-          >Save</b-button
+        <ValidationProvider name="documentation" v-slot="v">
+          <b-form-group label="Documentation" label-for="documentation">
+            <b-form-input
+              type="text"
+              id="documentation"
+              placeholder="documentation"
+              v-model="form.documentation"
+              :state="getValidationState(v)"
+              aria-describedby="input-3-live-feedback"
+            />
+            <b-form-invalid-feedback id="input-3-live-feedback"
+              >{{ v.errors[0] }}
+            </b-form-invalid-feedback>
+          </b-form-group>
+        </ValidationProvider>
+        <ValidationProvider
+          name="project owner"
+          :rules="{ required: false }"
+          v-slot="v"
         >
-      </div>
-    </b-form>
-  </ValidationObserver>
-</div>
+          <b-form-group label="Project owner" label-for="owner">
+            <b-form-select
+              id="projectOwner"
+              v-model="form.projectOwnerId"
+              :options="users"
+              :state="getValidationState(v)"
+              aria-describedby="input-1-live-feedback"
+            ></b-form-select>
+            <b-form-invalid-feedback id="input-1-live-feedback"
+              >{{ v.errors[0] }}
+            </b-form-invalid-feedback>
+          </b-form-group>
+        </ValidationProvider>
+        <ValidationProvider
+          name="scrum master"
+          :rules="{ required: false }"
+          v-slot="v"
+        >
+          <b-form-group label="Scrum master" label-for="owner">
+            <b-form-select
+              id="scrumOwner"
+              v-model="form.scrumMasterId"
+              :options="users"
+              :state="getValidationState(v)"
+              aria-describedby="input-1-live-feedback"
+            ></b-form-select>
+            <b-form-invalid-feedback id="input-1-live-feedback"
+              >{{ v.errors[0] }}
+            </b-form-invalid-feedback>
+          </b-form-group>
+        </ValidationProvider>
+
+        <br />
+        <h5>Project members</h5>
+        <table class="table table-hover mt-3 w-25" v-if="isAdmin">
+          <thead>
+            <td>
+              <tr>
+                Username
+              </tr>
+            </td>
+          </thead>
+          <tbody>
+            <tr v-for="developer of projectDevelopers" :key="developer.id">
+              <td>
+                {{ developer.user.username }}
+              </td>
+
+              <td>
+                <b-icon
+                  icon="x-lg"
+                  @click="removeMember(developer.id)"
+                  class="center-and-clickable"
+                ></b-icon>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <br />
+        <h5>Add member</h5>
+        <ValidationProvider
+          name="scrum master"
+          :rules="{ required: false }"
+          v-slot="v"
+        >
+          <b-form-group label-for="owner">
+            <b-form-select
+              id="addMember"
+              v-model="form.member"
+              :options="users"
+              :state="getValidationState(v)"
+              aria-describedby="input-1-live-feedback"
+              class="w-25"
+              v-if="isAdmin"
+            ></b-form-select>
+            <b-form-invalid-feedback id="input-1-live-feedback"
+              >{{ v.errors[0] }}
+            </b-form-invalid-feedback>
+          </b-form-group>
+        </ValidationProvider>
+        <div class="text-center">
+          <b-button
+            variant="primary"
+            class="d-flex align-item-left w-20 mt-3"
+            @click="addMember"
+            :disabled="!isAdmin"
+            >Add</b-button
+          >
+        </div>
+        <br />
+        <div v-if="error" class="text-center text-danger">{{ error }}</div>
+        <ul v-if="responseErrors.length > 0" class="text-danger">
+          <li v-for="err of responseErrors">{{ err }}</li>
+        </ul>
+
+        <div class="text-center">
+          <b-button
+            :disabled="!isAdmin"
+            type="submit"
+            variant="primary"
+            class="w-50 mt-3"
+            >Save</b-button
+          >
+        </div>
+      </b-form>
+    </ValidationObserver>
+  </div>
 </template>
 
 <script>
 import { BIcon } from "bootstrap-vue";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
   name: "edit-project",
@@ -175,11 +178,21 @@ export default {
       },
     };
   },
+  computed: {
+    ...mapGetters({
+      user: "user/getUser",
+      isAdmin: "user/isAdmin",
+      isNormalUser: "user/isNormalUser",
+    }),
+    ...mapActions(["user/unsetUser", "user/fetchUser"]),
+  },
   async mounted() {
     this.id = this.$route.params.id;
     if (!this.id) return;
     this.getProject();
-    this.getUsers();
+    if (this.isAdmin) {
+      this.getUsers();
+    }
   },
   methods: {
     async removeMember(id) {

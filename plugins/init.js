@@ -4,7 +4,6 @@ const unprotectedPaths = ["/login"];
 
 const adminOnlyPaths = [
   "/admin", // match any admin route
-  "/projects/",
 ];
 
 export default function (context) {
