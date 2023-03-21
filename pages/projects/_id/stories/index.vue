@@ -22,7 +22,7 @@
         >
       </b-button-group>
     </div>
-    <table class="table table-hover mt-3 w-100">
+    <table class="table table-hover mt-3 w-100" v-if="canSee">
       <thead>
         <tr>
           <th scope="col">Title</th>
@@ -137,6 +137,8 @@ export default {
       storiesUnrealizedSprint: [],
       storiesUnrealized: [],
       sprints: [],
+      developers: [],
+      canSee: false,
     };
   },
   created() {
@@ -238,6 +240,26 @@ export default {
       await this.$axios.$get(`project/${this.projectId}`).then((res) => {
         if (!res) return;
         this.project = res;
+        this.developers = res.developers;
+
+        this.found = false;
+
+        for (var key in this.developers) {
+          var developer = this.developers[key];
+
+          if (this.currentUser.id == developer.id) {
+            this.found = true;
+          }
+        }
+
+        if (
+          this.currentUser.id == this.project.projectOwnerId ||
+          this.currentUser.id == this.project.scrumMasterId
+        ) {
+          this.found = true;
+        }
+
+        this.canSee = this.found;
 
         this.sprints = this.project.sprints;
       });
