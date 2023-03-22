@@ -9,7 +9,7 @@
     <p>
       <span class="title">Description : </span>
     </p>
-    <p>{{ form.documentation }}</p>
+    <p style="white-space: pre-line">{{ form.documentation }}</p>
     <p>
       <span class="title">Project owner : </span>
       <span
