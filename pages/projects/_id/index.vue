@@ -7,7 +7,7 @@
       <span class="title">Title : </span> <span>{{ form.title }}</span>
     </p>
     <p>
-      <span class="title">Documentation : </span>
+      <span class="title">Description : </span>
     </p>
     <p>{{ form.documentation }}</p>
     <p>

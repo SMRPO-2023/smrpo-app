@@ -27,8 +27,8 @@
             </ValidationProvider>
 
             <ValidationProvider name="documentation" v-slot="v">
-              <b-form-group label="Documentation" label-for="documentation">
-                <b-form-input
+              <b-form-group label="Description" label-for="documentation">
+                <b-form-textarea
                   type="text"
                   id="documentation"
                   placeholder="Enter documentation"

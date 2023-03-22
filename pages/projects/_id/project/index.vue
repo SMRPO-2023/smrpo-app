@@ -21,7 +21,7 @@
         </ValidationProvider>
 
         <ValidationProvider name="documentation" v-slot="v">
-          <b-form-group label="Documentation" label-for="documentation">
+          <b-form-group label="Description" label-for="documentation">
             <b-form-input
               type="text"
               id="documentation"
