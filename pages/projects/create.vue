@@ -96,7 +96,7 @@
                   <td>
                     <b-icon
                       icon="x-lg"
-                      @click="removeMember(developer.id)"
+                      @click="removeMember(developer)"
                       class="center-and-clickable"
                     ></b-icon>
                   </td>
@@ -203,8 +203,14 @@ export default {
         });
     },
     removeMember: function (id) {
-      this.index = this.projectDevelopers.indexOf(id);
-      this.projectDevelopers.splice(this.index, 1);
+      const temp = [];
+      for (let i = 0; i < this.projectDevelopers.length; i++) {
+        if (this.projectDevelopers[i] !== id) {
+          temp.push(this.projectDevelopers[i]);
+        }
+      }
+
+      this.projectDevelopers = temp;
     },
     addMember: function () {
       if (this.form.member == 0) {
@@ -239,45 +245,80 @@ export default {
           });
         });
     },
-    async onSubmit() {
-      await this.$axios
-        .$post("/project", {
-          title: this.form.title,
-          documentation: this.form.documentation,
-          projectOwnerId: this.form.projectOwnerId,
-          scrumMasterId: this.form.scrumMasterId,
-        })
-        .then(async (res) => {
-          this.id = res.id;
-          this.projectDevelopers.forEach((developerId) =>
-            this.addMemberRequest(developerId)
-          );
-          await this.$router.replace("/projects");
-        })
-        .catch((error) => {
-          const status = error?.response?.status;
-          const data = error?.response?.data;
-          // some instances of errors return main message along with array of detailed shorter messages
-          if (status && status === 400) {
-            if (data && data.message instanceof Array) {
-              this.responseErrors = data.message;
-            }
-            this.error = "Wrong input, while creating project.";
-            this.error = data.message;
-            this.responseErrors = data.message;
-          } else if (status && status === 409) {
-            this.$toast.error("Project with the same title already exists.", {
-              duration: 3000,
-            });
-          } else {
-            this.$toast.error(
-              "An error has occurred, while creating projectttt.",
-              {
-                duration: 3000,
-              }
-            );
+    validateFields() {
+      var valid = true;
+      if (this.form.projectOwnerId == this.form.scrumMasterId) {
+        this.$toast.error(
+          "Project owner and scrum master can not be the same person.",
+          {
+            duration: 3000,
           }
+        );
+        valid = false;
+        return false;
+      }
+      if (this.form.projectOwnerId == this.form.scrumMasterId) {
+        this.$toast.error("Project owner can not be a member.", {
+          duration: 3000,
         });
+        valid = false;
+        return false;
+      }
+      for (var key in this.projectDevelopers) {
+        var id = this.projectDevelopers[key];
+        if (this.form.projectOwnerId == id) {
+          this.$toast.error("Project owner can not be a member.", {
+            duration: 3000,
+          });
+          valid = false;
+          return false;
+        }
+      }
+
+      return valid;
+    },
+    async onSubmit() {
+      if (this.validateFields()) {
+        await this.$axios
+          .$post("/project", {
+            title: this.form.title,
+            documentation: this.form.documentation,
+            projectOwnerId: this.form.projectOwnerId,
+            scrumMasterId: this.form.scrumMasterId,
+          })
+          .then(async (res) => {
+            this.id = res.id;
+
+            this.projectDevelopers.forEach((developerId) =>
+              this.addMemberRequest(developerId)
+            );
+            await this.$router.replace("/projects");
+          })
+          .catch((error) => {
+            const status = error?.response?.status;
+            const data = error?.response?.data;
+            // some instances of errors return main message along with array of detailed shorter messages
+            if (status && status === 400) {
+              if (data && data.message instanceof Array) {
+                this.responseErrors = data.message;
+              }
+              this.error = "Wrong input, while creating project.";
+              this.error = data.message;
+              this.responseErrors = data.message;
+            } else if (status && status === 409) {
+              this.$toast.error("Project with the same title already exists.", {
+                duration: 3000,
+              });
+            } else {
+              this.$toast.error(
+                "An error has occurred, while creating projectttt.",
+                {
+                  duration: 3000,
+                }
+              );
+            }
+          });
+      }
     },
   },
 };
