@@ -1,162 +1,156 @@
 <template>
-<div>
-  <h1 class="d-flex align-items-center">
-    <back-btn />
-    <span>Edit user story</span>
-  </h1>
+  <div>
+    <h1 class="d-flex align-items-center">
+      <back-btn />
+      <span>Edit user story</span>
+    </h1>
 
-  <ValidationObserver ref="observer" v-slot="{ handleSubmit }">
-    <b-form @submit.stop.prevent="handleSubmit(onSubmit)" class="mt-4">
-        
-      <!-- Title -->
-      <ValidationProvider
-        name="title"
-        :rules="{ required: true }"
-        v-slot="v"
-      >
-        <b-form-group label="Title" label-for="title">
-          <b-form-input
-            type="text"
-            id="title"
-            placeholder="Enter title"
-            v-model="form.title"
-            :state="getValidationState(v)"
-            aria-describedby="title-live-feedback"
-          />
-          <b-form-invalid-feedback id="title-live-feedback"
-            >{{ v.errors[0] }}
-          </b-form-invalid-feedback>
-        </b-form-group>
-      </ValidationProvider>
+    <ValidationObserver ref="observer" v-slot="{ handleSubmit }">
+      <b-form @submit.stop.prevent="handleSubmit(onSubmit)" class="mt-4">
+        <!-- Title -->
+        <ValidationProvider name="title" :rules="{ required: true }" v-slot="v">
+          <b-form-group label="Title" label-for="title">
+            <b-form-input
+              type="text"
+              id="title"
+              placeholder="Enter title"
+              v-model="form.title"
+              :state="getValidationState(v)"
+              aria-describedby="title-live-feedback"
+            />
+            <b-form-invalid-feedback id="title-live-feedback"
+              >{{ v.errors[0] }}
+            </b-form-invalid-feedback>
+          </b-form-group>
+        </ValidationProvider>
 
-      <!-- Description -->
-      <ValidationProvider
-        name="description"
-        v-slot="v"
-      >
-        <b-form-group label="Description" label-for="description">
-          <b-form-textarea
-            id="description"
-            placeholder="Enter description"
-            v-model="form.description"
-            :state="getValidationState(v)"
-            aria-describedby="description-live-feedback"
-          />
-          <b-form-invalid-feedback id="description-live-feedback"
-            >{{ v.errors[0] }}
-          </b-form-invalid-feedback>
-        </b-form-group>
-      </ValidationProvider>
+        <!-- Description -->
+        <ValidationProvider name="description" v-slot="v">
+          <b-form-group label="Description" label-for="description">
+            <b-form-textarea
+              id="description"
+              placeholder="Enter description"
+              v-model="form.description"
+              :state="getValidationState(v)"
+              aria-describedby="description-live-feedback"
+            />
+            <b-form-invalid-feedback id="description-live-feedback"
+              >{{ v.errors[0] }}
+            </b-form-invalid-feedback>
+          </b-form-group>
+        </ValidationProvider>
 
-      <!-- Priority -->
-      <ValidationProvider
-        name="priority"
-        :rules="{ required: true }"
-        v-slot="v"
-      >
-        <b-form-group label="Priority" label-for="priority">
-          <b-form-select
-            id="priority"
-            v-model="form.priority"
-            :options="prioritiesOptions"
-            :state="getValidationState(v)"
-            aria-describedby="priority-live-feedback"
-          ></b-form-select>
-          <b-form-invalid-feedback id="priority-live-feedback"
-            >{{ v.errors[0] }}
-          </b-form-invalid-feedback>
-        </b-form-group>
-      </ValidationProvider>
-
-      <!-- Points -->
-      <ValidationProvider
-        name="points"
-        :rules="{ required: true, numeric: true, min_value: 0.1, max_value: 20 }"
-        v-slot="v"
-      >
-        <b-form-group label="Points" label-for="points">
-          <b-form-input
-            type="number"
-            id="points"
-            placeholder="Enter points"
-            v-model="form.points"
-            :state="getValidationState(v)"
-            aria-describedby="points-live-feedback"
-          />
-          <b-form-invalid-feedback id="points-live-feedback"
-            >{{ v.errors[0] }}
-          </b-form-invalid-feedback>
-        </b-form-group>
-      </ValidationProvider>
-
-      <!-- Business value -->
-      <ValidationProvider
-        name="businessValue"
-        :rules="{ numeric: true, min_value: 1, max_value: 10 }"
-        v-slot="v"
-      >
-        <b-form-group label="Business value" label-for="businessValue">
-          <b-form-input
-            type="number"
-            id="businessValue"
-            placeholder="Enter business value"
-            v-model="form.businessValue"
-            :state="getValidationState(v)"
-            aria-describedby="businessValue-live-feedback"
-          />
-          <b-form-invalid-feedback id="businessValue-live-feedback"
-            >{{ v.errors[0] }}
-          </b-form-invalid-feedback>
-        </b-form-group>
-      </ValidationProvider>
-
-      <!-- Sprint -->
-      <ValidationProvider
-        name="sprint"
-        v-slot="v"
-      >
-        <b-form-group label="Sprint" label-for="sprint">
-          <b-form-select
-            id="sprint"
-            v-model="form.sprintId"
-            :options="sprintsOptions"
-            :state="getValidationState(v)"
-            :disabled="sprintsOptions.length <= 1"
-            aria-describedby="sprint-live-feedback"
-          ></b-form-select>
-          <b-form-invalid-feedback id="sprint-live-feedback"
-            >{{ v.errors[0] }}
-          </b-form-invalid-feedback>
-        </b-form-group>
-      </ValidationProvider>
-
-      <!-- Implemented -->
-      <b-form-group label="" label-for="implemented">
-        <b-form-checkbox
-          id="implemented"
-          name="implemented"
-          v-model="form.implemented"
+        <!-- Priority -->
+        <ValidationProvider
+          name="priority"
+          :rules="{ required: true }"
+          v-slot="v"
         >
-          Has been implemented?
-        </b-form-checkbox>
-      </b-form-group>
+          <b-form-group label="Priority" label-for="priority">
+            <b-form-select
+              id="priority"
+              v-model="form.priority"
+              :options="prioritiesOptions"
+              :state="getValidationState(v)"
+              aria-describedby="priority-live-feedback"
+            ></b-form-select>
+            <b-form-invalid-feedback id="priority-live-feedback"
+              >{{ v.errors[0] }}
+            </b-form-invalid-feedback>
+          </b-form-group>
+        </ValidationProvider>
 
-      <!-- footer -->
-      <div v-if="error" class="text-center text-danger">{{ error }}</div>
-      <ul v-if="responseErrors.length > 0" class="text-danger">
-        <li v-for="err of responseErrors">{{ err }}</li>
-      </ul>
-
-      <div class="text-center">
-        <b-button type="submit" variant="primary" class="w-50 mt-3"
-          >Save</b-button
+        <!-- Points -->
+        <ValidationProvider
+          name="points"
+          :rules="{
+            required: true,
+            numeric: true,
+            min_value: 0.1,
+            max_value: 20,
+          }"
+          v-slot="v"
         >
-      </div>
-    </b-form>
-  </ValidationObserver>
-</div>
+          <b-form-group label="Points" label-for="points">
+            <b-form-input
+              type="number"
+              id="points"
+              placeholder="Enter points"
+              v-model="form.points"
+              :state="getValidationState(v)"
+              aria-describedby="points-live-feedback"
+            />
+            <b-form-invalid-feedback id="points-live-feedback"
+              >{{ v.errors[0] }}
+            </b-form-invalid-feedback>
+          </b-form-group>
+        </ValidationProvider>
+
+        <!-- Business value -->
+        <ValidationProvider
+          name="businessValue"
+          :rules="{ numeric: true, min_value: 1, max_value: 10 }"
+          v-slot="v"
+        >
+          <b-form-group label="Business value" label-for="businessValue">
+            <b-form-input
+              type="number"
+              id="businessValue"
+              placeholder="Enter business value"
+              v-model="form.businessValue"
+              :state="getValidationState(v)"
+              aria-describedby="businessValue-live-feedback"
+            />
+            <b-form-invalid-feedback id="businessValue-live-feedback"
+              >{{ v.errors[0] }}
+            </b-form-invalid-feedback>
+          </b-form-group>
+        </ValidationProvider>
+
+        <!-- Sprint -->
+        <ValidationProvider name="sprint" v-slot="v">
+          <b-form-group label="Sprint" label-for="sprint">
+            <b-form-select
+              id="sprint"
+              v-model="form.sprintId"
+              :options="sprintsOptions"
+              :state="getValidationState(v)"
+              :disabled="sprintsOptions.length <= 1"
+              aria-describedby="sprint-live-feedback"
+            ></b-form-select>
+            <b-form-invalid-feedback id="sprint-live-feedback"
+              >{{ v.errors[0] }}
+            </b-form-invalid-feedback>
+          </b-form-group>
+        </ValidationProvider>
+
+        <!-- Implemented -->
+        <b-form-group label="" label-for="implemented">
+          <b-form-checkbox
+            id="implemented"
+            name="implemented"
+            v-model="form.implemented"
+          >
+            Has been implemented?
+          </b-form-checkbox>
+        </b-form-group>
+
+        <!-- footer -->
+        <div v-if="error" class="text-center text-danger">{{ error }}</div>
+        <ul v-if="responseErrors.length > 0" class="text-danger">
+          <li v-for="err of responseErrors">{{ err }}</li>
+        </ul>
+
+        <div class="text-center">
+          <b-button type="submit" variant="primary" class="w-50 mt-3"
+            >Save</b-button
+          >
+        </div>
+      </b-form>
+    </ValidationObserver>
+  </div>
 </template>
-  
+
 <script>
 import { BIcon } from "bootstrap-vue";
 import { mapGetters } from "vuex";
@@ -170,7 +164,7 @@ export default {
   mixins: [priorities],
   computed: {
     ...mapGetters({
-      projectId: "route-id/getProjectId"
+      projectId: "route-id/getProjectId",
     }),
   },
   data() {
@@ -229,7 +223,7 @@ export default {
           implemented: this.form.implemented,
           businessValue: this.form.businessValue,
           sprintId: this.form.sprintId,
-          projectId: this.projectId
+          projectId: this.projectId,
         })
         .then(async (res) => {
           this.error = null;
@@ -245,7 +239,8 @@ export default {
           if (status && status === 400) {
             if (data && data.message instanceof Array) {
               this.responseErrors = data.message;
-              this.error = "An error has occurred, while updating the user story";
+              this.error =
+                "An error has occurred, while updating the user story";
             } else {
               this.responseErrors = [];
               this.error = data.message;
@@ -254,19 +249,20 @@ export default {
             this.responseErrors = [];
             this.error = data?.message;
           }
-          this.$toast.error("An error has occurred, while updating the user story", {
-            duration: 3000,
-          });
+          this.$toast.error(
+            "An error has occurred, while updating the user story",
+            {
+              duration: 3000,
+            }
+          );
         });
     },
     async getSprints() {
       if (!this.projectId) return;
 
-      await this.$axios
-      .$get(`project/${this.projectId}`)
-      .then((res) => {
+      await this.$axios.$get(`project/${this.projectId}`).then((res) => {
         if (!res) return;
-        const sprints = res.sprints.map(s => ({value: s.id, text: s.name}));
+        const sprints = res.sprints.map((s) => ({ value: s.id, text: s.name }));
         this.sprintsOptions = this.sprintsOptions.concat(sprints);
       });
     },
@@ -274,32 +270,31 @@ export default {
       if (!this.projectId || !this.id) return;
 
       await this.$axios
-      .$get(`user-stories/${this.id}`)
-      .then((res) => {
-        if (!res) return Promise.reject("No data");
-        
-        this.form.title = res.title;
-        this.form.description = res.description;
-        this.form.priority = res.priority;
-        this.form.points = res.points;
-        this.form.implemented = res.implemented;
-        this.form.businessValue = res.businessValue;
-        this.form.sprintId = res.sprintId;
-        this.form.projectId = res.projectId;
-      })
-      .catch((reason) => {
-        console.error(reason);
-        this.$toast.error(
-          "An error has occurred, while getting user story information",
-          {
-            duration: 3000,
-          }
-        );
-      });
+        .$get(`user-stories/${this.id}`)
+        .then((res) => {
+          if (!res) return Promise.reject("No data");
+
+          this.form.title = res.title;
+          this.form.description = res.description;
+          this.form.priority = res.priority;
+          this.form.points = res.points;
+          this.form.implemented = res.implemented;
+          this.form.businessValue = res.businessValue;
+          this.form.sprintId = res.sprintId;
+          this.form.projectId = res.projectId;
+        })
+        .catch((reason) => {
+          console.error(reason);
+          this.$toast.error(
+            "An error has occurred, while getting user story information",
+            {
+              duration: 3000,
+            }
+          );
+        });
     },
   },
 };
 </script>
-  
+
 <style scoped></style>
-  

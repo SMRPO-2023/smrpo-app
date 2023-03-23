@@ -4,7 +4,7 @@
       <h1 class="mb-0">Stories</h1>
 
       <b-button
-        :disabled="!hasPermission()"
+        v-if="hasPermission()"
         variant="primary"
         href="stories/create"
         class="d-flex flex-column justify-content-center"
