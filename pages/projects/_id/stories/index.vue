@@ -248,7 +248,7 @@ export default {
         for (var key in this.developers) {
           var developer = this.developers[key];
 
-          if (this.currentUser.id == developer.id) {
+          if (this.currentUser.id == developer.user.id) {
             this.found = true;
           }
         }
