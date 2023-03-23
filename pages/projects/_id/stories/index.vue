@@ -29,7 +29,7 @@
           <th scope="col">Description</th>
           <th scope="col">Business value</th>
           <th scope="col">Priority</th>
-          <th scope="col">Implemented</th>
+          <th scope="col">Accepted</th>
           <th scope="col">Sprint</th>
           <th scope="col">Criteria</th>
           <th scope="col"></th>

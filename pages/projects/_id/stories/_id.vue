@@ -131,7 +131,7 @@
             name="implemented"
             v-model="form.implemented"
           >
-            Has been implemented?
+            Has been accepted?
           </b-form-checkbox>
         </b-form-group>
 
