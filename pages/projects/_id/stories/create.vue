@@ -25,7 +25,11 @@
         </ValidationProvider>
 
         <!-- Description -->
-        <ValidationProvider name="description" v-slot="v">
+        <ValidationProvider
+          name="description"
+          :rules="{ required: true }"
+          v-slot="v"
+        >
           <b-form-group label="Description" label-for="description">
             <b-form-textarea
               id="description"
