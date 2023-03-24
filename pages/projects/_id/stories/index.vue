@@ -191,7 +191,7 @@ export default {
       if (!storyId) return;
 
       await this.$axios
-        .$post(`/user-stories/accept${storyId}`, {
+        .$post(`/user-stories/accept/${storyId}`, {
           acceptanceTest: true,
         })
         .then((res) => {
