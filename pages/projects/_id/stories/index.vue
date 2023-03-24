@@ -16,7 +16,9 @@
         <b-button variant="info" @click="showAll()">All</b-button>
         <b-button variant="success" @click="showRealized()">Realized</b-button>
 
-        <b-button variant="warning" @click="showOnSprint()">On sprint</b-button>
+        <b-button variant="warning" @click="showOnSprint()"
+          >Unrealized on sprint</b-button
+        >
         <b-button variant="danger" @click="showUnrealized()"
           >Unrealized</b-button
         >
