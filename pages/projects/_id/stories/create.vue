@@ -90,7 +90,6 @@
         <ValidationProvider
           name="points"
           :rules="{
-            required: true,
             numeric: true,
             min_value: 0.1,
             max_value: 50,
