@@ -30,6 +30,7 @@
           <th scope="col">Business value</th>
           <th scope="col">Priority</th>
           <th scope="col">Accepted</th>
+          <th scope="col">Accept</th>
           <th scope="col">Sprint</th>
           <th scope="col">Criteria</th>
           <th scope="col"></th>
@@ -71,10 +72,19 @@
           <td>
             <b-button
               size="sm"
-              :variant="getVariantForImplemented(!story.implemented)"
+              :variant="getVariantForImplemented(!story.acceptanceTest)"
               disabled
             >
-              {{ getNameForImplemented(story.implemented) }}
+              {{ getNameForImplemented(story.acceptanceTest) }}
+            </b-button>
+          </td>
+          <td>
+            <b-button
+              :disabled="!story.canBeAccepted"
+              :variant="getVariantForImplemented(!story.canBeAccepted)"
+              @click="acceptStory(story.id)"
+            >
+              Accept
             </b-button>
           </td>
           <td>
@@ -172,6 +182,20 @@ export default {
     findSprintName(sprintId) {
       if (!sprintId || !this.sprints || !this.sprints.length) return null;
       return this.sprints.find((s) => s.id === sprintId)?.name;
+    },
+    async acceptStory() {
+      if (!this.projectId) return;
+
+      await this.$axios
+        .$post(`user-stories/accept${this.projectId}`, {
+          params: {
+            acceptanceTest: true,
+          },
+        })
+        .then((res) => {
+          if (!res) return;
+          alert("POSTED");
+        });
     },
     async getUnrealizedSprint() {
       if (!this.projectId) return;
