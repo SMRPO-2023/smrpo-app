@@ -183,18 +183,16 @@ export default {
       if (!sprintId || !this.sprints || !this.sprints.length) return null;
       return this.sprints.find((s) => s.id === sprintId)?.name;
     },
-    async acceptStory() {
-      if (!this.projectId) return;
+    async acceptStory(storyId) {
+      if (!storyId) return;
 
       await this.$axios
-        .$post(`user-stories/accept${this.projectId}`, {
-          params: {
-            acceptanceTest: true,
-          },
+        .$post(`/user-stories/accept${storyId}`, {
+          acceptanceTest: true,
         })
         .then((res) => {
           if (!res) return;
-          alert("POSTED");
+          this.$router.go(0);
         });
     },
     async getUnrealizedSprint() {
