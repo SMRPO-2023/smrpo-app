@@ -83,6 +83,7 @@
               :disabled="!story.canBeAccepted"
               :variant="getVariantForImplemented(!story.canBeAccepted)"
               @click="acceptStory(story.id)"
+              v-if="isProjectOwner()"
             >
               Accept
             </b-button>
@@ -178,6 +179,9 @@ export default {
         this.currentUser.id === this.project.projectOwnerId ||
         this.currentUser.id === this.project.scrumMasterId
       );
+    },
+    isProjectOwner() {
+      return this.currentUser.id === this.project.projectOwnerId;
     },
     findSprintName(sprintId) {
       if (!sprintId || !this.sprints || !this.sprints.length) return null;
