@@ -1,49 +1,58 @@
 export const state = () => ({
   token: null,
-  user: null
-})
+  user: null,
+  lastLogin: null,
+});
 
 export const mutations = {
   setToken(state, value) {
-    state.token = value
+    state.token = value;
   },
   setUser(state, value) {
-    state.user = value
+    state.user = value;
+  },
+  setLastLogin(state, value) {
+    state.lastLogin = value;
   },
   unsetUser(state, value) {
-    state.user = null
+    state.user = null;
   },
   unsetToken(state, value) {
-    state.user = null
+    state.user = null;
   },
-}
+  unsetLastLogin(state) {},
+};
 
 export const getters = {
   getUser(state) {
-    return state.user
+    return state.user;
+  },
+  getLastLogin(state) {
+    return state.lastLogin;
   },
   isAdmin(state) {
     if (!state.user) return false;
-    return state.user.role === 'ADMIN'
+    return state.user.role === "ADMIN";
   },
   isNormalUser(state) {
     if (!state.user) return false;
-    return state.user.role === 'USER'
-  }
-}
+    return state.user.role === "USER";
+  },
+};
 
 export const actions = {
   async fetchUser({ commit }, userId) {
-    await this.$axios.$get(`/users/me`)
-      .then(res => {
-        commit('setUser', res)
+    await this.$axios
+      .$get(`/users/me`)
+      .then((res) => {
+        commit("setUser", res);
       })
-      .catch(res => {
-        commit('set', null)
-      })
+      .catch((res) => {
+        commit("set", null);
+      });
   },
   unsetUser({ commit }) {
-    commit('unsetUser')
-    commit('unsetToken')
+    commit("unsetUser");
+    commit("unsetToken");
   },
-}
+};

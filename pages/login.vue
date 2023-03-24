@@ -94,7 +94,7 @@ export default {
       return dirty || validated ? valid : null;
     },
 
-    ...mapMutations(["user/setUser", "user/setToken"]),
+    ...mapMutations(["user/setUser", "user/setToken", "user/setLastLogin"]),
     ...mapActions(["user/fetchUser", "user/unsetUser"]),
     async onSubmit() {
       this.loading = true;
@@ -104,6 +104,7 @@ export default {
         .then(async (res) => {
           localStorage.setItem("jwt", res?.accessToken);
           localStorage.setItem("userId", res?.userId);
+          await this.$store.commit("user/setLastLogin", res.firstLogin);
           await this.$store.commit("user/setToken", res?.accessToken);
           await this.$store.dispatch("user/fetchUser", res?.userId);
           await this.$router.push("/");

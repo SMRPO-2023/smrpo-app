@@ -24,8 +24,11 @@
           <b-dropdown-item @click="logout">Logout</b-dropdown-item>
           <b-dropdown-divider v-if="user.lastLogin"></b-dropdown-divider>
           <b-dropdown-text v-if="user.lastLogin" style="width: 240px"
-            ><small
+            ><small v-if="!firstLogin"
               >Last login: <b>{{ formatDateTime(user.lastLogin) }}</b></small
+            >
+            <small v-else
+              ><b>This is your first login</b></small
             ></b-dropdown-text
           >
         </b-nav-item-dropdown>
@@ -52,10 +55,11 @@ export default {
   computed: {
     ...mapGetters({
       user: "user/getUser",
+      firstLogin: "user/getLastLogin",
       isAdmin: "user/isAdmin",
       isNormalUser: "user/isNormalUser",
     }),
-    ...mapActions(["user/unsetUser", "user/fetchUser"]),
+    ...mapActions(["user/unsetUser", "user/fetchUser", "user/getLastLogin"]),
   },
   methods: {
     async logout() {
