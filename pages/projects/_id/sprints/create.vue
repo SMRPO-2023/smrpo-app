@@ -1,132 +1,134 @@
 <template>
-<div>
-  <h1 class="d-flex align-items-center">
-    <back-btn />
-    <span>New sprint</span>
-  </h1>
+  <div>
+    <h1 class="d-flex align-items-center">
+      <back-btn />
+      <span>New sprint</span>
+    </h1>
 
-  <ValidationObserver ref="observer" v-slot="{ handleSubmit }">
-    <b-form @submit.stop.prevent="handleSubmit(onSubmit)" class="mt-4">
-        
-      <!-- Name -->
-      <ValidationProvider
-        name="name"
-        :rules="{ required: true }"
-        v-slot="v"
-      >
-        <b-form-group label="Name" label-for="name">
-          <b-form-input
-            type="text"
-            id="name"
-            placeholder="Enter name"
-            v-model="form.name"
-            :state="getValidationState(v)"
-            aria-describedby="name-live-feedback"
-          />
-          <b-form-invalid-feedback id="name-live-feedback"
-            >{{ v.errors[0] }}
-          </b-form-invalid-feedback>
-        </b-form-group>
-      </ValidationProvider>
+    <ValidationObserver ref="observer" v-slot="{ handleSubmit }">
+      <b-form @submit.stop.prevent="handleSubmit(onSubmit)" class="mt-4">
+        <!-- Name -->
+        <ValidationProvider name="name" :rules="{ required: true }" v-slot="v">
+          <b-form-group label="Name" label-for="name">
+            <b-form-input
+              type="text"
+              id="name"
+              placeholder="Enter name"
+              v-model="form.name"
+              :state="getValidationState(v)"
+              aria-describedby="name-live-feedback"
+            />
+            <b-form-invalid-feedback id="name-live-feedback"
+              >{{ v.errors[0] }}
+            </b-form-invalid-feedback>
+          </b-form-group>
+        </ValidationProvider>
 
-      <b-row>
-        <b-col>
-          <!-- Start -->
-          <ValidationProvider
-            name="start"
-            :rules="{ required: true, between: [minDate, maxStartDate] }"
-            v-slot="v"
-          >
-            <b-form-group label="Start date" label-for="start">
-              <b-form-datepicker
-                id="start"
-                placeholder="Choose start date"
-                v-model="form.start"
-                :state="getValidationState(v)"
-                :min="minDate"
-                :max="maxStartDate"
-                today-button
-                reset-button
-                value-as-date
-                aria-describedby="start-live-feedback"
-              />
-              <b-form-invalid-feedback id="start-live-feedback"
-                >{{ v.errors[0] }}
-              </b-form-invalid-feedback>
-            </b-form-group>
-          </ValidationProvider>
-        </b-col>
-        
-        <b-col>
-          <!-- End -->
-          <ValidationProvider
-            name="end"
-            :rules="{ required: true, between: [minEndDate, maxDate] }"
-            v-slot="v"
-          >
-            <b-form-group label="End date" label-for="end">
-              <b-form-datepicker
-                id="end"
-                placeholder="Choose end date"
-                v-model="form.end"
-                :state="getValidationState(v)"
-                :min="minEndDate"
-                :max="maxDate"
-                today-button
-                reset-button
-                value-as-date
-                aria-describedby="end-live-feedback"
-              />
-              <b-form-invalid-feedback id="end-live-feedback"
-                >{{ v.errors[0] }}
-              </b-form-invalid-feedback>
-            </b-form-group>
-          </ValidationProvider>
-        </b-col>
-      </b-row>
+        <b-row>
+          <b-col>
+            <!-- Start -->
+            <ValidationProvider
+              name="start"
+              :rules="{ required: true, between: [minDate, maxStartDate] }"
+              v-slot="v"
+            >
+              <b-form-group label="Start date" label-for="start">
+                <b-form-datepicker
+                  id="start"
+                  placeholder="Choose start date"
+                  v-model="form.start"
+                  :state="getValidationState(v)"
+                  :min="minDate"
+                  :max="maxStartDate"
+                  :date-disabled-fn="dateDisabled"
+                  today-button
+                  reset-button
+                  value-as-date
+                  aria-describedby="start-live-feedback"
+                />
+                <b-form-invalid-feedback id="start-live-feedback"
+                  >{{ v.errors[0] }}
+                </b-form-invalid-feedback>
+              </b-form-group>
+            </ValidationProvider>
+          </b-col>
 
-      <!-- Velocity -->
-      <ValidationProvider
-        name="velocity"
-        :rules="{ required: true, numeric: true, min_value: 0, max_value: 100 }"
-        v-slot="v"
-      >
-        <b-form-group label="Velocity" label-for="velocity">
-          <b-form-input
-            type="number"
-            id="velocity"
-            placeholder="Enter velocity"
-            v-model="form.velocity"
-            :state="getValidationState(v)"
-            aria-describedby="velocity-live-feedback"
-          />
-          <b-form-invalid-feedback id="velocity-live-feedback"
-            >{{ v.errors[0] }}
-          </b-form-invalid-feedback>
-        </b-form-group>
-      </ValidationProvider>
+          <b-col>
+            <!-- End -->
+            <ValidationProvider
+              name="end"
+              :rules="{ required: true, between: [minEndDate, maxDate] }"
+              v-slot="v"
+            >
+              <b-form-group label="End date" label-for="end">
+                <b-form-datepicker
+                  id="end"
+                  placeholder="Choose end date"
+                  v-model="form.end"
+                  :state="getValidationState(v)"
+                  :min="minEndDate"
+                  :max="maxDate"
+                  :date-disabled-fn="dateDisabled"
+                  today-button
+                  reset-button
+                  value-as-date
+                  aria-describedby="end-live-feedback"
+                />
+                <b-form-invalid-feedback id="end-live-feedback"
+                  >{{ v.errors[0] }}
+                </b-form-invalid-feedback>
+              </b-form-group>
+            </ValidationProvider>
+          </b-col>
+        </b-row>
 
-      <!-- footer -->
-      <div v-if="error" class="text-center text-danger">{{ error }}</div>
-      <ul v-if="responseErrors.length > 0" class="text-danger">
-        <li v-for="err of responseErrors">{{ err }}</li>
-      </ul>
-
-      <div class="text-center">
-        <b-button 
-          :disabled="!isScrumMaster()" 
-          type="submit" 
-          variant="primary" 
-          class="w-50 mt-3"
+        <!-- Velocity -->
+        <ValidationProvider
+          name="velocity"
+          :rules="{
+            required: true,
+            numeric: true,
+            min_value: 0,
+            max_value: 100,
+          }"
+          v-slot="v"
         >
-          Create
-        </b-button>
-      </div>
-    </b-form>
-  </ValidationObserver>
-</div>
+          <b-form-group label="Velocity" label-for="velocity">
+            <b-form-input
+              type="number"
+              id="velocity"
+              placeholder="Enter velocity"
+              v-model="form.velocity"
+              :state="getValidationState(v)"
+              aria-describedby="velocity-live-feedback"
+            />
+            <b-form-invalid-feedback id="velocity-live-feedback"
+              >{{ v.errors[0] }}
+            </b-form-invalid-feedback>
+          </b-form-group>
+        </ValidationProvider>
+
+        <!-- footer -->
+        <div v-if="error" class="text-center text-danger">{{ error }}</div>
+        <ul v-if="responseErrors.length > 0" class="text-danger">
+          <li v-for="err of responseErrors">{{ err }}</li>
+        </ul>
+
+        <div class="text-center">
+          <b-button
+            :disabled="!isScrumMaster()"
+            type="submit"
+            variant="primary"
+            class="w-50 mt-3"
+          >
+            Create
+          </b-button>
+        </div>
+      </b-form>
+    </ValidationObserver>
+  </div>
 </template>
-  
+
 <script>
 import { mapGetters } from "vuex";
 
@@ -135,7 +137,7 @@ export default {
   computed: {
     ...mapGetters({
       currentUser: "user/getUser",
-      projectId: "route-id/getProjectId"
+      projectId: "route-id/getProjectId",
     }),
     maxStartDate() {
       return this.form.end || this.maxDate;
@@ -166,6 +168,11 @@ export default {
     this.maxDate.setHours(0, 0, 0, 0);
   },
   methods: {
+    dateDisabled(ymd, date) {
+      const weekday = date.getDay();
+      const day = date.getDate();
+      return weekday === 0 || weekday === 6 || day === 13;
+    },
     isScrumMaster() {
       if (!this.currentUser || !this.project) return false;
       return this.currentUser.id === this.project.scrumMasterId;
@@ -176,9 +183,7 @@ export default {
     async getProject() {
       if (!this.projectId) return;
 
-      await this.$axios
-      .$get(`project/${this.projectId}`)
-      .then((res) => {
+      await this.$axios.$get(`project/${this.projectId}`).then((res) => {
         if (!res) return;
         this.project = res;
       });
@@ -192,7 +197,7 @@ export default {
           start: this.form.start,
           end: this.form.end,
           velocity: +this.form.velocity,
-          projectId: this.projectId
+          projectId: this.projectId,
         })
         .then(async (res) => {
           await this.$router.replace(`/projects/${this.projectId}/sprints`);
@@ -217,5 +222,5 @@ export default {
   },
 };
 </script>
-  
+
 <style scoped></style>
