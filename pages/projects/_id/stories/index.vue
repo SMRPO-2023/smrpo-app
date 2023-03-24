@@ -86,14 +86,10 @@
             </nuxt-link>
           </td>
           <td>
-            <tr v-for="criteria of story.acceptanceCriteria" :key="criteria.id">
-              <b-button
-                size="sm"
-                class="m-1"
-                :variant="getVariantForImplemented(!criteria.completed)"
-              >
-                {{ criteria.completed }}
-              </b-button>
+            <tr>
+              {{
+                story.acceptanceCriteria | limit(100)
+              }}
             </tr>
           </td>
 

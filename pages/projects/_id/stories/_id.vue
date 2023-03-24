@@ -44,6 +44,28 @@
           </b-form-group>
         </ValidationProvider>
 
+        <!-- Acceptance criteria -->
+        <ValidationProvider
+          name="acceptanceCriteria"
+          :rules="{ required: true }"
+          v-slot="v"
+        >
+          <b-form-group
+            label="Acceptance Criteria"
+            label-for="acceptanceCriteria"
+          >
+            <b-form-textarea
+              id="acceptanceCriteria"
+              placeholder="Enter Criteria"
+              v-model="form.acceptanceCriteria"
+              :state="getValidationState(v)"
+              aria-describedby="acceptanceCriteria-live-feedback"
+            />
+            <b-form-invalid-feedback id="acceptanceCriteria-live-feedback"
+              >{{ v.errors[0] }}
+            </b-form-invalid-feedback>
+          </b-form-group>
+        </ValidationProvider>
         <!-- Priority -->
         <ValidationProvider
           name="priority"
@@ -181,6 +203,7 @@ export default {
       form: {
         title: null,
         description: null,
+        acceptanceCriteria: null,
         priority: null,
         points: null,
         implemented: false,
@@ -222,8 +245,9 @@ export default {
         .$patch(`user-stories/${this.id}`, {
           title: this.form.title,
           description: this.form.description,
+          acceptanceCriteria: this.form.acceptanceCriteria,
           priority: this.form.priority,
-          points: +this.form.points,
+          points: parseInt(this.form.points),
           implemented: this.form.implemented,
           businessValue: this.form.businessValue,
           sprintId: this.form.sprintId,
