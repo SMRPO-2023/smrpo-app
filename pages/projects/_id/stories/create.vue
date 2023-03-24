@@ -43,6 +43,28 @@
             </b-form-invalid-feedback>
           </b-form-group>
         </ValidationProvider>
+        <!-- Acceptance criteria -->
+        <ValidationProvider
+          name="acceptanceCriteria"
+          :rules="{ required: true }"
+          v-slot="v"
+        >
+          <b-form-group
+            label="Acceptance Criteria"
+            label-for="acceptanceCriteria"
+          >
+            <b-form-textarea
+              id="acceptanceCriteria"
+              placeholder="Enter Criteria"
+              v-model="form.acceptanceCriteria"
+              :state="getValidationState(v)"
+              aria-describedby="acceptanceCriteria-live-feedback"
+            />
+            <b-form-invalid-feedback id="acceptanceCriteria-live-feedback"
+              >{{ v.errors[0] }}
+            </b-form-invalid-feedback>
+          </b-form-group>
+        </ValidationProvider>
 
         <!-- Priority -->
         <ValidationProvider
@@ -71,7 +93,7 @@
             required: true,
             numeric: true,
             min_value: 0.1,
-            max_value: 20,
+            max_value: 50,
           }"
           v-slot="v"
         >
@@ -172,6 +194,7 @@ export default {
       form: {
         title: null,
         description: null,
+        acceptanceCriteria: null,
         priority: null,
         points: null,
         implemented: false,
@@ -202,16 +225,13 @@ export default {
 
       await this.$axios
         .$post("user-stories", {
+          priority: this.form.priority,
           title: this.form.title,
           description: this.form.description,
-          priority: this.form.priority,
-          points: +this.form.points,
-          implemented: this.form.implemented,
-          businessValue: this.form.businessValue
-            ? +this.form.businessValue
-            : null,
-          sprintId: this.form.sprintId,
+          points: parseInt(this.form.points),
           projectId: this.projectId,
+          businessValue: parseInt(this.form.value),
+          acceptanceCriteria: this.form.acceptanceCriteria,
         })
         .then(async (res) => {
           await this.$router.replace(`/projects/${this.projectId}/stories`);
