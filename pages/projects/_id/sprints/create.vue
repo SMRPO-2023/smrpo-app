@@ -88,7 +88,7 @@
           :rules="{
             required: true,
             numeric: true,
-            min_value: 0,
+            min_value: 0.1,
             max_value: 100,
           }"
           v-slot="v"
@@ -154,7 +154,7 @@ export default {
       error: null,
       responseErrors: [],
       form: {
-        name: null,
+        name: 'Sprint ' + new Date().toISOString().split('T')[0],
         start: null,
         end: null,
         velocity: null,
@@ -170,8 +170,8 @@ export default {
   methods: {
     dateDisabled(ymd, date) {
       const weekday = date.getDay();
-      const day = date.getDate();
-      return weekday === 0 || weekday === 6 || day === 13;
+      // sunday - 0, saturday - 6
+      return weekday === 0 || weekday === 6;
     },
     isScrumMaster() {
       if (!this.currentUser || !this.project) return false;

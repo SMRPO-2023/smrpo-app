@@ -84,13 +84,6 @@
             <br />
             <h5>Project members</h5>
             <table class="table table-hover mt-3 w-25">
-              <thead>
-                <td>
-                  <tr>
-                    Username
-                  </tr>
-                </td>
-              </thead>
               <tbody>
                 <tr v-for="developer of projectDevelopers" :key="developer.id">
                   <td>
@@ -238,9 +231,9 @@ export default {
         .then((res) => {
           this.allUsers = res;
           this.users.push({ value: 0, text: "Choose user" }),
-            res.forEach((user) => {
-              this.users.push({ value: user.id, text: user.username });
-            });
+          res.forEach((user) => {
+            this.users.push({ value: user.id, text: user.username });
+          });
         })
         .catch((reason) => {
           console.error(reason);

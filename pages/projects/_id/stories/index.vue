@@ -100,13 +100,7 @@
               {{ findSprintName(story.sprintId) }}
             </nuxt-link>
           </td>
-          <td>
-            <tr>
-              {{
-                story.acceptanceCriteria | limit(100)
-              }}
-            </tr>
-          </td>
+          <td>{{ story.acceptanceCriteria | limit(100) }}</td>
 
           <td>
             <b-icon

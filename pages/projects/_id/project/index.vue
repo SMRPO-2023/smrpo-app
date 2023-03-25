@@ -183,7 +183,6 @@ export default {
       isAdmin: "user/isAdmin",
       isNormalUser: "user/isNormalUser",
     }),
-    ...mapActions(["user/unsetUser", "user/fetchUser"]),
   },
   async mounted() {
     this.id = this.$route.params.id;

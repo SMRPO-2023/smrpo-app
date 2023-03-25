@@ -95,7 +95,7 @@ export default {
     },
 
     ...mapMutations(["user/setUser", "user/setToken", "user/setLastLogin"]),
-    ...mapActions(["user/fetchUser", "user/unsetUser"]),
+    ...mapActions(["user/fetchUser"]),
     async onSubmit() {
       this.loading = true;
 

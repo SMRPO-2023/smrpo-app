@@ -38,15 +38,12 @@
                 }}</span>
               </td>
               <td >
-                <tr>
-                  <b-button
-                    variant="primary"
-                    v-if="hasPermission(project)"
-                    class="d-flex align-item-left w-20 mt-2"
-                    @click="showUsers(project.id)"
-                    >Members</b-button
-                  >
-                </tr>
+                <b-button
+                  variant="primary"
+                  v-if="hasPermission(project)"
+                  @click="showUsers(project.id)"
+                  >Members</b-button
+                >
               </td>
               <td v-if="isAdmin">
                 <b-icon
@@ -60,6 +57,7 @@
         </table>
       </b-col>
     </b-row>
+
     <b-modal ref="user-modal" id="user-modal" hide-footer>
       <template #modal-title> Members</template>
       <div class="d-block d-flex">
@@ -69,13 +67,20 @@
               <th scope="col">Username</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody v-if="getProjectDevelopers(currentProjectId).length > 0">
             <tr
               v-for="projectUsers of getProjectDevelopers(currentProjectId)"
-              :key="projectUsers.id"
+              :key="projectUsers?.id"
             >
               <td>
-                {{ projectUsers.username }}
+                {{ projectUsers?.username }}
+              </td>
+            </tr>
+          </tbody>
+          <tbody v-else>
+            <tr>
+              <td>
+                No members
               </td>
             </tr>
           </tbody>
@@ -102,14 +107,11 @@ export default {
     return {
       users: [],
       projects: [],
-      projectDevelopers: [],
+      projectDevelopers: new Map(),
       currentProjectId: null,
     };
   },
   async created() {
-    if (this.isAdmin) {
-      await this.getUsers();
-    }
     await this.getProjects();
   },
   computed: {
@@ -119,7 +121,7 @@ export default {
       isAdmin: "user/isAdmin",
       isNormalUser: "user/isNormalUser",
     }),
-    ...mapActions(["user/unsetUser", "user/fetchUser"]),
+    ...mapActions(["user/unsetUser"]),
   },
   methods: {
     hasPermission(project) {
@@ -131,7 +133,6 @@ export default {
     },
     async showUsers(projectId) {
       this.currentProjectId = projectId;
-      // console.log(this.currentProjectId);
       this.$refs["user-modal"].show();
     },
     async getProjects() {
@@ -139,7 +140,6 @@ export default {
         .$get("/project")
         .then((res) => {
           this.projects = res;
-          this.projects.forEach((project) => this.getDeveloper(project.id));
         })
         .catch((reason) => {
           console.error(reason);
@@ -161,55 +161,17 @@ export default {
           });
         });
     },
-    getDeveloper(id) {
-      this.$axios
-        .$get(`/project-developers`, {
-          params: {
-            "project-id": id,
-          },
-        })
-        .then((res) => {
-          if (Object.keys(res).length !== 0) {
-            //this.developers = [];
-            //res.forEach((developer) => developers.push(developer.id));
-            this.projectDevelopers.push(res);
-          } else {
-            this.projectDevelopers.push("");
-          }
-        })
-        .catch((reason) => {
-          console.error(reason);
-          this.$toast.error(
-            "An error has occurred, while getting developers.",
-            {
-              duration: 3000,
-            }
-          );
-        });
-    },
     getProjectDevelopers(projectId) {
-      this.projectDeveloperObjects = [];
-      this.projectDevelopers.forEach((project) => {
-        if (project) {
-          project.forEach((user) => {
-            if (user.projectId === projectId) {
-              this.projectDeveloperObjects.push(this.getUserById(user.userId));
-            }
-          });
-        }
-      });
-      // console.log(this.projectDeveloperObjects);
-      return this.projectDeveloperObjects;
+      const project = this.projects.find((project) => project.id === projectId);
+      if (project) {
+        return project.developers.map(d => ({id: d.id, username: d.user.username}))
+      } else {
+        return [];
+      }
     },
     getUserById(id) {
-      this.foundUser = null;
-      this.users.forEach((user) => {
-        if (user.id === id) {
-          this.foundUser = user;
-        }
-      });
-
-      return this.foundUser;
+      if (!this.users || !this.users.length) return;
+      return this.users.find((user) => user.id === id);
     },
     async deleteProject(project) {
       let confirmed = false;

@@ -59,7 +59,7 @@ export default {
       isAdmin: "user/isAdmin",
       isNormalUser: "user/isNormalUser",
     }),
-    ...mapActions(["user/unsetUser", "user/fetchUser", "user/getLastLogin"]),
+    ...mapActions(["user/unsetUser", "user/fetchUser"]),
   },
   methods: {
     async logout() {
