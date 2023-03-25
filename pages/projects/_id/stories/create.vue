@@ -132,7 +132,9 @@
           </b-form-group>
         </ValidationProvider>
 
-        <!-- Sprint -->
+        <!-- Sprint
+        NOT PART OF TICKET
+
         <ValidationProvider name="sprint" v-slot="v">
           <b-form-group label="Sprint" label-for="sprint">
             <b-form-select
@@ -147,7 +149,7 @@
               >{{ v.errors[0] }}
             </b-form-invalid-feedback>
           </b-form-group>
-        </ValidationProvider>
+        </ValidationProvider> -->
 
         <!-- footer -->
         <div v-if="error" class="text-center text-danger">{{ error }}</div>
