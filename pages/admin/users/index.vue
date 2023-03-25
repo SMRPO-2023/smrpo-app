@@ -4,12 +4,9 @@
       <b-col offset-lg="2" lg="8" cols="12" class="my-3">
         <div class="d-flex justify-content-between align-items-center">
           <h1 class="mb-0">Users</h1>
-          <b-button
-            variant="primary"
-            href="users/create"
-            class="d-flex flex-column justify-content-center"
-            >Create</b-button
-          >
+          <nuxt-link to="users/create">
+            <b-button variant="primary">Create</b-button>
+          </nuxt-link>
         </div>
         <table class="table table-hover mt-3 w-100">
           <thead>

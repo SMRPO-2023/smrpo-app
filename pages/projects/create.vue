@@ -178,7 +178,7 @@ export default {
     await this.getUsers();
   },
   methods: {
-    getUserById: function (id) {
+    getUserById(id) {
       this.foundUser = null;
       this.allUsers.forEach((user) => {
         if (user.id == id) {
@@ -188,7 +188,7 @@ export default {
 
       return this.foundUser;
     },
-    addMemberRequest: function (userId) {
+    addMemberRequest(userId) {
       this.$axios
         .$post(`/project-developers`, {
           userId: userId,
@@ -206,7 +206,7 @@ export default {
           });
         });
     },
-    removeMember: function (id) {
+    removeMember(id) {
       const temp = [];
       for (let i = 0; i < this.projectDevelopers.length; i++) {
         if (this.projectDevelopers[i] !== id) {
@@ -216,7 +216,7 @@ export default {
 
       this.projectDevelopers = temp;
     },
-    addMember: function () {
+    addMember() {
       if (this.form.member == 0) {
         this.$toast.error("Please choose a member.", {
           duration: 3000,

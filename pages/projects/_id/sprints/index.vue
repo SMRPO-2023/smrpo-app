@@ -3,7 +3,7 @@
     <div class="d-flex justify-content-between align-items-center">
       <h1 class="mb-0">Sprints</h1>
       <b-button
-        v-if="isScrumMaster()"
+        v-if="isScrumMaster() || isAdmin"
         variant="primary"
         href="sprints/create"
         class="d-flex flex-column justify-content-center"
@@ -58,7 +58,8 @@ export default {
   computed: {
     ...mapGetters({
       currentUser: "user/getUser",
-      projectId: "route-id/getProjectId",
+      isAdmin: "user/isAdmin",
+      projectId: "route-id/getProjectId"
     }),
   },
   data() {
@@ -123,4 +124,6 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+
+</style>

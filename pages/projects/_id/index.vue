@@ -60,7 +60,7 @@ export default {
       id: null,
       error: null,
       responseErrors: [],
-      user: null,
+      // user: null,
       users: [],
       allUsers: [],
       projectDevelopers: [],
@@ -96,20 +96,20 @@ export default {
       this.$axios
         .$get(`project/${this.id}`)
         .then((res) => {
-          this.user = res;
-          if (!res) return;
+          // this.user = res;
+          // if (!res) return;
 
-          this.form.title = res.title;
-          this.form.documentation = res.documentation;
-          if (res.projectOwner !== null) {
-            this.form.projectOwner = res.projectOwner;
-            this.form.projectOwnerUsername = res.projectOwner.username;
+          this.form.title = res?.title;
+          this.form.documentation = res?.documentation;
+          if (res?.projectOwner !== null) {
+            this.form.projectOwner = res?.projectOwner;
+            this.form.projectOwnerUsername = res?.projectOwner.username;
           }
-          if (res.scrumMaster !== null) {
-            this.form.scrumMaster = res.scrumMaster;
-            this.form.scrumMasterUsername = res.scrumMaster.username;
+          if (res?.scrumMaster !== null) {
+            this.form.scrumMaster = res?.scrumMaster;
+            this.form.scrumMasterUsername = res?.scrumMaster.username;
           }
-          this.projectDevelopers = res.developers;
+          this.projectDevelopers = res?.developers;
         })
         .catch((reason) => {
           console.error(reason);

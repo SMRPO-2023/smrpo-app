@@ -4,13 +4,9 @@
       <b-col offset-lg="2" lg="8" cols="12" class="my-3">
         <div class="d-flex justify-content-between align-items-center">
           <h1 class="mb-0">Projects</h1>
-          <b-button
-            v-if="isAdmin"
-            variant="primary"
-            href="projects/create"
-            class="d-flex flex-column justify-content-center"
-            >Create</b-button
-          >
+          <nuxt-link v-if="isAdmin" to="projects/create">
+            <b-button variant="primary">Create</b-button>
+          </nuxt-link>
         </div>
         <table class="table table-hover mt-3 w-100">
           <thead>
@@ -135,7 +131,7 @@ export default {
     },
     async showUsers(projectId) {
       this.currentProjectId = projectId;
-      console.log(this.currentProjectId);
+      // console.log(this.currentProjectId);
       this.$refs["user-modal"].show();
     },
     async getProjects() {
@@ -165,7 +161,7 @@ export default {
           });
         });
     },
-    getDeveloper: function (id) {
+    getDeveloper(id) {
       this.$axios
         .$get(`/project-developers`, {
           params: {
@@ -191,24 +187,24 @@ export default {
           );
         });
     },
-    getProjectDevelopers: function (projectId) {
+    getProjectDevelopers(projectId) {
       this.projectDeveloperObjects = [];
       this.projectDevelopers.forEach((project) => {
-        if (project != "") {
+        if (project) {
           project.forEach((user) => {
-            if (user.projectId == projectId) {
+            if (user.projectId === projectId) {
               this.projectDeveloperObjects.push(this.getUserById(user.userId));
             }
           });
         }
       });
-      console.log(this.projectDeveloperObjects);
+      // console.log(this.projectDeveloperObjects);
       return this.projectDeveloperObjects;
     },
-    getUserById: function (id) {
+    getUserById(id) {
       this.foundUser = null;
       this.users.forEach((user) => {
-        if (user.id == id) {
+        if (user.id === id) {
           this.foundUser = user;
         }
       });
