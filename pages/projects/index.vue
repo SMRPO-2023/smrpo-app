@@ -19,7 +19,7 @@
               <th scope="col">Description</th>
               <th scope="col">Project owner</th>
               <th scope="col">Scrum master</th>
-              <th scope="col" v-if="isAdmin">Members</th>
+              <th scope="col" >Members</th>
               <th scope="col" v-if="isAdmin"></th>
             </tr>
           </thead>
@@ -41,10 +41,11 @@
                   project.scrumMaster.username
                 }}</span>
               </td>
-              <td v-if="isAdmin">
+              <td >
                 <tr>
                   <b-button
                     variant="primary"
+                    v-if="hasPermission(project)"
                     class="d-flex align-item-left w-20 mt-2"
                     @click="showUsers(project.id)"
                     >Members</b-button
@@ -118,12 +119,20 @@ export default {
   computed: {
     ...mapGetters({
       user: "user/getUser",
+      currentUser: "user/getUser",
       isAdmin: "user/isAdmin",
       isNormalUser: "user/isNormalUser",
     }),
     ...mapActions(["user/unsetUser", "user/fetchUser"]),
   },
   methods: {
+    hasPermission(project) {
+      if (!this.currentUser ) return false;
+      return (
+        this.currentUser.id === project.projectOwnerId ||
+        this.currentUser.id === project.scrumMasterId || this.isAdmin
+      );
+    },
     async showUsers(projectId) {
       this.currentProjectId = projectId;
       console.log(this.currentProjectId);
