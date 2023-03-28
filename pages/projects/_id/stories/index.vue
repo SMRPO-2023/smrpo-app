@@ -11,7 +11,7 @@
         >Create</b-button
       >
     </div>
-    <div class="d-flex float-right pb-3 pt-3">
+    <div class="d-flex justify-content-end pb-3 pt-3" v-if="canSee">
       <b-button-group>
         <b-button variant="info" @click="showAll()">All</b-button>
         <b-button variant="success" @click="showRealized()">Realized</b-button>
@@ -113,6 +113,10 @@
         </tr>
       </tbody>
     </table>
+   
+    <div class="w-100 text-center text-muted" v-if="!canSee">
+      <span>You don't have any permission or aren't a part of any user story</span>
+    </div>
   </div>
 </template>
 
@@ -131,6 +135,7 @@ export default {
     ...mapGetters({
       isAdmin: "user/isAdmin",
       currentUser: "user/getUser",
+      isAdmin: "user/isAdmin",
       projectId: "route-id/getProjectId",
     }),
   },
@@ -265,7 +270,7 @@ export default {
         this.project = res;
         this.developers = res.developers;
 
-        this.found = false;
+        let found = false;
 
         for (const key in this.developers) {
           const developer = this.developers[key];
@@ -279,10 +284,10 @@ export default {
           this.currentUser.id === this.project.projectOwnerId ||
           this.currentUser.id === this.project.scrumMasterId
         ) {
-          this.found = true;
+          found = true;
         }
 
-        this.canSee = this.found;
+        this.canSee = this.isAdmin || found;
 
         this.sprints = this.project.sprints;
       });
