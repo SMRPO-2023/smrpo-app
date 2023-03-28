@@ -32,7 +32,7 @@
           <td>{{ sprint.velocity }}</td>
           <td>
             <b-icon
-              v-if="isScrumMaster()"
+              v-if="isScrumMaster() || isAdmin"
               icon="x-lg"
               @click="deleteSprint(sprint)"
               class="center-and-clickable"

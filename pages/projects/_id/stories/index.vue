@@ -45,9 +45,9 @@
             <nuxt-link
               v-if="canChange(story)"
               :to="{ path: `stories/${story.id}`}"
-            > 
+            >
             #{{ story.id }} - {{ story.title }}
-           </nuxt-link> 
+           </nuxt-link>
             <span>#{{ story.id }} - {{ story.title }}</span>-->
             <span>#{{ story.id }} - {{ story.title }}</span>
           </td>
@@ -87,7 +87,7 @@
               :disabled="!story.canBeAccepted"
               :variant="getVariantForImplemented(!story.canBeAccepted)"
               @click="acceptStory(story.id)"
-              v-if="isProjectOwner()"
+              v-if="isProjectOwner() || isAdmin"
             >
               Accept
             </b-button>
@@ -129,6 +129,7 @@ export default {
   mixins: [priorities],
   computed: {
     ...mapGetters({
+      isAdmin: "user/isAdmin",
       currentUser: "user/getUser",
       projectId: "route-id/getProjectId",
     }),
@@ -175,7 +176,8 @@ export default {
       if (!this.currentUser || !this.project) return false;
       return (
         this.currentUser.id === this.project.projectOwnerId ||
-        this.currentUser.id === this.project.scrumMasterId
+        this.currentUser.id === this.project.scrumMasterId ||
+        this.isAdmin
       );
     },
     isProjectOwner() {
@@ -265,17 +267,17 @@ export default {
 
         this.found = false;
 
-        for (var key in this.developers) {
-          var developer = this.developers[key];
+        for (const key in this.developers) {
+          const developer = this.developers[key];
 
-          if (this.currentUser.id == developer.user.id) {
+          if (this.currentUser.id === developer.user.id) {
             this.found = true;
           }
         }
 
         if (
-          this.currentUser.id == this.project.projectOwnerId ||
-          this.currentUser.id == this.project.scrumMasterId
+          this.currentUser.id === this.project.projectOwnerId ||
+          this.currentUser.id === this.project.scrumMasterId
         ) {
           this.found = true;
         }

@@ -26,7 +26,7 @@
                   project.title
                 }}</nuxt-link>
               </td>
-              <td><span style="white-space: pre-line">{{ project.documentation }}</span</td>
+              <td><span style="white-space: pre-line">{{ project.documentation }}</span></td>
               <td>
                 <span v-if="project.projectOwner">{{
                   project.projectOwner.username

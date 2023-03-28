@@ -116,7 +116,7 @@
 
         <div class="text-center">
           <b-button
-            :disabled="!isScrumMaster()"
+            :disabled="!(isScrumMaster() || isAdmin)"
             type="submit"
             variant="primary"
             class="w-50 mt-3"
@@ -136,6 +136,7 @@ export default {
   name: "create-sprint",
   computed: {
     ...mapGetters({
+      isAdmin: "user/isAdmin",
       currentUser: "user/getUser",
       projectId: "route-id/getProjectId",
     }),
