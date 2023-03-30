@@ -41,14 +41,13 @@
       <tbody>
         <tr v-for="story of stories" :key="story.id">
           <td>
-            <!--
-            <nuxt-link
+            <!-- <nuxt-link
               v-if="canChange(story)"
               :to="{ path: `stories/${story.id}`}"
             >
-            #{{ story.id }} - {{ story.title }}
-           </nuxt-link>
-            <span>#{{ story.id }} - {{ story.title }}</span>-->
+              #{{ story.id }} - {{ story.title }}
+            </nuxt-link>
+            <span v-else>#{{ story.id }} - {{ story.title }}</span> -->
             <span>#{{ story.id }} - {{ story.title }}</span>
           </td>
           <td>{{ story.description | limit(100) }}</td>
@@ -310,7 +309,7 @@ export default {
       if (!confirmed) return;
 
       this.$axios
-        .$patch(`user-stories/${story.id}`, {
+        .$put(`user-stories/${story.id}`, {
           ...story,
           priority: priority.value,
         })

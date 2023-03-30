@@ -242,7 +242,7 @@ export default {
       if (!confirmed || !this.projectId || !this.id) return;
 
       await this.$axios
-        .$patch(`user-stories/${this.id}`, {
+        .$put(`user-stories/${this.id}`, {
           title: this.form.title,
           description: this.form.description,
           acceptanceCriteria: this.form.acceptanceCriteria,

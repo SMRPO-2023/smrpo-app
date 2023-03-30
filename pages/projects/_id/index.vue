@@ -48,10 +48,10 @@
 
 <script>
 import { BIcon } from "bootstrap-vue";
-import { mapActions, mapGetters } from "vuex";
+import { mapGetters } from "vuex";
 
 export default {
-  name: "edit-project",
+  name: "view-project",
   components: {
     BIcon,
   },
@@ -113,7 +113,7 @@ export default {
         .catch((reason) => {
           console.error(reason);
           this.$toast.error(
-            "An error has occurred, while getting user informaiton",
+            "An error has occurred, while getting project information",
             {
               duration: 3000,
             }

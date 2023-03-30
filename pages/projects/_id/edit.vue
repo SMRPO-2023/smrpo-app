@@ -152,7 +152,7 @@
 
 <script>
 import { BIcon } from "bootstrap-vue";
-import { mapActions, mapGetters } from "vuex";
+import { mapGetters } from "vuex";
 
 export default {
   name: "edit-project",
@@ -216,7 +216,7 @@ export default {
           this.projectDevelopers = this.projectDevelopers.filter(
             (p) => p.id !== id
           );
-          this.$toast.success("Member secuessfully removed", {
+          this.$toast.success("Member successfully removed", {
             duration: 3000,
           });
         })
@@ -271,7 +271,7 @@ export default {
         .catch((reason) => {
           console.error(reason);
           this.$toast.error(
-            "An error has occurred, while getting user informaiton",
+            "An error has occurred, while getting project information",
             {
               duration: 3000,
             }

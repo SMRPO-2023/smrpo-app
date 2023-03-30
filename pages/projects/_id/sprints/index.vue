@@ -3,7 +3,7 @@
     <div class="d-flex justify-content-between align-items-center">
       <h1 class="mb-0">Sprints</h1>
       <b-button
-        v-if="isScrumMaster() || isAdmin"
+        v-if="isScrumMaster || isAdmin"
         variant="primary"
         href="sprints/create"
         class="d-flex flex-column justify-content-center"
@@ -32,7 +32,7 @@
           <td>{{ sprint.velocity }}</td>
           <td>
             <b-icon
-              v-if="isScrumMaster() || isAdmin"
+              v-if="canChange(sprint)"
               icon="x-lg"
               @click="deleteSprint(sprint)"
               class="center-and-clickable"
@@ -61,6 +61,10 @@ export default {
       isAdmin: "user/isAdmin",
       projectId: "route-id/getProjectId"
     }),
+    isScrumMaster() {
+      if (!this.currentUser || !this.project) return false;
+      return this.currentUser.id === this.project.scrumMasterId;
+    },
   },
   data() {
     return {
@@ -72,9 +76,20 @@ export default {
     this.getProjectWithData();
   },
   methods: {
-    isScrumMaster() {
-      if (!this.currentUser || !this.project) return false;
-      return this.currentUser.id === this.project.scrumMasterId;
+    canChange(sprint) {
+      return (
+        this.hasPermission() && !this.hasSprintStarted(sprint.start)
+      );
+    },
+    hasPermission() {
+      return this.isAdmin || this.isScrumMaster;
+    },
+    hasSprintStarted(start) {
+      const now = new Date();
+      start = new Date(start);
+      start.setHours(0, 0, 0, 0);
+      now.setHours(0, 0, 0, 0);
+      return start <= now;
     },
     async getProjectWithData() {
       if (!this.projectId) return;

@@ -6,13 +6,13 @@ export const state = () => ({
 
 export const mutations = {
   setProjectId(state, id) {
-    state.projectId = +id
+    state.projectId = id
   },
   setStoryId(state, id) {
-    state.storyId = +id
+    state.storyId = id
   },
   setSprintId(state, id) {
-    state.sprintId = +id
+    state.sprintId = id
   },
 }
 
