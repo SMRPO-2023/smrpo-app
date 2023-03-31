@@ -22,10 +22,10 @@
           </template>
           <b-dropdown-item :to="`/profile`">Profile</b-dropdown-item>
           <b-dropdown-item @click="logout">Logout</b-dropdown-item>
-          <b-dropdown-divider v-if="user.lastLogin"></b-dropdown-divider>
-          <b-dropdown-text v-if="user.lastLogin" style="width: 240px"
-            ><small v-if="!firstLogin"
-              >Last login: <b>{{ formatDateTime(user.lastLogin) }}</b></small
+          <b-dropdown-divider></b-dropdown-divider>
+          <b-dropdown-text style="width: 240px"
+            ><small v-if="firstLogin != null"
+              >Last login: <b>{{ formatDateTime(firstLogin) }}</b></small
             >
             <small v-else
               ><b>This is your first login</b></small

@@ -104,7 +104,7 @@ export default {
         .then(async (res) => {
           localStorage.setItem("jwt", res?.accessToken);
           localStorage.setItem("userId", res?.userId);
-          await this.$store.commit("user/setLastLogin", res.firstLogin);
+          await this.$store.commit("user/setLastLogin", res.lastLogin);
           await this.$store.commit("user/setToken", res?.accessToken);
           await this.$store.dispatch("user/fetchUser", res?.userId);
           await this.$router.push("/");
