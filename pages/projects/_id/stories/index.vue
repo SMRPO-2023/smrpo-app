@@ -113,7 +113,7 @@
         </tr>
       </tbody>
     </table>
-   
+
     <div class="w-100 text-center text-muted" v-if="!canSee">
       <span>You don't have any permission or aren't a part of any user story</span>
     </div>
@@ -133,7 +133,6 @@ export default {
   mixins: [priorities],
   computed: {
     ...mapGetters({
-      isAdmin: "user/isAdmin",
       currentUser: "user/getUser",
       isAdmin: "user/isAdmin",
       projectId: "route-id/getProjectId",
