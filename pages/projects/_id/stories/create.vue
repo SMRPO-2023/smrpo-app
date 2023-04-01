@@ -183,6 +183,7 @@ export default {
     ...mapGetters({
       currentUser: "user/getUser",
       projectId: "route-id/getProjectId",
+      isAdmin: "user/isAdmin",
     }),
   },
   data() {
@@ -215,7 +216,8 @@ export default {
       if (!this.currentUser || !this.project) return false;
       return (
         this.currentUser.id === this.project.projectOwnerId ||
-        this.currentUser.id === this.project.scrumMasterId
+        this.currentUser.id === this.project.scrumMasterId ||
+        this.isAdmin
       );
     },
     getValidationState({ dirty, validated, valid = null }) {
