@@ -41,14 +41,9 @@
       <tbody>
         <tr v-for="story of stories" :key="story.id">
           <td>
-            <!-- <nuxt-link
-              v-if="canChange(story)"
-              :to="{ path: `stories/${story.id}`}"
-            >
+            <nuxt-link :to="{ path: `stories/${story.id}`}">
               #{{ story.id }} - {{ story.title }}
             </nuxt-link>
-            <span v-else>#{{ story.id }} - {{ story.title }}</span> -->
-            <span>#{{ story.id }} - {{ story.title }}</span>
           </td>
           <td>{{ story.description | limit(100) }}</td>
           <td>{{ story.businessValue }}</td>
@@ -172,7 +167,7 @@ export default {
     },
     canChange(story) {
       return (
-        this.hasPermission() && !story.implemented && story.sprintId === null
+        this.hasPermission() && !story.acceptanceTest && story.sprintId === null
       );
     },
     hasPermission() {

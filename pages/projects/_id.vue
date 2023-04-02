@@ -4,27 +4,41 @@
     <b-row>
       <b-col offset-lg="2" lg="8" cols="12" class="my-3">
         <div>
-          <b-dropdown id="projects-navigation-dropdown" size="sm" :text="getActiveProjectTab()">
-            <template v-for="projectTab of projectTabs">
+          <b-dropdown id="projects-navigation-dropdown" size="sm" :text="getActiveTab('project')">
+            <template v-for="tab of projectTabs">
               <b-dropdown-item 
-                v-if="projectTab.show" 
-                :key="projectTab.name" 
-                :to="{ path: projectTab.path }" 
-                :exact="projectTab.exact"
-              >{{ projectTab.name }}</b-dropdown-item>
+                v-if="tab.show" 
+                :key="tab.name" 
+                :to="{ path: tab.path }" 
+                :exact="tab.exact"
+              >{{ tab.name }}</b-dropdown-item>
             </template>
           </b-dropdown>
 
           <template v-if="sprintId">
             <b-icon icon="chevron-right" />
-            <b-dropdown id="sprints-navigation-dropdown" size="sm" :text="getActiveSprintTab()">
-              <template v-for="sprintTab of sprintTabs">
+            <b-dropdown id="sprints-navigation-dropdown" size="sm" :text="getActiveTab('sprint')">
+              <template v-for="tab of sprintTabs">
                 <b-dropdown-item 
-                  v-if="sprintTab.show" 
-                  :key="sprintTab.name" 
-                  :to="{ path: sprintTab.path }" 
-                  :exact="sprintTab.exact"
-                >{{ sprintTab.name }}</b-dropdown-item>
+                  v-if="tab.show" 
+                  :key="tab.name" 
+                  :to="{ path: tab.path }" 
+                  :exact="tab.exact"
+                >{{ tab.name }}</b-dropdown-item>
+              </template>
+            </b-dropdown>
+          </template>
+
+          <template v-if="storyId">
+            <b-icon icon="chevron-right" />
+            <b-dropdown id="stories-navigation-dropdown" size="sm" :text="getActiveTab('userStory')">
+              <template v-for="tab of userStoryTabs">
+                <b-dropdown-item 
+                  v-if="tab.show" 
+                  :key="tab.name" 
+                  :to="{ path: tab.path }" 
+                  :exact="tab.exact"
+                >{{ tab.name }}</b-dropdown-item>
               </template>
             </b-dropdown>
           </template>
@@ -55,7 +69,12 @@ export default {
       isAdmin: "user/isAdmin",
       projectId: "route-id/getProjectId",
       sprintId: "route-id/getSprintId",
+      storyId: "route-id/getStoryId",
     }),
+    isProjectOwner() {
+      if (!this.currentUser || !this.project) return false;
+      return this.currentUser.id === this.project.projectOwnerId;
+    },
     isScrumMaster() {
       if (!this.currentUser || !this.project) return false;
       return this.currentUser.id === this.project.scrumMasterId;
@@ -67,6 +86,10 @@ export default {
       start.setHours(0, 0, 0, 0);
       now.setHours(0, 0, 0, 0);
       return start <= now;
+    },
+    canChangeUserStory() {
+      if (!this.userStory) return false;
+      return !this.userStory.acceptanceTest && this.userStory.sprintId === null
     },
     projectTabs() {
       return [
@@ -112,23 +135,50 @@ export default {
         },
       ];
     },
+    userStoryTabs() {
+      return [
+        {
+          name: "View",
+          path: `/projects/${this.projectId}/stories/${this.storyId}`,
+          exact: true,
+          show: true,
+        },
+        {
+          name: "Edit",
+          path: `/projects/${this.projectId}/stories/${this.storyId}/edit`,
+          exact: true,
+          show: (this.isAdmin || this.isProjectOwner || this.isScrumMaster) && this.canChangeUserStory,
+        },
+        {
+          name: "Tasks",
+          path: `/projects/${this.projectId}/stories/${this.storyId}/tasks`,
+          exact: true,
+          show: true,
+        },
+      ];
+    },
   },
   data() {
     return {
       project: null,
       sprint: null,
+      userStory: null,
     };
   },
   mounted() {
     this.getProject();
     this.getSprint();
+    this.getUserStory();
   },
   methods: {
-    getActiveProjectTab() {
-      return this.projectTabs.find((tab) => tab.exact ? tab.path === this.$route.path : this.$route.path.startsWith(tab.path))?.name;
-    },
-    getActiveSprintTab() {
-      return this.sprintTabs.find((tab) => tab.exact ? tab.path === this.$route.path : this.$route.path.startsWith(tab.path))?.name;
+    getActiveTab(type) {
+      let data = [];
+      if (type === "project") data = this.projectTabs;
+      else if (type === "sprint") data = this.sprintTabs;
+      else if (type === "userStory") data = this.userStoryTabs;
+      else return data;
+
+      return data.find((tab) => tab.exact ? tab.path === this.$route.path : this.$route.path.startsWith(tab.path))?.name;
     },
     async getProject() {
       if (!this.projectId) return;
@@ -147,6 +197,15 @@ export default {
         .$get(`sprints/${this.sprintId}`)
         .then((res) => {
           this.sprint = res;
+        });
+    },
+    async getUserStory() {
+      if (!this.storyId) return;
+
+      this.$axios
+        .$get(`user-stories/${this.storyId}`)
+        .then((res) => {
+          this.userStory = res;
         });
     },
   },
