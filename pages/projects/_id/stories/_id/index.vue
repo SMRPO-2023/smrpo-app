@@ -30,7 +30,7 @@
     </p>
 
     <p v-if="story.sprintId">
-      <span class="title">Sprint:</span> <nuxt-link :to="{ path: `projects/${story.projectId}/sprints/${story.sprintId}` }">{{ story.sprintId }}</nuxt-link>
+      <span class="title">Sprint:</span> <nuxt-link :to="{ path: `/projects/${story.projectId}/sprints/${story.sprintId}` }">{{ story.sprintId }}</nuxt-link>
     </p>
   </div>
 </template>

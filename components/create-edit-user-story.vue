@@ -85,7 +85,6 @@
         <ValidationProvider
           name="points"
           :rules="{
-            numeric: true,
             min_value: 0.1,
             max_value: 50,
           }"
@@ -200,6 +199,9 @@ export default {
         acceptanceCriteria: null,
       },
     };
+  },
+  created() {
+    this.getProjectWithData();
   },
   mounted() {
     this.prioritiesOptions = this.prioritiesOptions.concat(this.priorities);

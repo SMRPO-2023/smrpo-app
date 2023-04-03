@@ -169,7 +169,7 @@ export default {
         {
           name: "Tasks",
           path: `/projects/${this.projectId}/stories/${this.storyId}/tasks`,
-          exact: true,
+          exact: false, // because we have a nested route
           show: true,
         },
       ];

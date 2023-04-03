@@ -3,13 +3,9 @@
     <div class="d-flex justify-content-between align-items-center">
       <h1 class="mb-0">Stories</h1>
 
-      <b-button
-        v-if="hasPermission()"
-        variant="primary"
-        href="stories/create"
-        class="d-flex flex-column justify-content-center"
-        >Create</b-button
-      >
+      <nuxt-link v-if="hasPermission()" to="stories/create">
+        <b-button variant="primary">Create</b-button>
+      </nuxt-link>
     </div>
     <div class="d-flex justify-content-end pb-3 pt-3" v-if="canSee">
       <b-button-group>
