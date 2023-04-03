@@ -25,7 +25,7 @@
           <td>
             <nuxt-link
               v-if="hasPermission()"
-              :to="{ path: `sprints/${sprint.id}` }"
+              :to="{ path: `sprints/${sprint.id}`, query: { projectId: 1 } }"
             >
               {{ sprint.name }}
             </nuxt-link>

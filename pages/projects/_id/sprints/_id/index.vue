@@ -126,6 +126,7 @@ export default {
   data() {
     return {
       id: null,
+      projectId: null,
       stories: [],
       sprintStories: [],
       sprint: {
@@ -138,6 +139,7 @@ export default {
   },
   async mounted() {
     this.id = this.$route.params.id;
+    this.projectId = this.$route.query.projectId;
     if (!this.id) return;
     this.getSprint();
     this.getProjectStories();
@@ -203,7 +205,7 @@ export default {
       await this.$axios
         .$get(`user-stories/get-addable`, {
           params: {
-            "project-id": this.id,
+            "project-id": this.projectId,
           },
         })
         .then((res) => {
