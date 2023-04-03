@@ -23,9 +23,16 @@
       <tbody>
         <tr v-for="sprint of sprints" :key="sprint.id">
           <td>
-            <nuxt-link :to="{ path: `sprints/${sprint.id}` }">
+            <nuxt-link
+              v-if="hasPermission()"
+              :to="{ path: `sprints/${sprint.id}` }"
+            >
               {{ sprint.name }}
             </nuxt-link>
+
+            <span v-if="!hasPermission()">
+              {{ sprint.name }}
+            </span>
           </td>
           <td>{{ formatDate(sprint.start) }}</td>
           <td>{{ formatDate(sprint.end) }}</td>
@@ -59,7 +66,7 @@ export default {
     ...mapGetters({
       currentUser: "user/getUser",
       isAdmin: "user/isAdmin",
-      projectId: "route-id/getProjectId"
+      projectId: "route-id/getProjectId",
     }),
     isScrumMaster() {
       if (!this.currentUser || !this.project) return false;
@@ -77,9 +84,7 @@ export default {
   },
   methods: {
     canChange(sprint) {
-      return (
-        this.hasPermission() && !this.hasSprintStarted(sprint.start)
-      );
+      return this.hasPermission() && !this.hasSprintStarted(sprint.start);
     },
     hasPermission() {
       return this.isAdmin || this.isScrumMaster;
@@ -139,6 +144,4 @@ export default {
 };
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

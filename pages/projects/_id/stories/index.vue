@@ -13,7 +13,11 @@
     </div>
     <div class="d-flex justify-content-end pb-3 pt-3" v-if="canSee">
       <b-button-group>
+        <b-button variant="warning" @click="showFutureReleases()"
+          >Feature releases</b-button
+        >
         <b-button variant="info" @click="showAll()">All</b-button>
+
         <b-button variant="success" @click="showRealized()">Realized</b-button>
 
         <b-button variant="warning" @click="showOnSprint()"
@@ -41,7 +45,7 @@
       <tbody>
         <tr v-for="story of stories" :key="story.id">
           <td>
-            <nuxt-link :to="{ path: `stories/${story.id}`}">
+            <nuxt-link :to="{ path: `stories/${story.id}` }">
               #{{ story.id }} - {{ story.title }}
             </nuxt-link>
           </td>
@@ -109,7 +113,9 @@
     </table>
 
     <div class="w-100 text-center text-muted" v-if="!canSee">
-      <span>You don't have any permission or aren't a part of any user story</span>
+      <span
+        >You don't have any permission or aren't a part of any user story</span
+      >
     </div>
   </div>
 </template>
@@ -136,6 +142,7 @@ export default {
     return {
       project: null,
       stories: [],
+      featureReleases: [],
       allStories: [],
       storiesRealized: [],
       storiesUnrealizedSprint: [],
@@ -151,8 +158,12 @@ export default {
     this.getRealizedStories();
     this.getUnrealizedSprint();
     this.getUnrealized();
+    this.getFutureReleases();
   },
   methods: {
+    showFutureReleases() {
+      this.stories = this.featureReleases;
+    },
     showAll() {
       this.stories = this.allStories;
     },
@@ -195,6 +206,20 @@ export default {
         .then((res) => {
           if (!res) return;
           this.$router.go(0);
+        });
+    },
+    async getFutureReleases() {
+      if (!this.projectId) return;
+
+      await this.$axios
+        .$get(`user-stories/future-releases`, {
+          params: {
+            "project-id": this.projectId,
+          },
+        })
+        .then((res) => {
+          if (!res) return;
+          this.featureReleases = res;
         });
     },
     async getUnrealizedSprint() {
