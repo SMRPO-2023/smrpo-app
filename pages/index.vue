@@ -9,10 +9,7 @@
 <script>
 
 export default {
-  data() {
-    return {
-    }
-  },
+  middleware: 'redirect-to-home',
 }
 </script>
 

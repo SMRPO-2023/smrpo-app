@@ -2,13 +2,10 @@
   <div>
     <div class="d-flex justify-content-between align-items-center">
       <h1 class="mb-0">Sprints</h1>
-      <b-button
-        v-if="isScrumMaster || isAdmin"
-        variant="primary"
-        href="sprints/create"
-        class="d-flex flex-column justify-content-center"
-        >Create</b-button
-      >
+
+      <nuxt-link v-if="isScrumMaster || isAdmin" to="sprints/create">
+        <b-button variant="primary">Create</b-button>
+      </nuxt-link>
     </div>
     <table class="table table-hover mt-3 w-100">
       <thead>
@@ -17,6 +14,7 @@
           <th scope="col">Start</th>
           <th scope="col">End</th>
           <th scope="col">Velocity</th>
+          <th scope="col"></th>
           <th scope="col"></th>
         </tr>
       </thead>
@@ -36,8 +34,9 @@
           </td>
           <td>{{ formatDate(sprint.start) }}</td>
           <td>{{ formatDate(sprint.end) }}</td>
-          <td>{{ sprint.velocity }}</td>
-          <td>
+          <td class="narrow-col">{{ sprint.velocity }}</td>
+          <td class="narrow-col"><b-badge v-if="isSprintActive(sprint)" variant="primary">Active</b-badge></td>
+          <td class="narrow-col">
             <b-icon
               v-if="canChange(sprint)"
               icon="x-lg"
@@ -96,6 +95,11 @@ export default {
       now.setHours(0, 0, 0, 0);
       return start <= now;
     },
+    isSprintActive(sprint) {
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      return new Date(sprint.start) <= now && new Date(sprint.end) >= now;
+    },
     async getProjectWithData() {
       if (!this.projectId) return;
 
@@ -144,4 +148,8 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.narrow-col {
+  width: 3rem
+}
+</style>

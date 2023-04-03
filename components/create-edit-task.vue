@@ -38,89 +38,45 @@
             </b-form-invalid-feedback>
           </b-form-group>
         </ValidationProvider>
-        <!-- Acceptance criteria -->
-        <ValidationProvider
-          name="acceptanceCriteria"
-          :rules="{ required: true }"
-          v-slot="v"
-        >
-          <b-form-group
-            label="Acceptance Criteria"
-            label-for="acceptanceCriteria"
-          >
-            <b-form-textarea
-              id="acceptanceCriteria"
-              placeholder="Enter Criteria"
-              v-model="form.acceptanceCriteria"
-              :state="getValidationState(v)"
-              aria-describedby="acceptanceCriteria-live-feedback"
-            />
-            <b-form-invalid-feedback id="acceptanceCriteria-live-feedback"
-              >{{ v.errors[0] }}
-            </b-form-invalid-feedback>
-          </b-form-group>
-        </ValidationProvider>
 
-        <!-- Priority -->
+        <!-- Hours -->
         <ValidationProvider
-          name="priority"
-          :rules="{ required: true }"
-          v-slot="v"
-        >
-          <b-form-group label="Priority" label-for="priority">
-            <b-form-select
-              id="priority"
-              v-model="form.priority"
-              :options="prioritiesOptions"
-              :state="getValidationState(v)"
-              aria-describedby="priority-live-feedback"
-            ></b-form-select>
-            <b-form-invalid-feedback id="priority-live-feedback"
-              >{{ v.errors[0] }}
-            </b-form-invalid-feedback>
-          </b-form-group>
-        </ValidationProvider>
-
-        <!-- Points -->
-        <ValidationProvider
-          name="points"
+          name="hours"
           :rules="{
+            required: true,
             min_value: 0.1,
-            max_value: 50,
           }"
           v-slot="v"
         >
-          <b-form-group label="Points" label-for="points">
+          <b-form-group label="Hours" label-for="hours">
             <b-form-input
               type="number"
-              id="points"
-              placeholder="Enter points"
-              v-model="form.points"
+              id="hours"
+              placeholder="Enter hours"
+              v-model="form.hours"
               :state="getValidationState(v)"
-              aria-describedby="points-live-feedback"
+              aria-describedby="hours-live-feedback"
             />
-            <b-form-invalid-feedback id="points-live-feedback"
+            <b-form-invalid-feedback id="hours-live-feedback"
               >{{ v.errors[0] }}
             </b-form-invalid-feedback>
           </b-form-group>
         </ValidationProvider>
 
-        <!-- Business value -->
+        <!-- User -->
         <ValidationProvider
-          name="businessValue"
-          :rules="{ numeric: true, min_value: 1, max_value: 10 }"
+          name="userId"
           v-slot="v"
         >
-          <b-form-group label="Business value" label-for="businessValue">
-            <b-form-input
-              type="number"
-              id="businessValue"
-              placeholder="Enter business value"
-              v-model="form.businessValue"
+          <b-form-group label="Assignee" label-for="assignee">
+            <b-form-select
+              id="assignee"
+              v-model="form.userId"
+              :options="userOptions"
               :state="getValidationState(v)"
-              aria-describedby="businessValue-live-feedback"
-            />
-            <b-form-invalid-feedback id="businessValue-live-feedback"
+              aria-describedby="assignee-live-feedback"
+            ></b-form-select>
+            <b-form-invalid-feedback id="assignee-live-feedback"
               >{{ v.errors[0] }}
             </b-form-invalid-feedback>
           </b-form-group>
@@ -134,12 +90,12 @@
 
         <div class="text-center">
           <b-button
-            :disabled="!hasPermission"
+            :disabled="!canCreate"
             type="submit"
             variant="primary"
             class="w-50 mt-3"
           >
-            <template v-if="story">
+            <template v-if="task">
               Save
             </template>
             <template v-else>
@@ -154,57 +110,63 @@
 
 <script>
 import { mapGetters } from "vuex";
-import priorities from "@/mixins/priorities";
 
 export default {
-  name: "create-edit-user-story",
+  name: "create-edit-task",
   props: {
-    story: {
+    task: {
       type: Object,
       default: null,
     },
   },
-  mixins: [priorities],
   computed: {
     ...mapGetters({
       isAdmin: "user/isAdmin",
       currentUser: "user/getUser",
       projectId: "route-id/getProjectId",
       storyId: "route-id/getStoryId",
+      taskId: "route-id/getTaskId",
     }),
-    isProjectOwner() {
-      if (!this.currentUser || !this.project) return false;
-      return this.currentUser.id === this.project.projectOwnerId;
-    },
     isScrumMaster() {
       if (!this.currentUser || !this.project) return false;
       return this.currentUser.id === this.project.scrumMasterId;
     },
+    isDeveloper() {
+      if (!this.currentUser || !this.project) return false;
+      return this.project.developers.find((u) => u.user.id === this.currentUser.id);
+    },
     hasPermission() {
-      return this.isAdmin || this.isProjectOwner || this.isScrumMaster;
+      return this.isAdmin || this.isScrumMaster || this.isDeveloper
+    },
+    canCreate() {
+      if (!this.project || !this.story || !this.sprint) return false;
+      return this.hasPermission && !this.story.acceptanceTest && this.story.sprintId && this.isSprintActive;
+    },
+    isSprintActive() {
+      if (!this.sprint) return false;
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      return new Date(this.sprint.start) <= now && new Date(this.sprint.end) >= now;
     },
   },
   data() {
     return {
       project: null,
+      story: null,
+      sprint: null,
       error: null,
       responseErrors: [],
-      prioritiesOptions: [{ value: null, text: "Choose priority" }],
+      userOptions: [{ value: null, text: "Choose user" }],
       form: {
         title: null,
         description: null,
-        priority: null,
-        points: null,
-        businessValue: null,
-        acceptanceCriteria: null,
+        hours: null,
+        userId: null,
       },
     };
   },
   created() {
     this.getProjectWithData();
-  },
-  mounted() {
-    this.prioritiesOptions = this.prioritiesOptions.concat(this.priorities);
   },
   methods: {
     getValidationState({ dirty, validated, valid = null }) {
@@ -213,10 +175,10 @@ export default {
     async onSubmit() {
       if (!this.projectId) return;
 
-      if (this.storyId && this.story) {
-        await this.updateStory();
+      if (this.taskId && this.task) {
+        await this.updateTask();
       } else {
-        await this.createStory();
+        await this.createTask();
       }
     },
     async getProjectWithData() {
@@ -224,26 +186,72 @@ export default {
 
       await this.$axios.$get(`project/${this.projectId}`).then((res) => {
         if (!res) return;
+        // project
         this.project = res;
+        // story
+        this.story = res.UserStory.find((s) => s.id === this.storyId);
+        // sprint
+        this.sprint = res.sprints.find((s) => s.id === this.story.sprintId);
+        // developers
+        const developers = res.developers.map(u => ({ value: u.user.id, text: u.user.username }));
+        const scrumMasterIsDeveloper = developers.find(u => u.value === res.scrumMasterId);
+        if (!scrumMasterIsDeveloper) {
+          developers.push({ value: res.scrumMasterId, text: res.scrumMaster.username });
+        }
+        developers.sort((a, b) => a.text.localeCompare(b.text))
+        this.userOptions = this.userOptions.concat(developers);
       });
     },
-    async updateStory() {
-      if (!this.storyId) return;
+    async createTask() {
+      if (!this.projectId || !this.storyId) return;
 
       await this.$axios
-        .$put(`user-stories/${this.storyId}`, {
+        .$post("tasks", {
           title: this.form.title,
           description: this.form.description,
-          priority: this.form.priority,
-          points: parseInt(this.form.points),
-          projectId: this.projectId,
-          businessValue: parseInt(this.form.value),
-          acceptanceCriteria: this.form.acceptanceCriteria,
+          hours: parseInt(this.form.hours),
+          userId: this.form.userId,
+          userStoryId: this.storyId,
+        })
+        .then(async (res) => {
+          await this.$router.replace(`/projects/${this.projectId}/stories/${this.storyId}/tasks`);
+        })
+        .catch((error) => {
+          const status = error?.response?.status;
+          const data = error?.response?.data;
+          // some instances of errors return main message along with array of detailed shorter messages
+          if (status && status === 400) {
+            if (data && data.message instanceof Array) {
+              this.responseErrors = data.message;
+            }
+            this.error = "Wrong input, while creating the task";
+          } else {
+            this.error = data?.message;
+          }
+          this.$toast.error(
+            "An error has occurred, while creating the task",
+            {
+              duration: 3000,
+            }
+          );
+        });
+    },
+    async updateTask() {
+      if (!this.projectId || !this.storyId || !this.taskId) return;
+
+      await this.$axios
+        .$put(`tasks/${this.taskId}`, {
+          id: this.taskId,
+          title: this.form.title,
+          description: this.form.description,
+          hours: parseInt(this.form.hours),
+          userId: this.form.userId,
+          userStoryId: this.storyId,
         })
         .then(async (res) => {
           this.error = null;
           this.responseErrors = [];
-          this.$toast.success("User story successfully updated", {
+          this.$toast.success("Task information successfully updated", {
             duration: 3000,
           });
         })
@@ -254,72 +262,26 @@ export default {
           if (status && status === 400) {
             if (data && data.message instanceof Array) {
               this.responseErrors = data.message;
-              this.error =
-                "An error has occurred, while updating the user story";
-            } else {
-              this.responseErrors = [];
-              this.error = data.message;
             }
-          } else {
-            this.responseErrors = [];
-            this.error = data?.message;
-          }
-          this.$toast.error(
-            "An error has occurred, while updating the user story",
-            {
-              duration: 3000,
-            }
-          );
-        });
-    },
-    async createStory() {
-      if (!this.projectId) return;
-
-      await this.$axios
-        .$post("user-stories", {
-          title: this.form.title,
-          description: this.form.description,
-          priority: this.form.priority,
-          points: parseInt(this.form.points),
-          projectId: this.projectId,
-          businessValue: parseInt(this.form.value),
-          acceptanceCriteria: this.form.acceptanceCriteria,
-        })
-        .then(async (res) => {
-          await this.$router.replace(`/projects/${this.projectId}/stories`);
-        })
-        .catch((error) => {
-          const status = error?.response?.status;
-          const data = error?.response?.data;
-          // some instances of errors return main message along with array of detailed shorter messages
-          if (status && status === 400) {
-            if (data && data.message instanceof Array) {
-              this.responseErrors = data.message;
-            }
-            this.error = "Wrong input, while creating the user story";
+            this.error = "Wrong input, while updating the task";
           } else {
             this.error = data?.message;
           }
-          this.$toast.error(
-            "An error has occurred, while creating the user story",
-            {
-              duration: 3000,
-            }
-          );
+          this.$toast.error("An error has occurred, while updating the task",{
+            duration: 3000,
+          });
         });
-    },
+    }
   },
   watch: { 
-    story: function(value) {
+    task: function(value) {
       // fill form data
       if (value) {
         this.form = {
           title: value.title,
           description: value.description,
-          acceptanceCriteria: value.acceptanceCriteria,
-          priority: value.priority,
-          points: value.points,
-          businessValue: value.businessValue,
+          hours: value.hours,
+          userId: value.userId,
         };
       }
     }
@@ -327,5 +289,5 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped>  
 </style>

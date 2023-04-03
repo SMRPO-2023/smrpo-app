@@ -113,7 +113,6 @@
 </template>
 
 <script>
-import { BIcon } from "bootstrap-vue";
 import datetime from "@/mixins/datetime";
 import priorities from "@/mixins/priorities";
 

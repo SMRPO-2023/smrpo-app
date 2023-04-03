@@ -2,6 +2,7 @@ export const state = () => ({
   projectId: null,
   storyId: null,
   sprintId: null,
+  taskId: null,
 });
 
 export const mutations = {
@@ -14,6 +15,9 @@ export const mutations = {
   setSprintId(state, id) {
     state.sprintId = id
   },
+  setTaskId(state, id) {
+    state.taskId = id
+  }
 }
 
 export const getters = {
@@ -25,5 +29,8 @@ export const getters = {
   },
   getSprintId(state) {
     return state.sprintId
+  },
+  getTaskId(state) {
+    return state.taskId
   },
 }

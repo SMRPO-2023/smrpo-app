@@ -57,6 +57,20 @@
               </template>
             </b-dropdown>
           </template>
+
+          <template v-if="taskId">
+            <b-icon icon="chevron-right" />
+            <b-dropdown id="stories-navigation-dropdown" size="sm" :text="getActiveTab('task')">
+              <template v-for="tab of taskTabs">
+                <b-dropdown-item 
+                  v-if="tab.show" 
+                  :key="tab.name" 
+                  :to="{ path: tab.path }" 
+                  :exact="tab.exact"
+                >{{ tab.name }}</b-dropdown-item>
+              </template>
+            </b-dropdown>
+          </template>
         </div>
       </b-col>
     </b-row>
@@ -85,6 +99,7 @@ export default {
       projectId: "route-id/getProjectId",
       sprintId: "route-id/getSprintId",
       storyId: "route-id/getStoryId",
+      taskId: "route-id/getTaskId",
     }),
     isProjectOwner() {
       if (!this.currentUser || !this.project) return false;
@@ -169,6 +184,22 @@ export default {
         {
           name: "Tasks",
           path: `/projects/${this.projectId}/stories/${this.storyId}/tasks`,
+          exact: false, // because we have a nested route
+          show: true,
+        },
+      ];
+    },
+    taskTabs() {
+      return [
+        {
+          name: "View",
+          path: `/projects/${this.projectId}/stories/${this.storyId}/tasks/${this.taskId}`,
+          exact: true,
+          show: true,
+        },
+        {
+          name: "Edit",
+          path: `/projects/${this.projectId}/stories/${this.storyId}/tasks/${this.taskId}/edit`,
           exact: true,
           show: true,
         },
@@ -180,12 +211,14 @@ export default {
       project: null,
       sprint: null,
       userStory: null,
+      task: null,
     };
   },
   mounted() {
     this.getProject();
     this.getSprint();
     this.getUserStory();
+    this.getTask();
   },
   methods: {
     getActiveTab(type) {
@@ -193,6 +226,7 @@ export default {
       if (type === "project") data = this.projectTabs;
       else if (type === "sprint") data = this.sprintTabs;
       else if (type === "userStory") data = this.userStoryTabs;
+      else if (type === "task") data = this.taskTabs;
       else return data;
 
       return data.find((tab) =>
@@ -222,6 +256,15 @@ export default {
       this.$axios.$get(`user-stories/${this.storyId}`).then((res) => {
         this.userStory = res;
       });
+    },
+    async getTask() {
+      if (!this.taskId) return;
+
+      this.$axios
+        .$get(`tasks/${this.taskId}`)
+        .then((res) => {
+          this.task = res;
+        });
     },
   },
 };
