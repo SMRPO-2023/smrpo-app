@@ -236,8 +236,56 @@ export default {
           );
         });
     },
+    async updateTask() {
+      if (!this.projectId || !this.storyId || !this.taskId) return;
+
+      await this.$axios
+        .$put(`tasks/${this.taskId}`, {
+          id: this.taskId,
+          title: this.form.title,
+          description: this.form.description,
+          hours: parseInt(this.form.hours),
+          userId: this.form.userId,
+          userStoryId: this.storyId,
+        })
+        .then(async (res) => {
+          this.error = null;
+          this.responseErrors = [];
+          this.$toast.success("Task information successfully updated", {
+            duration: 3000,
+          });
+        })
+        .catch((error) => {
+          const status = error?.response?.status;
+          const data = error?.response?.data;
+          // some instances of errors return main message along with array of detailed shorter messages
+          if (status && status === 400) {
+            if (data && data.message instanceof Array) {
+              this.responseErrors = data.message;
+            }
+            this.error = "Wrong input, while updating the task";
+          } else {
+            this.error = data?.message;
+          }
+          this.$toast.error("An error has occurred, while updating the task",{
+            duration: 3000,
+          });
+        });
+    }
+  },
+  watch: { 
+    task: function(value) {
+      // fill form data
+      if (value) {
+        this.form = {
+          title: value.title,
+          description: value.description,
+          hours: value.hours,
+          userId: value.userId,
+        };
+      }
+    }
   }
-  // TODO: watch for task changes
 }
 </script>
 
