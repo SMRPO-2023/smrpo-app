@@ -4,41 +4,56 @@
     <b-row>
       <b-col offset-lg="2" lg="8" cols="12" class="my-3">
         <div>
-          <b-dropdown id="projects-navigation-dropdown" size="sm" :text="getActiveTab('project')">
+          <b-dropdown
+            id="projects-navigation-dropdown"
+            size="sm"
+            :text="getActiveTab('project')"
+          >
             <template v-for="tab of projectTabs">
-              <b-dropdown-item 
-                v-if="tab.show" 
-                :key="tab.name" 
-                :to="{ path: tab.path }" 
+              <b-dropdown-item
+                v-if="tab.show"
+                :key="tab.name"
+                :to="{ path: tab.path }"
                 :exact="tab.exact"
-              >{{ tab.name }}</b-dropdown-item>
+                >{{ tab.name }}</b-dropdown-item
+              >
             </template>
           </b-dropdown>
 
           <template v-if="sprintId">
             <b-icon icon="chevron-right" />
-            <b-dropdown id="sprints-navigation-dropdown" size="sm" :text="getActiveTab('sprint')">
+            <b-dropdown
+              id="sprints-navigation-dropdown"
+              size="sm"
+              :text="getActiveTab('sprint')"
+            >
               <template v-for="tab of sprintTabs">
-                <b-dropdown-item 
-                  v-if="tab.show" 
-                  :key="tab.name" 
-                  :to="{ path: tab.path }" 
+                <b-dropdown-item
+                  v-if="tab.show"
+                  :key="tab.name"
+                  :to="{ path: tab.path }"
                   :exact="tab.exact"
-                >{{ tab.name }}</b-dropdown-item>
+                  >{{ tab.name }}</b-dropdown-item
+                >
               </template>
             </b-dropdown>
           </template>
 
           <template v-if="storyId">
             <b-icon icon="chevron-right" />
-            <b-dropdown id="stories-navigation-dropdown" size="sm" :text="getActiveTab('userStory')">
+            <b-dropdown
+              id="stories-navigation-dropdown"
+              size="sm"
+              :text="getActiveTab('userStory')"
+            >
               <template v-for="tab of userStoryTabs">
-                <b-dropdown-item 
-                  v-if="tab.show" 
-                  :key="tab.name" 
-                  :to="{ path: tab.path }" 
+                <b-dropdown-item
+                  v-if="tab.show"
+                  :key="tab.name"
+                  :to="{ path: tab.path }"
                   :exact="tab.exact"
-                >{{ tab.name }}</b-dropdown-item>
+                  >{{ tab.name }}</b-dropdown-item
+                >
               </template>
             </b-dropdown>
           </template>
@@ -89,7 +104,7 @@ export default {
     },
     canChangeUserStory() {
       if (!this.userStory) return false;
-      return !this.userStory.acceptanceTest && this.userStory.sprintId === null
+      return !this.userStory.acceptanceTest && this.userStory.sprintId === null;
     },
     projectTabs() {
       return [
@@ -103,7 +118,7 @@ export default {
           name: "Edit",
           path: `/projects/${this.projectId}/edit`,
           exact: true,
-          show: this.isAdmin,
+          show: this.isAdmin || this.isScrumMaster,
         },
         {
           name: "Stories",
@@ -147,7 +162,9 @@ export default {
           name: "Edit",
           path: `/projects/${this.projectId}/stories/${this.storyId}/edit`,
           exact: true,
-          show: (this.isAdmin || this.isProjectOwner || this.isScrumMaster) && this.canChangeUserStory,
+          show:
+            (this.isAdmin || this.isProjectOwner || this.isScrumMaster) &&
+            this.canChangeUserStory,
         },
         {
           name: "Tasks",
@@ -178,35 +195,33 @@ export default {
       else if (type === "userStory") data = this.userStoryTabs;
       else return data;
 
-      return data.find((tab) => tab.exact ? tab.path === this.$route.path : this.$route.path.startsWith(tab.path))?.name;
+      return data.find((tab) =>
+        tab.exact
+          ? tab.path === this.$route.path
+          : this.$route.path.startsWith(tab.path)
+      )?.name;
     },
     async getProject() {
       if (!this.projectId) return;
 
-      await this.$axios
-        .$get(`project/${this.projectId}`)
-        .then((res) => {
-          if (!res) return;
-          this.project = res;
-        });
+      await this.$axios.$get(`project/${this.projectId}`).then((res) => {
+        if (!res) return;
+        this.project = res;
+      });
     },
     async getSprint() {
       if (!this.sprintId) return;
 
-      this.$axios
-        .$get(`sprints/${this.sprintId}`)
-        .then((res) => {
-          this.sprint = res;
-        });
+      this.$axios.$get(`sprints/${this.sprintId}`).then((res) => {
+        this.sprint = res;
+      });
     },
     async getUserStory() {
       if (!this.storyId) return;
 
-      this.$axios
-        .$get(`user-stories/${this.storyId}`)
-        .then((res) => {
-          this.userStory = res;
-        });
+      this.$axios.$get(`user-stories/${this.storyId}`).then((res) => {
+        this.userStory = res;
+      });
     },
   },
 };
