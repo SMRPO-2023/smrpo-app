@@ -8,7 +8,63 @@
       </nuxt-link>
     </div>
 
-    <!-- TODO: table -->
+    <table class="table table-hover mt-3 w-100">
+      <thead>
+        <tr>
+          <th scope="col">Title</th>
+          <th scope="col">Description</th>
+          <th scope="col">Hours</th>
+          <th scope="col">Assigned to</th>
+          <th scope="col">Done</th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="task of tasks" :key="task.id">
+          <td>
+            <nuxt-link :to="{ path: `tasks/${task.id}` }">
+              {{ task.title }}
+            </nuxt-link>
+          </td>
+          <td>{{ task.description | limit(100) }}</td>
+          <td>{{ task.hours }}</td>
+          <td>
+            <span v-if="task.status === 'ASSIGNED'">
+              {{ task.assignedTo.username }}
+            </span>
+            <span v-else class="text-muted">
+              Nobody
+            </span>
+          </td>
+          <td>
+            <b-button
+              v-if="task.done"
+              size="sm"
+              variant="success"
+              disabled
+            >
+              Yes
+            </b-button>
+            <b-button
+              v-else
+              size="sm"
+              variant="danger"
+              disabled
+            >
+              No
+            </b-button>
+          </td>
+          <td class="narrow-col">
+            <b-icon
+              v-if="hasPermission"
+              icon="x-lg"
+              @click="deleteTask(task)"
+              class="center-and-clickable"
+            ></b-icon>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
@@ -51,10 +107,12 @@ export default {
       project: null,
       story: null,
       sprint: null,
+      tasks: [],
     };
   },
   created() {
     this.getProjectWithData();
+    this.getTasks();
   },
   methods: {
     async getProjectWithData() {
@@ -66,6 +124,51 @@ export default {
         this.story = res.UserStory.find((s) => s.id === this.storyId);
         this.sprint = res.sprints.find((s) => s.id === this.story.sprintId);
       });
+    },
+    async getTasks() {
+      if (!this.storyId) return;
+
+      await this.$axios
+        .$get(`tasks`, { params: { usid: this.storyId } })
+        .then((res) => {
+          if (!res) return;
+          this.tasks = res;
+        })
+    },
+    async deleteTask(task) {
+      let confirmed = false;
+      try {
+        confirmed = await this.$bvModal.msgBoxConfirm(
+          "Are you sure you want to delete this task?",
+          {
+            title: "Delete",
+            cancelTitle: "Cancel",
+            okTitle: "Confirm",
+          }
+        );
+      } catch (error) {
+        console.error(error);
+      }
+
+      if (!confirmed) return;
+
+      this.$axios
+        .$delete(`tasks/${task.id}`)
+        .then((res) => {
+          this.tasks = this.tasks.filter((t) => t.id !== task.id);
+          this.$toast.success("Task successfully removed", {
+            duration: 3000,
+          });
+        })
+        .catch((reason) => {
+          console.error(reason);
+          this.$toast.error(
+            "An error has occurred, while deleting the task",
+            {
+              duration: 3000,
+            }
+          );
+        });
     },
   },
 }
