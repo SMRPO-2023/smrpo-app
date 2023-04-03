@@ -74,7 +74,7 @@
 
         <br />
         <h5>Project members</h5>
-        <table class="table table-hover mt-3 w-25" v-if="isAdmin">
+        <table class="table table-hover mt-3 w-25">
           <thead>
             <td>
               <tr>
@@ -114,7 +114,6 @@
               :state="getValidationState(v)"
               aria-describedby="input-1-live-feedback"
               class="w-25"
-              v-if="isAdmin"
             ></b-form-select>
             <b-form-invalid-feedback id="input-1-live-feedback"
               >{{ v.errors[0] }}
@@ -126,7 +125,6 @@
             variant="primary"
             class="d-flex align-item-left w-20 mt-3"
             @click="addMember"
-            :disabled="!isAdmin"
             >Add</b-button
           >
         </div>
@@ -137,11 +135,7 @@
         </ul>
 
         <div class="text-center">
-          <b-button
-            :disabled="!isAdmin"
-            type="submit"
-            variant="primary"
-            class="w-50 mt-3"
+          <b-button type="submit" variant="primary" class="w-50 mt-3"
             >Save</b-button
           >
         </div>
@@ -179,6 +173,7 @@ export default {
   },
   computed: {
     ...mapGetters({
+      currentUser: "user/getUser",
       user: "user/getUser",
       isAdmin: "user/isAdmin",
       isNormalUser: "user/isNormalUser",
@@ -188,9 +183,8 @@ export default {
     this.id = this.$route.params.id;
     if (!this.id) return;
     this.getProject();
-    if (this.isAdmin) {
-      this.getUsers();
-    }
+
+    this.getUsers();
   },
   methods: {
     async removeMember(id) {
@@ -244,7 +238,7 @@ export default {
         .catch((reason) => {
           console.error(reason);
           this.$toast.error(
-            "An error has occurred, while adding new member. Make sure member isent project owner.",
+            "An error has occurred, while adding new member. Make sure member isent project owner, or already a member.",
             {
               duration: 3000,
             }
@@ -319,7 +313,7 @@ export default {
     },
     async getUsers() {
       this.$axios
-        .$get("admin/users")
+        .$get("users")
         .then((res) => {
           this.users.push({ value: null, text: "Choose user" }),
             res.forEach((user) => {
