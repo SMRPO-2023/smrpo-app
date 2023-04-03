@@ -19,7 +19,7 @@
           <th scope="col"></th>
         </tr>
       </thead>
-      <tbody>
+      <tbody v-if="tasks.length">
         <tr v-for="task of tasks" :key="task.id">
           <td>
             <nuxt-link :to="{ path: `tasks/${task.id}` }">
@@ -61,6 +61,14 @@
               @click="deleteTask(task)"
               class="center-and-clickable"
             ></b-icon>
+          </td>
+        </tr>
+      </tbody>
+
+      <tbody v-else>
+        <tr>
+          <td colspan="6" class="text-center text-muted">
+            No tasks yet
           </td>
         </tr>
       </tbody>

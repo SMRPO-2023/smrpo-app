@@ -238,7 +238,7 @@ export default {
         .catch((reason) => {
           console.error(reason);
           this.$toast.error(
-            "An error has occurred, while adding new member. Make sure member isent project owner, or already a member.",
+            "An error has occurred, while adding new member. Make sure member isn't project owner, or already a member.",
             {
               duration: 3000,
             }

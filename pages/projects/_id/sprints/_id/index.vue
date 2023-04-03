@@ -113,6 +113,8 @@
 </template>
 
 <script>
+import { BIcon } from "bootstrap-vue";
+import { mapGetters } from "vuex";
 import datetime from "@/mixins/datetime";
 import priorities from "@/mixins/priorities";
 
@@ -122,10 +124,14 @@ export default {
     BIcon,
   },
   mixins: [datetime, priorities],
+  computed: {
+    ...mapGetters({
+      projectId: "route-id/getProjectId",
+    }),
+  },
   data() {
     return {
       id: null,
-      projectId: null,
       stories: [],
       sprintStories: [],
       sprint: {
@@ -138,7 +144,6 @@ export default {
   },
   async mounted() {
     this.id = this.$route.params.id;
-    this.projectId = this.$route.query.projectId;
     if (!this.id) return;
     this.getSprint();
     this.getProjectStories();
@@ -199,7 +204,7 @@ export default {
         });
     },
     async getProjectStories() {
-      if (!this.id) return;
+      if (!this.id || !this.projectId) return;
 
       await this.$axios
         .$get(`user-stories/get-addable`, {
