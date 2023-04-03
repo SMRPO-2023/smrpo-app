@@ -243,9 +243,12 @@ export default {
         })
         .catch((reason) => {
           console.error(reason);
-          this.$toast.error("An error has occurred, while adding new member.", {
-            duration: 3000,
-          });
+          this.$toast.error(
+            "An error has occurred, while adding new member. Make sure member isent project owner.",
+            {
+              duration: 3000,
+            }
+          );
         });
     },
     getValidationState({ dirty, validated, valid = null }) {
@@ -280,7 +283,7 @@ export default {
     },
     async onSubmit() {
       await this.$axios
-        .$put(`project/${this.user.id}`, {
+        .$put(`project/${this.id}`, {
           title: this.form.title,
           documentation: this.form.documentation,
           projectOwnerId: this.form.projectOwnerId,
