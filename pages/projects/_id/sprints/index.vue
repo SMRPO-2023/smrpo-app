@@ -35,7 +35,9 @@
           <td>{{ formatDate(sprint.start) }}</td>
           <td>{{ formatDate(sprint.end) }}</td>
           <td class="narrow-col">{{ sprint.velocity }}</td>
-          <td class="narrow-col"><b-badge v-if="isSprintActive(sprint)" variant="primary">Active</b-badge></td>
+          <td class="narrow-col">
+            <b-badge :variant="getVariantForSprintStatus(sprint)">{{ getNameForSprintStatus(sprint) }}</b-badge>
+          </td>
           <td class="narrow-col">
             <b-icon
               v-if="canChange(sprint)"
@@ -103,6 +105,21 @@ export default {
       const now = new Date();
       now.setHours(0, 0, 0, 0);
       return new Date(sprint.start) <= now && new Date(sprint.end) >= now;
+    },
+    isSprintFinished(sprint) {
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      return new Date(sprint.end) < now;
+    },
+    getVariantForSprintStatus(sprint) {
+      if (this.isSprintActive(sprint)) return "primary";
+      else if (this.isSprintFinished(sprint)) return "danger";
+      else return;
+    },
+    getNameForSprintStatus(sprint) {
+      if (this.isSprintActive(sprint)) return "Active";
+      else if (this.isSprintFinished(sprint)) return "Finished";
+      else return;
     },
     async getProjectWithData() {
       if (!this.projectId) return;

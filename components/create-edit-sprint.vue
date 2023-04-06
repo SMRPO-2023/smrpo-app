@@ -3,7 +3,7 @@
     <ValidationObserver ref="observer" v-slot="{ handleSubmit }">
       <b-form @submit.stop.prevent="handleSubmit(onSubmit)" class="mt-4">
         <!-- Name -->
-        <ValidationProvider name="name" :rules="{ required: true }" v-slot="v">
+        <ValidationProvider name="name" :rules="{ required: true }" v-slot="v" ref="nameProvider">
           <b-form-group label="Name" label-for="name">
             <b-form-input
               type="text"
@@ -32,6 +32,7 @@
                   id="start"
                   placeholder="Choose start date"
                   v-model="form.start"
+                  @input="onStartChanged"
                   :state="getValidationState(v)"
                   :min="minDate"
                   :max="maxStartDate"
@@ -88,16 +89,21 @@
           v-slot="v"
         >
           <b-form-group label="Velocity" label-for="velocity">
-            <b-form-input
-              type="number"
-              id="velocity"
-              placeholder="Enter velocity"
-              v-model="form.velocity"
+            <b-input-group append="points">
+              <b-form-input
+                type="number"
+                id="velocity"
+                placeholder="Enter velocity"
+                v-model="form.velocity"
+                :state="getValidationState(v)"
+                aria-describedby="velocity-live-feedback"
+              />
+            </b-input-group>
+            <b-form-invalid-feedback 
+              id="velocity-live-feedback"
               :state="getValidationState(v)"
-              aria-describedby="velocity-live-feedback"
-            />
-            <b-form-invalid-feedback id="velocity-live-feedback"
-              >{{ v.errors[0] }}
+            >
+              {{ v.errors[0] }}
             </b-form-invalid-feedback>
           </b-form-group>
         </ValidationProvider>
@@ -165,7 +171,7 @@ export default {
       error: null,
       responseErrors: [],
       form: {
-        name: 'Sprint ' + new Date().toISOString().split('T')[0],
+        name: 'Sprint ' + new Date().toDateString().split('T')[0],
         start: null,
         end: null,
         velocity: null,
@@ -186,6 +192,12 @@ export default {
     },
     getValidationState({ dirty, validated, valid = null }) {
       return dirty || validated ? valid : null;
+    },
+    async onStartChanged(value) {
+      const dirty = await this.$refs.nameProvider.flags.dirty;
+      if (!dirty) {
+        this.form.name = 'Sprint ' + value.toDateString().split('T')[0];
+      }
     },
     async getProject() {
       if (!this.projectId) return;
