@@ -55,6 +55,7 @@
               placeholder="Enter hours"
               v-model="form.hours"
               :state="getValidationState(v)"
+              :step="0.0001"
               aria-describedby="hours-live-feedback"
             />
             <b-form-invalid-feedback id="hours-live-feedback"
@@ -68,7 +69,7 @@
           name="userId"
           v-slot="v"
         >
-          <b-form-group label="Assignee" label-for="assignee">
+          <b-form-group label="Assigned to" label-for="assignee">
             <b-form-select
               id="assignee"
               v-model="form.userId"
@@ -209,7 +210,7 @@ export default {
         .$post("tasks", {
           title: this.form.title,
           description: this.form.description,
-          hours: parseInt(this.form.hours),
+          hours: parseFloat(this.form.hours),
           userId: this.form.userId,
           userStoryId: this.storyId,
         })
@@ -217,23 +218,7 @@ export default {
           await this.$router.replace(`/projects/${this.projectId}/stories/${this.storyId}/tasks`);
         })
         .catch((error) => {
-          const status = error?.response?.status;
-          const data = error?.response?.data;
-          // some instances of errors return main message along with array of detailed shorter messages
-          if (status && status === 400) {
-            if (data && data.message instanceof Array) {
-              this.responseErrors = data.message;
-            }
-            this.error = "Wrong input, while creating the task";
-          } else {
-            this.error = data?.message;
-          }
-          this.$toast.error(
-            "An error has occurred, while creating the task",
-            {
-              duration: 3000,
-            }
-          );
+          this.handleSubmitError(error, "creating the task");
         });
     },
     async updateTask() {
@@ -244,7 +229,7 @@ export default {
           id: this.taskId,
           title: this.form.title,
           description: this.form.description,
-          hours: parseInt(this.form.hours),
+          hours: parseFloat(this.form.hours),
           userId: this.form.userId,
           userStoryId: this.storyId,
         })
@@ -256,22 +241,25 @@ export default {
           });
         })
         .catch((error) => {
-          const status = error?.response?.status;
-          const data = error?.response?.data;
-          // some instances of errors return main message along with array of detailed shorter messages
-          if (status && status === 400) {
-            if (data && data.message instanceof Array) {
-              this.responseErrors = data.message;
-            }
-            this.error = "Wrong input, while updating the task";
-          } else {
-            this.error = data?.message;
-          }
-          this.$toast.error("An error has occurred, while updating the task",{
-            duration: 3000,
-          });
+          this.handleSubmitError(error, "updating the task");
         });
-    }
+    },
+    handleSubmitError(error, errorActionMessage) {
+      const status = error?.response?.status;
+      const data = error?.response?.data;
+      // some instances of errors return main message along with array of detailed shorter messages
+      if (status && status === 400) {
+        if (data && data.message instanceof Array) {
+          this.responseErrors = data.message;
+        }
+        this.error = "Wrong input, while " + errorActionMessage;
+      } else {
+        this.error = data?.message;
+      }
+      this.$toast.error("An error has occurred, while " + errorActionMessage, {
+        duration: 3000,
+      });
+    },
   },
   watch: { 
     task: function(value) {

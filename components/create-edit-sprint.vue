@@ -99,6 +99,7 @@
                 placeholder="Enter velocity"
                 v-model="form.velocity"
                 :state="getValidationState(v)"
+                :step="0.0001"
                 aria-describedby="velocity-live-feedback"
               />
             </b-input-group>
