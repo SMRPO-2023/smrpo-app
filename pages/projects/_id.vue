@@ -125,13 +125,11 @@ export default {
       if (!this.currentUser || !this.project) return false;
       return this.currentUser.id === this.project.scrumMasterId;
     },
-    hasSprintStarted() {
+    hasSprintFinished() {
       if (!this.sprint) return false;
       const now = new Date();
-      const start = new Date(this.sprint.start);
-      start.setHours(0, 0, 0, 0);
       now.setHours(0, 0, 0, 0);
-      return start <= now;
+      return new Date(this.sprint.end) < now;
     },
     canChangeUserStory() {
       if (!this.userStory) return false;
@@ -200,7 +198,7 @@ export default {
           name: "Edit",
           path: `/projects/${this.projectId}/sprints/${this.sprintId}/edit`,
           exact: true,
-          show: (this.isAdmin || this.isScrumMaster) && !this.hasSprintStarted,
+          show: (this.isAdmin || this.isScrumMaster) && !this.hasSprintFinished,
         },
       ];
     },

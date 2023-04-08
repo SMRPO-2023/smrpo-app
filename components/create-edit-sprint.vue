@@ -11,6 +11,7 @@
               placeholder="Enter name"
               v-model="form.name"
               :state="getValidationState(v)"
+              :disabled="isSprintActive"
               aria-describedby="name-live-feedback"
             />
             <b-form-invalid-feedback id="name-live-feedback"
@@ -40,6 +41,7 @@
                   today-button
                   reset-button
                   value-as-date
+                  :disabled="isSprintActive"
                   aria-describedby="start-live-feedback"
                 />
                 <b-form-invalid-feedback id="start-live-feedback"
@@ -68,6 +70,7 @@
                   today-button
                   reset-button
                   value-as-date
+                  :disabled="isSprintActive"
                   aria-describedby="end-live-feedback"
                 />
                 <b-form-invalid-feedback id="end-live-feedback"
@@ -116,7 +119,7 @@
 
         <div class="text-center">
           <b-button
-            :disabled="!(isScrumMaster || isAdmin)"
+            :disabled="!(isScrumMaster || isAdmin) || hasSprintFinished"
             type="submit"
             variant="primary"
             class="w-50 mt-3"
@@ -161,6 +164,18 @@ export default {
     isScrumMaster() {
       if (!this.currentUser || !this.project) return false;
       return this.currentUser.id === this.project.scrumMasterId;
+    },
+    isSprintActive() {
+      if (!this.sprint) return false;
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      return new Date(this.sprint.start) <= now && new Date(this.sprint.end) >= now;
+    },
+    hasSprintFinished() {
+      if (!this.sprint) return false;
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      return new Date(this.sprint.end) < now;
     },
   },
   data() {
@@ -211,10 +226,44 @@ export default {
       if (!this.projectId) return;
 
       if (this.sprintId && this.sprint) {
-        await this.updateSprint();
+        if (this.isSprintActive) {
+          await this.updateSprintVelocity();
+        } else {
+          await this.updateSprint();
+        }
       } else {
         await this.createSprint();
       }
+    },
+    async updateSprintVelocity() {
+      // TODO: wait for backend to implement this
+      await this.$axios
+        .$put(`sprints/${this.sprintId}/velocity`, {
+          velocity: +this.form.velocity,
+        })
+        .then((res) => {
+          this.error = null;
+          this.responseErrors = [];
+          this.$toast.success("Sprint information successfully updated", {
+            duration: 3000,
+          });
+        })
+        .catch((error) => {
+          const status = error?.response?.status;
+          const data = error?.response?.data;
+          // some instances of errors return main message along with array of detailed shorter messages
+          if (status && status === 400) {
+            if (data && data.message instanceof Array) {
+              this.responseErrors = data.message;
+            }
+            this.error = "Wrong input, while creating sprint";
+          } else {
+            this.error = data?.message;
+          }
+          this.$toast.error("An error has occurred, while creating sprint", {
+            duration: 3000,
+          });
+        });
     },
     async updateSprint() {
       await this.$axios

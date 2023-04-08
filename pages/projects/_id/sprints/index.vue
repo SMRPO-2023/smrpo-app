@@ -113,19 +113,19 @@ export default {
       now.setHours(0, 0, 0, 0);
       return new Date(sprint.start) <= now && new Date(sprint.end) >= now;
     },
-    isSprintFinished(sprint) {
+    hasSprintFinished(sprint) {
       const now = new Date();
       now.setHours(0, 0, 0, 0);
       return new Date(sprint.end) < now;
     },
     getVariantForSprintStatus(sprint) {
       if (this.isSprintActive(sprint)) return "primary";
-      else if (this.isSprintFinished(sprint)) return "danger";
+      else if (this.hasSprintFinished(sprint)) return "danger";
       else return;
     },
     getNameForSprintStatus(sprint) {
       if (this.isSprintActive(sprint)) return "Active";
-      else if (this.isSprintFinished(sprint)) return "Finished";
+      else if (this.hasSprintFinished(sprint)) return "Finished";
       else return;
     },
     async getProjectWithData() {
