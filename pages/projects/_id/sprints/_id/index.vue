@@ -27,6 +27,7 @@
             <th scope="col">Business value</th>
             <th scope="col">Priority</th>
             <th scope="col">Acceptance test</th>
+            <th scope="col">Points</th>
             <th scope="col"></th>
           </tr>
         </thead>
@@ -49,6 +50,7 @@
             </td>
 
             <td>{{ story.acceptanceCriteria | limit(100) }}</td>
+            <td>{{ story.points }}</td>
             <td>
               <b-input-group size="lg" style="font-scale: 12px">
                 <p class="h3">
@@ -71,7 +73,8 @@
             <th scope="col">Description</th>
             <th scope="col">Business value</th>
             <th scope="col">Priority</th>
-            <th scope="col">Criteria</th>
+            <th scope="col">Acceptance test</th>
+            <th scope="col">Points</th>
             <th scope="col"></th>
           </tr>
         </thead>
@@ -96,6 +99,7 @@
             </td>
 
             <td>{{ story.acceptanceCriteria | limit(100) }}</td>
+            <td>{{ story.points }}</td>
             <td>
               <b-input-group size="lg" style="font-scale: 12px">
                 <p class="h3">
