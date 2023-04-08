@@ -15,7 +15,7 @@
               <th scope="col">Description</th>
               <th scope="col">Project owner</th>
               <th scope="col">Scrum master</th>
-              <th scope="col" >Members</th>
+              <th scope="col">Developers</th>
               <th scope="col" v-if="isAdmin"></th>
             </tr>
           </thead>
@@ -26,7 +26,11 @@
                   project.title
                 }}</nuxt-link>
               </td>
-              <td><span style="white-space: pre-line">{{ project.documentation }}</span></td>
+              <td>
+                <span style="white-space: pre-line">{{
+                  project.documentation
+                }}</span>
+              </td>
               <td>
                 <span v-if="project.projectOwner">{{
                   project.projectOwner.username
@@ -37,12 +41,12 @@
                   project.scrumMaster.username
                 }}</span>
               </td>
-              <td >
+              <td>
                 <b-button
                   variant="primary"
                   v-if="hasPermission(project)"
                   @click="showUsers(project.id)"
-                  >Members</b-button
+                  >Developers</b-button
                 >
               </td>
               <td v-if="isAdmin">
@@ -79,9 +83,7 @@
           </tbody>
           <tbody v-else>
             <tr>
-              <td>
-                No members
-              </td>
+              <td>No members</td>
             </tr>
           </tbody>
         </table>
@@ -125,10 +127,11 @@ export default {
   },
   methods: {
     hasPermission(project) {
-      if (!this.currentUser ) return false;
+      if (!this.currentUser) return false;
       return (
         this.currentUser.id === project.projectOwnerId ||
-        this.currentUser.id === project.scrumMasterId || this.isAdmin
+        this.currentUser.id === project.scrumMasterId ||
+        this.isAdmin
       );
     },
     async showUsers(projectId) {
@@ -164,7 +167,10 @@ export default {
     getProjectDevelopers(projectId) {
       const project = this.projects.find((project) => project.id === projectId);
       if (project) {
-        return project.developers.map(d => ({id: d.id, username: d.user.username}))
+        return project.developers.map((d) => ({
+          id: d.id,
+          username: d.user.username,
+        }));
       } else {
         return [];
       }

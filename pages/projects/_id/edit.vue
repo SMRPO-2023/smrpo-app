@@ -73,7 +73,7 @@
         </ValidationProvider>
 
         <br />
-        <h5>Project members</h5>
+        <h5>Project developers</h5>
         <table class="table table-hover mt-3 w-25">
           <thead>
             <td>
@@ -100,7 +100,7 @@
         </table>
 
         <br />
-        <h5>Add member</h5>
+        <h5>Add developer</h5>
         <ValidationProvider
           name="scrum master"
           :rules="{ required: false }"
