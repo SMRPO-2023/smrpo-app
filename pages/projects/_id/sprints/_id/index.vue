@@ -30,7 +30,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="story of sprintStories" :key="story.id">
+        <tr v-for="story of sprint.UserStories" :key="story.id">
           <td>
             <a> #{{ story.id }} - {{ story.title }} </a>
           </td>
@@ -133,7 +133,6 @@ export default {
     return {
       id: null,
       stories: [],
-      sprintStories: [],
       sprint: {
         name: null,
         start: null,
@@ -147,27 +146,14 @@ export default {
     if (!this.id) return;
     this.getSprint();
     this.getProjectStories();
-    this.getSprintStories();
   },
   methods: {
-    async getSprintStories() {
-      await this.$axios
-        .$get(`user-stories`, {
-          params: {
-            sprintId: this.id,
-          },
-        })
-        .then((res) => {
-          if (!res) return;
-          this.sprintStories = res;
-        });
-    },
     async removeFromSprint(storyId) {
       await this.$axios
         .$post(`user-stories/remove-from-sprint/${storyId}`)
         .then(async (res) => {
+          this.getSprint();
           this.getProjectStories();
-          this.getSprintStories();
           this.$toast.success("Story removed from sprint.", {
             duration: 3000,
           });
@@ -188,8 +174,8 @@ export default {
           stories: [storyId],
         })
         .then(async (res) => {
+          this.getSprint();
           this.getProjectStories();
-          this.getSprintStories();
           this.$toast.success("Story moved to sprint.", {
             duration: 3000,
           });
