@@ -17,98 +17,100 @@
     <p>
       <span class="title">Velocity:</span> <span>{{ sprint.velocity }}</span>
     </p>
-    <h2 class="pt-3">Stories in sprint</h2>
-    <table class="table table-hover mt-3 w-100">
-      <thead>
-        <tr>
-          <th scope="col">Title</th>
-          <th scope="col">Description</th>
-          <th scope="col">Business value</th>
-          <th scope="col">Priority</th>
-          <th scope="col">Acceptance test</th>
-          <th scope="col"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="story of sprint.UserStories" :key="story.id">
-          <td>
-            <a> #{{ story.id }} - {{ story.title }} </a>
-          </td>
-          <td>{{ story.description | limit(100) }}</td>
-          <td>{{ story.businessValue }}</td>
+    <div v-if="isSprintActive(sprint)">
+      <h2 class="pt-3">Stories in sprint</h2>
+      <table class="table table-hover mt-3 w-100">
+        <thead>
+          <tr>
+            <th scope="col">Title</th>
+            <th scope="col">Description</th>
+            <th scope="col">Business value</th>
+            <th scope="col">Priority</th>
+            <th scope="col">Acceptance test</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="story of sprint.UserStories" :key="story.id">
+            <td>
+              <a> #{{ story.id }} - {{ story.title }} </a>
+            </td>
+            <td>{{ story.description | limit(100) }}</td>
+            <td>{{ story.businessValue }}</td>
 
-          <td>
-            <b-button
-              id="dropdown-right"
-              right
-              :variant="getVariantForPriority(story.priority)"
-            >
-              {{ getNameForPriority(story.priority) }}
-            </b-button>
-          </td>
+            <td>
+              <b-button
+                id="dropdown-right"
+                right
+                :variant="getVariantForPriority(story.priority)"
+              >
+                {{ getNameForPriority(story.priority) }}
+              </b-button>
+            </td>
 
-          <td>{{ story.acceptanceCriteria | limit(100) }}</td>
-          <td>
-            <b-input-group size="lg" style="font-scale: 12px">
-              <p class="h3">
-                <b-icon
-                  icon="arrow-down-circle"
-                  @click="removeFromSprint(story.id)"
-                  class="center-and-clickable"
-                ></b-icon>
-              </p>
-            </b-input-group>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <h2 class="pt-3">Stories</h2>
-    <table class="table table-hover mt-3 w-100">
-      <thead>
-        <tr>
-          <th scope="col">Title</th>
-          <th scope="col">Description</th>
-          <th scope="col">Business value</th>
-          <th scope="col">Priority</th>
-          <th scope="col">Criteria</th>
-          <th scope="col"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="story of stories" :key="story.id">
-          <td>
-            <nuxt-link :to="{ path: `stories/${story.id}` }">
-              #{{ story.id }} - {{ story.title }}
-            </nuxt-link>
-          </td>
-          <td>{{ story.description | limit(100) }}</td>
-          <td>{{ story.businessValue }}</td>
+            <td>{{ story.acceptanceCriteria | limit(100) }}</td>
+            <td>
+              <b-input-group size="lg" style="font-scale: 12px">
+                <p class="h3">
+                  <b-icon
+                    icon="arrow-down-circle"
+                    @click="removeFromSprint(story.id)"
+                    class="center-and-clickable"
+                  ></b-icon>
+                </p>
+              </b-input-group>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <h2 class="pt-3">Stories</h2>
+      <table class="table table-hover mt-3 w-100">
+        <thead>
+          <tr>
+            <th scope="col">Title</th>
+            <th scope="col">Description</th>
+            <th scope="col">Business value</th>
+            <th scope="col">Priority</th>
+            <th scope="col">Criteria</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="story of stories" :key="story.id">
+            <td>
+              <nuxt-link :to="{ path: `stories/${story.id}` }">
+                #{{ story.id }} - {{ story.title }}
+              </nuxt-link>
+            </td>
+            <td>{{ story.description | limit(100) }}</td>
+            <td>{{ story.businessValue }}</td>
 
-          <td>
-            <b-button
-              id="dropdown-right"
-              right
-              :variant="getVariantForPriority(story.priority)"
-            >
-              {{ getNameForPriority(story.priority) }}
-            </b-button>
-          </td>
+            <td>
+              <b-button
+                id="dropdown-right"
+                right
+                :variant="getVariantForPriority(story.priority)"
+              >
+                {{ getNameForPriority(story.priority) }}
+              </b-button>
+            </td>
 
-          <td>{{ story.acceptanceCriteria | limit(100) }}</td>
-          <td>
-            <b-input-group size="lg" style="font-scale: 12px">
-              <p class="h3">
-                <b-icon
-                  icon="arrow-up-circle"
-                  @click="moveToSprint(story.id)"
-                  class="center-and-clickable"
-                ></b-icon>
-              </p>
-            </b-input-group>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+            <td>{{ story.acceptanceCriteria | limit(100) }}</td>
+            <td>
+              <b-input-group size="lg" style="font-scale: 12px">
+                <p class="h3">
+                  <b-icon
+                    icon="arrow-up-circle"
+                    @click="moveToSprint(story.id)"
+                    class="center-and-clickable"
+                  ></b-icon>
+                </p>
+              </b-input-group>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -148,6 +150,11 @@ export default {
     this.getProjectStories();
   },
   methods: {
+    isSprintActive(sprint) {
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      return new Date(sprint.start) <= now && new Date(sprint.end) >= now;
+    },
     async removeFromSprint(storyId) {
       await this.$axios
         .$post(`user-stories/remove-from-sprint/${storyId}`)
