@@ -34,7 +34,7 @@
           </td>
           <td>{{ formatDate(sprint.start) }}</td>
           <td>{{ formatDate(sprint.end) }}</td>
-          <td class="narrow-col">{{ sprint.velocity }}</td>
+          <td>{{ sprint.velocity }}</td>
           <td class="narrow-col">
             <b-badge :variant="getVariantForSprintStatus(sprint)">{{ getNameForSprintStatus(sprint) }}</b-badge>
           </td>

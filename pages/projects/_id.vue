@@ -4,6 +4,9 @@
     <b-row>
       <b-col offset-lg="2" lg="8" cols="12" class="my-3">
         <div>
+          <!-- Project -->
+          <span>{{ getProjectTitle }}</span>
+          <b-icon icon="chevron-right" />
           <b-dropdown
             id="projects-navigation-dropdown"
             size="sm"
@@ -21,6 +24,8 @@
           </b-dropdown>
 
           <template v-if="sprintId">
+            <b-icon icon="chevron-right" />
+            <span>{{ getSprintTitle }}</span>
             <b-icon icon="chevron-right" />
             <b-dropdown
               id="sprints-navigation-dropdown"
@@ -41,6 +46,8 @@
 
           <template v-if="storyId">
             <b-icon icon="chevron-right" />
+            <span>{{ getUserStoryTitle }}</span>
+            <b-icon icon="chevron-right" />
             <b-dropdown
               id="stories-navigation-dropdown"
               size="sm"
@@ -60,16 +67,18 @@
 
           <template v-if="storyId">
             <b-icon icon="chevron-right" />
-            <b-dropdown
-              id="stories-navigation-dropdown"
-              size="sm"
-              :text="getActiveTab('userStory')"
+            <span>{{ getTaskTitle }}</span>
+            <b-icon icon="chevron-right" />
+            <b-dropdown 
+              id="stories-navigation-dropdown" 
+              size="sm" 
+              :text="getActiveTab('task')"
             >
-              <template v-for="tab of userStoryTabs">
-                <b-dropdown-item
-                  v-if="tab.show"
-                  :key="tab.name"
-                  :to="{ path: tab.path }"
+              <template v-for="tab of taskTabs">
+                <b-dropdown-item 
+                  v-if="tab.show" 
+                  :key="tab.name" 
+                  :to="{ path: tab.path }" 
                   :exact="tab.exact"
                   >{{ tab.name }}</b-dropdown-item
                 >
@@ -127,6 +136,22 @@ export default {
     canChangeUserStory() {
       if (!this.userStory) return false;
       return !this.userStory.acceptanceTest && this.userStory.sprintId === null;
+    },
+    getProjectTitle() {
+      if (!this.project) return "";
+      return this.project.title;
+    },
+    getSprintTitle() {
+      if (!this.sprint) return "";
+      return this.sprint.name;
+    },
+    getUserStoryTitle() {
+      if (!this.userStory) return "";
+      return this.userStory.title;
+    },
+    getTaskTitle() {
+      if (!this.task) return "";
+      return this.task.title;
     },
     projectTabs() {
       return [
@@ -285,4 +310,11 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+a:hover {
+  text-decoration: underline;
+}
+a {
+  color: black !important;
+}
+</style>
