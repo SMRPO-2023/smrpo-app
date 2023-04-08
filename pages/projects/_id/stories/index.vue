@@ -39,7 +39,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="story of stories" :key="story.id">
+        <tr v-for="story of stories.stories" :key="story.id">
           <td>
             <nuxt-link :to="{ path: `stories/${story.id}` }">
               #{{ story.id }} - {{ story.title }}
