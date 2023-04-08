@@ -64,10 +64,9 @@
           </td>
         </tr>
       </tbody>
-
       <tbody v-else>
         <tr>
-          <td colspan="6" class="text-center text-muted">
+          <td class="text-muted text-center" colspan="6">
             No tasks yet
           </td>
         </tr>

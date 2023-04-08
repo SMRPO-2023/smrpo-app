@@ -149,7 +149,7 @@ export default {
           show: this.isAdmin || this.isScrumMaster,
         },
         {
-          name: "Stories",
+          name: "Product backlog",
           path: `/projects/${this.projectId}/stories`,
           exact: false, // because we have a nested route
           show: true,

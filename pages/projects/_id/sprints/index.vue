@@ -18,7 +18,7 @@
           <th scope="col"></th>
         </tr>
       </thead>
-      <tbody>
+      <tbody v-if="sprints.length">
         <tr v-for="sprint of sprints" :key="sprint.id">
           <td>
             <nuxt-link
@@ -45,6 +45,13 @@
               @click="deleteSprint(sprint)"
               class="center-and-clickable"
             ></b-icon>
+          </td>
+        </tr>
+      </tbody>
+      <tbody v-else>
+        <tr>
+          <td class="text-muted text-center" colspan="6">
+            No sprints yet
           </td>
         </tr>
       </tbody>

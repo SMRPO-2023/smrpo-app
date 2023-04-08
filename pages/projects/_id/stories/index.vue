@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="d-flex justify-content-between align-items-center">
-      <h1 class="mb-0">Stories</h1>
+      <h1 class="mb-0">Product backlog</h1>
 
       <nuxt-link v-if="hasPermission()" to="stories/create">
         <b-button variant="primary">Create</b-button>

@@ -19,7 +19,7 @@
               <th scope="col" v-if="isAdmin"></th>
             </tr>
           </thead>
-          <tbody>
+          <tbody v-if="projects.length">
             <tr v-for="project of projects" :key="project.id">
               <td>
                 <nuxt-link :to="{ path: `projects/${project.id}` }">{{
@@ -55,6 +55,13 @@
                   @click="deleteProject(project)"
                   class="center-and-clickable"
                 ></b-icon>
+              </td>
+            </tr>
+          </tbody>
+          <tbody v-else>
+            <tr>
+              <td class="text-muted text-center" :colspan="isAdmin ? 6 : 5">
+                No projects yet
               </td>
             </tr>
           </tbody>
