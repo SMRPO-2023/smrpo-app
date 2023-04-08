@@ -25,7 +25,7 @@
           <th scope="col">Description</th>
           <th scope="col">Business value</th>
           <th scope="col">Priority</th>
-          <th scope="col">Criteria</th>
+          <th scope="col">Acceptance test</th>
           <th scope="col"></th>
         </tr>
       </thead>
