@@ -86,7 +86,11 @@ export default {
       return this.hasPermission() && !this.hasSprintStarted(sprint.start);
     },
     hasPermission() {
-      return this.isAdmin || this.isScrumMaster;
+      return this.isAdmin || this.isScrumMaster || this.isProjectOwner();
+    },
+    isProjectOwner() {
+      if (!this.currentUser || !this.project) return false;
+      return this.currentUser.id === this.project.projectOwnerId;
     },
     hasSprintStarted(start) {
       const now = new Date();

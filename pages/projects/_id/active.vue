@@ -1,24 +1,10 @@
 <template>
-  <div>
-    <h1>View sprint</h1>
-    <br />
-
-    <p>
-      <span class="title">Name:</span> <span>{{ name }}</span>
-    </p>
-    <p>
-      <span class="title">Start date:</span>
-      <span>{{ formatDate(start) }}</span>
-    </p>
-    <p>
-      <span class="title">End date:</span>
-      <span>{{ formatDate(end) }}</span>
-    </p>
-    <p>
-      <span class="title">Velocity:</span> <span>{{ velocity }}</span>
-    </p>
-    <div v-if="isSprintActive(sprint)">
-      <h2 class="pt-3">Stories in sprint</h2>
+  <b-container fluid>
+    <b-row>
+      <b-col offset-lg="2" lg="8" cols="12" class="my-3">
+        <div class="d-flex justify-content-between align-items-center">
+          <h1 class="pt-3">Stories in sprint</h1>
+        </div>
       <table class="table table-hover mt-3 w-100">
         <thead>
           <tr>
@@ -28,11 +14,10 @@
             <th scope="col">Priority</th>
             <th scope="col">Acceptance test</th>
             <th scope="col">Points</th>
-            <th scope="col"></th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="story of sprint.UserStories" :key="story.id">
+          <tr v-for="story of stories" :key="story.id">
             <td>
               <a> #{{ story.id }} - {{ story.title }} </a>
             </td>
@@ -51,78 +36,14 @@
 
             <td>{{ story.acceptanceCriteria | limit(100) }}</td>
             <td>{{ story.points }}</td>
-            <td>
-              <b-input-group size="lg" style="font-scale: 12px">
-                <p class="h3">
-                  <b-button
-                    v-if="isProjectOwner()"
-                    variant="danger"
-                    @click="removeFromSprint(story.id)"
-                    class="center-and-clickable"
-                  >Reject</b-button>
-                  
-                </p>
-              </b-input-group>
-            </td>
           </tr>
         </tbody>
       </table>
-      <hr>
-      <h4 class="d-flex justify-content-end mr-5">Sum : {{currentLoad}} / {{ velocity }}</h4>
-      <br>
-      <div v-if="isScrumMaster()">
-      <h2 class="pt-3">Stories</h2>
-      <table class="table table-hover mt-3 w-100">
-        <thead>
-          <tr>
-            <th scope="col">Title</th>
-            <th scope="col">Description</th>
-            <th scope="col">Business value</th>
-            <th scope="col">Priority</th>
-            <th scope="col">Acceptance test</th>
-            <th scope="col">Points</th>
-            <th scope="col"></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="story of addableStories" :key="story.id">
-            <td>
-              <nuxt-link :to="{ path: `stories/${story.id}` }">
-                #{{ story.id }} - {{ story.title }}
-              </nuxt-link>
-            </td>
-            <td>{{ story.description | limit(100) }}</td>
-            <td>{{ story.businessValue }}</td>
 
-            <td>
-              <b-button
-                id="dropdown-right"
-                right
-                :variant="getVariantForPriority(story.priority)"
-              >
-                {{ getNameForPriority(story.priority) }}
-              </b-button>
-            </td>
-
-            <td>{{ story.acceptanceCriteria | limit(100) }}</td>
-            <td>{{ story.points }}</td>
-            <td>
-              <b-input-group size="lg" style="font-scale: 12px" v-if="canBeAdded(story.points)">
-                <p class="h3">
-                  <b-icon
-                    icon="arrow-up-circle"
-                    @click="moveToSprint(story.id)"
-                    class="center-and-clickable"
-                  ></b-icon>
-                </p>
-              </b-input-group>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      </div>
-    </div>
-  </div>
+      </b-col>
+    </b-row>
+    
+  </b-container>
 </template>
 
 <script>
@@ -261,16 +182,19 @@ export default {
     },
     async getSprint() {
       this.$axios
-        .$get(`sprints/${this.id}`)
+        .$get(`sprints/active-sprint`,{
+          params: {
+            "project-id": this.id,
+          },
+        })
         .then((res) => {
-          this.getAddableStories(res.sprint.projectId);
-          this.getProject(res.sprint.projectId);
-          this.sprint = res.sprint;
-          this.name = res.sprint.name;
-          this.start = res.sprint.start;
-          this.end = res.sprint.end;
-          this.velocity = res.sprint.velocity;
-          this.stories = res.sprint.UserStories;
+          this.getProject(res.projectId);
+          this.sprint = res;
+          this.name = res.name;
+          this.start = res.start;
+          this.end = res.end;
+          this.velocity = res.velocity;
+          this.stories = res.UserStories;
           this.currentLoad = res.currentLoad;
         })
         .catch((reason) => {
@@ -287,13 +211,4 @@ export default {
 };
 </script>
 
-<style scoped>
-.title {
-  font-size: 1.17em;
-  margin-top: 1em;
-  margin-bottom: 1em;
-  margin-left: 0;
-  margin-right: 0;
-  font-weight: bold;
-}
-</style>
+<style scoped></style>

@@ -26,7 +26,7 @@
     </p>
     <div v-if="isAdmin">
       <p>
-        <span class="title">Members </span>
+        <span class="title">Developers</span>
       </p>
       <table class="table table-hover mt-3 w-100">
         <thead>

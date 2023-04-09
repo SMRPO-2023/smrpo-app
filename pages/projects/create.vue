@@ -82,7 +82,7 @@
               </b-form-group>
             </ValidationProvider>
             <br />
-            <h5>Project members</h5>
+            <h5>Project developers</h5>
             <table class="table table-hover mt-3 w-25">
               <tbody>
                 <tr v-for="developer of projectDevelopers" :key="developer.id">
@@ -102,7 +102,7 @@
             </table>
 
             <br />
-            <h5>Add member</h5>
+            <h5>Add developer</h5>
             <ValidationProvider
               name="scrum master"
               :rules="{ required: false }"
@@ -231,9 +231,9 @@ export default {
         .then((res) => {
           this.allUsers = res;
           this.users.push({ value: 0, text: "Choose user" }),
-          res.forEach((user) => {
-            this.users.push({ value: user.id, text: user.username });
-          });
+            res.forEach((user) => {
+              this.users.push({ value: user.id, text: user.username });
+            });
         })
         .catch((reason) => {
           console.error(reason);
