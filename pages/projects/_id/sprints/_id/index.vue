@@ -4,18 +4,18 @@
     <br />
 
     <p>
-      <span class="title">Name:</span> <span>{{ sprint.name }}</span>
+      <span class="title">Name:</span> <span>{{ name }}</span>
     </p>
     <p>
       <span class="title">Start date:</span>
-      <span>{{ formatDate(sprint.start) }}</span>
+      <span>{{ formatDate(start) }}</span>
     </p>
     <p>
       <span class="title">End date:</span>
-      <span>{{ formatDate(sprint.end) }}</span>
+      <span>{{ formatDate(end) }}</span>
     </p>
     <p>
-      <span class="title">Velocity:</span> <span>{{ sprint.velocity }}</span>
+      <span class="title">Velocity:</span> <span>{{ velocity }}</span>
     </p>
     <div v-if="isSprintActive(sprint)">
       <h2 class="pt-3">Stories in sprint</h2>
@@ -65,6 +65,9 @@
           </tr>
         </tbody>
       </table>
+      <hr>
+      <h4 class="d-flex justify-content-end mr-5">Sum : {{currentLoad}} / {{ velocity }}</h4>
+      <br>
       <h2 class="pt-3">Stories</h2>
       <table class="table table-hover mt-3 w-100">
         <thead>
@@ -79,7 +82,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="story of stories" :key="story.id">
+          <tr v-for="story of addableStories" :key="story.id">
             <td>
               <nuxt-link :to="{ path: `stories/${story.id}` }">
                 #{{ story.id }} - {{ story.title }}
@@ -101,7 +104,7 @@
             <td>{{ story.acceptanceCriteria | limit(100) }}</td>
             <td>{{ story.points }}</td>
             <td>
-              <b-input-group size="lg" style="font-scale: 12px">
+              <b-input-group size="lg" style="font-scale: 12px" v-if="canBeAdded(story.points)">
                 <p class="h3">
                   <b-icon
                     icon="arrow-up-circle"
@@ -139,32 +142,40 @@ export default {
     return {
       id: null,
       stories: [],
-      sprint: {
-        name: null,
-        start: null,
-        end: null,
-        velocity: null,
-      },
+      addableStories: [],
+      sprint: null,
+      name: null,
+      start: null,
+      end: null,
+      velocity: null,
+      currentLoad: null,
     };
   },
   async mounted() {
     this.id = this.$route.params.id;
     if (!this.id) return;
     this.getSprint();
-    this.getProjectStories();
+   
   },
   methods: {
+    canBeAdded(points) {
+      if(this.currentLoad + points < this.velocity){
+        return true;
+      }
+      return false;
+    },
     isSprintActive(sprint) {
-      const now = new Date();
-      now.setHours(0, 0, 0, 0);
-      return new Date(sprint.start) <= now && new Date(sprint.end) >= now;
+      if(sprint != null){
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+        return new Date(sprint.start) <= now && new Date(sprint.end) >= now;
+      }
     },
     async removeFromSprint(storyId) {
       await this.$axios
         .$post(`user-stories/remove-from-sprint/${storyId}`)
         .then(async (res) => {
           this.getSprint();
-          this.getProjectStories();
           this.$toast.success("Story removed from sprint.", {
             duration: 3000,
           });
@@ -186,7 +197,6 @@ export default {
         })
         .then(async (res) => {
           this.getSprint();
-          this.getProjectStories();
           this.$toast.success("Story moved to sprint.", {
             duration: 3000,
           });
@@ -200,25 +210,38 @@ export default {
           );
         });
     },
-    async getProjectStories() {
-      if (!this.id || !this.projectId) return;
-
-      await this.$axios
-        .$get(`user-stories/get-addable`, {
+    async getAddableStories(projectId) {
+      this.$axios
+        .$get(`user-stories/get-addable`,{
           params: {
-            "project-id": this.projectId,
+            "project-id": projectId,
           },
         })
         .then((res) => {
-          if (!res) return;
-          this.stories = res;
+          this.addableStories = res;
+        })
+        .catch((reason) => {
+          console.error(reason);
+          this.$toast.error(
+            "An error has occurred, while getting sprint information",
+            {
+              duration: 3000,
+            }
+          );
         });
     },
     async getSprint() {
       this.$axios
         .$get(`sprints/${this.id}`)
         .then((res) => {
-          this.sprint = res;
+          this.sprint = res.sprint;
+          this.name = res.sprint.name;
+          this.start = res.sprint.start;
+          this.end = res.sprint.end;
+          this.velocity = res.sprint.velocity;
+          this.stories = res.sprint.UserStories;
+          this.currentLoad = res.currentLoad;
+           this.getAddableStories(res.sprint.projectId);
         })
         .catch((reason) => {
           console.error(reason);
