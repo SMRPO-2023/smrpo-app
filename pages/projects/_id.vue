@@ -58,19 +58,26 @@
             </b-dropdown>
           </template>
 
-          <template v-if="taskId">
+          <template v-if="storyId">
             <b-icon icon="chevron-right" />
-            <b-dropdown id="stories-navigation-dropdown" size="sm" :text="getActiveTab('task')">
-              <template v-for="tab of taskTabs">
-                <b-dropdown-item 
-                  v-if="tab.show" 
-                  :key="tab.name" 
-                  :to="{ path: tab.path }" 
+            <b-dropdown
+              id="stories-navigation-dropdown"
+              size="sm"
+              :text="getActiveTab('userStory')"
+            >
+              <template v-for="tab of userStoryTabs">
+                <b-dropdown-item
+                  v-if="tab.show"
+                  :key="tab.name"
+                  :to="{ path: tab.path }"
                   :exact="tab.exact"
-                >{{ tab.name }}</b-dropdown-item>
+                  >{{ tab.name }}</b-dropdown-item
+                >
               </template>
             </b-dropdown>
           </template>
+
+          
         </div>
       </b-col>
     </b-row>
@@ -130,6 +137,12 @@ export default {
           show: true,
         },
         {
+          name: "Active stories",
+          path: `/projects/${this.projectId}/active`,
+          exact: false, // because we have a nested route
+          show: true,
+        },
+        {
           name: "Edit",
           path: `/projects/${this.projectId}/edit`,
           exact: true,
@@ -147,6 +160,7 @@ export default {
           exact: false, // because we have a nested route
           show: true,
         },
+        
       ];
     },
     sprintTabs() {
@@ -227,6 +241,7 @@ export default {
       else if (type === "sprint") data = this.sprintTabs;
       else if (type === "userStory") data = this.userStoryTabs;
       else if (type === "task") data = this.taskTabs;
+      else if (type === "activeSprint") data = this.activeSprintTabs;
       else return data;
 
       return data.find((tab) =>
