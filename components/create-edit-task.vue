@@ -83,6 +83,11 @@
           </b-form-group>
         </ValidationProvider>
 
+        <!-- Assigned to self warning -->
+        <b-alert :show="isTaskSelfAssigned" variant="warning">
+          You have assigned this task to yourself, once saved it will be treated as already accepted.
+        </b-alert>
+
         <!-- footer -->
         <div v-if="error" class="text-center text-danger">{{ error }}</div>
         <ul v-if="responseErrors.length > 0" class="text-danger">
@@ -149,6 +154,10 @@ export default {
       now.setHours(0, 0, 0, 0);
       return new Date(this.sprint.start) <= now && new Date(this.sprint.end) >= now;
     },
+    isTaskSelfAssigned() {
+      if (this.form.userId === null || !this.currentUser) return false;
+      return this.form.userId === this.currentUser.id;
+    },
   },
   data() {
     return {
@@ -213,6 +222,7 @@ export default {
           hours: parseFloat(this.form.hours),
           userId: this.form.userId,
           userStoryId: this.storyId,
+          status: this.form.userId ? this.isTaskSelfAssigned ? 'ACTIVE' : 'ASSIGNED' : 'UNASSIGNED',
         })
         .then(async (res) => {
           await this.$router.replace(`/projects/${this.projectId}/stories/${this.storyId}/tasks`);
@@ -232,6 +242,7 @@ export default {
           hours: parseFloat(this.form.hours),
           userId: this.form.userId,
           userStoryId: this.storyId,
+          status: this.form.userId ? this.isTaskSelfAssigned ? 'ACTIVE' : 'ASSIGNED' : 'UNASSIGNED',
         })
         .then(async (res) => {
           this.error = null;
