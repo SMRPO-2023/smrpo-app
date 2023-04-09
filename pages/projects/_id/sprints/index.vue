@@ -137,7 +137,9 @@ export default {
       await this.$axios.$get(`project/${this.projectId}`).then((res) => {
         if (!res) return;
         this.project = res;
-        this.sprints = this.project.sprints;
+        this.sprints = this.project.sprints.sort((a, b) => {
+          return new Date(a.start) - new Date(b.start);
+        });
       });
     },
     async deleteSprint(sprint) {

@@ -160,12 +160,6 @@ export default {
           show: true,
         },
         {
-          name: "Active stories",
-          path: `/projects/${this.projectId}/active`,
-          exact: false, // because we have a nested route
-          show: true,
-        },
-        {
           name: "Edit",
           path: `/projects/${this.projectId}/edit`,
           exact: true,
@@ -183,7 +177,12 @@ export default {
           exact: false, // because we have a nested route
           show: true,
         },
-        
+        {
+          name: "Sprint backlog",
+          path: `/projects/${this.projectId}/sprint-backlog`,
+          exact: true,
+          show: true,
+        },
       ];
     },
     sprintTabs() {
@@ -285,7 +284,7 @@ export default {
       if (!this.sprintId) return;
 
       this.$axios.$get(`sprints/${this.sprintId}`).then((res) => {
-        this.sprint = res;
+        this.sprint = res.sprint;
       });
     },
     async getUserStory() {

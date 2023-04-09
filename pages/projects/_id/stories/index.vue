@@ -41,7 +41,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="story of stories.stories" :key="story.id">
+          <tr v-for="story of stories" :key="story.id">
             <td>
               <nuxt-link :to="{ path: `stories/${story.id}` }">
                 #{{ story.id }} - {{ story.title }}
@@ -275,8 +275,8 @@ export default {
         .then((res) => {
           if (!res) return;
 
-          this.allStories = res;
-          this.stories = res;
+          this.allStories = res.stories;
+          this.stories = res.stories;
         });
     },
     async getProjectWithData() {
