@@ -54,11 +54,13 @@
             <td>
               <b-input-group size="lg" style="font-scale: 12px">
                 <p class="h3">
-                  <b-icon
-                    icon="arrow-down-circle"
+                  <b-button
+                    v-if="isProjectOwner()"
+                    variant="danger"
                     @click="removeFromSprint(story.id)"
                     class="center-and-clickable"
-                  ></b-icon>
+                  >Reject</b-button>
+                  
                 </p>
               </b-input-group>
             </td>
@@ -68,6 +70,7 @@
       <hr>
       <h4 class="d-flex justify-content-end mr-5">Sum : {{currentLoad}} / {{ velocity }}</h4>
       <br>
+      <div v-if="isScrumMaster()">
       <h2 class="pt-3">Stories</h2>
       <table class="table table-hover mt-3 w-100">
         <thead>
@@ -117,6 +120,7 @@
           </tr>
         </tbody>
       </table>
+      </div>
     </div>
   </div>
 </template>
@@ -135,7 +139,8 @@ export default {
   mixins: [datetime, priorities],
   computed: {
     ...mapGetters({
-      projectId: "route-id/getProjectId",
+      currentUser: "user/getUser",
+      isAdmin: "user/isAdmin",
     }),
   },
   data() {
@@ -149,15 +154,39 @@ export default {
       end: null,
       velocity: null,
       currentLoad: null,
+      project: null,
     };
   },
   async mounted() {
     this.id = this.$route.params.id;
     if (!this.id) return;
     this.getSprint();
+    
    
   },
   methods: {
+    isProjectOwner() {
+      if (!this.currentUser || !this.project) return false;
+      if (this.isAdmin){
+        return true;
+      }
+      return this.currentUser.id === this.project.projectOwnerId;
+    },
+    isScrumMaster() {
+      if (this.isAdmin){
+        return true;
+      }
+      if (!this.currentUser || !this.project) return false;
+      return this.currentUser.id === this.project.scrumMasterId;
+    },
+    async getProject(projectId) {
+      if (!projectId) return;
+
+      await this.$axios.$get(`project/${projectId}`).then((res) => {
+        if (!res) return;
+        this.project = res;
+      });
+    },
     canBeAdded(points) {
       if(this.currentLoad + points < this.velocity){
         return true;
@@ -234,6 +263,8 @@ export default {
       this.$axios
         .$get(`sprints/${this.id}`)
         .then((res) => {
+          this.getAddableStories(res.sprint.projectId);
+          this.getProject(res.sprint.projectId);
           this.sprint = res.sprint;
           this.name = res.sprint.name;
           this.start = res.sprint.start;
@@ -241,7 +272,6 @@ export default {
           this.velocity = res.sprint.velocity;
           this.stories = res.sprint.UserStories;
           this.currentLoad = res.currentLoad;
-           this.getAddableStories(res.sprint.projectId);
         })
         .catch((reason) => {
           console.error(reason);
