@@ -7,55 +7,58 @@
         <b-button variant="primary">Create</b-button>
       </nuxt-link>
     </div>
-    <table class="table table-hover mt-3 w-100">
-      <thead>
-        <tr>
-          <th scope="col">Name</th>
-          <th scope="col">Start</th>
-          <th scope="col">End</th>
-          <th scope="col">Velocity</th>
-          <th scope="col"></th>
-          <th scope="col"></th>
-        </tr>
-      </thead>
-      <tbody v-if="sprints.length">
-        <tr v-for="sprint of sprints" :key="sprint.id">
-          <td>
-            <nuxt-link
-              v-if="hasPermission()"
-              :to="{ path: `sprints/${sprint.id}` }"
-            >
-              {{ sprint.name }}
-            </nuxt-link>
 
-            <span v-if="!hasPermission()">
-              {{ sprint.name }}
-            </span>
-          </td>
-          <td>{{ formatDate(sprint.start) }}</td>
-          <td>{{ formatDate(sprint.end) }}</td>
-          <td>{{ sprint.velocity }}</td>
-          <td class="narrow-col">
-            <b-badge :variant="getVariantForSprintStatus(sprint)">{{ getNameForSprintStatus(sprint) }}</b-badge>
-          </td>
-          <td class="narrow-col">
-            <b-icon
-              v-if="canChange(sprint)"
-              icon="x-lg"
-              @click="deleteSprint(sprint)"
-              class="center-and-clickable"
-            ></b-icon>
-          </td>
-        </tr>
-      </tbody>
-      <tbody v-else>
-        <tr>
-          <td class="text-muted text-center" colspan="6">
-            No sprints yet
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table class="table table-hover mt-3">
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Start</th>
+            <th scope="col">End</th>
+            <th scope="col">Velocity</th>
+            <th scope="col"></th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody v-if="sprints.length">
+          <tr v-for="sprint of sprints" :key="sprint.id">
+            <td>
+              <nuxt-link
+                v-if="hasPermission()"
+                :to="{ path: `sprints/${sprint.id}` }"
+              >
+                {{ sprint.name }}
+              </nuxt-link>
+  
+              <span v-if="!hasPermission()">
+                {{ sprint.name }}
+              </span>
+            </td>
+            <td>{{ formatDate(sprint.start) }}</td>
+            <td>{{ formatDate(sprint.end) }}</td>
+            <td>{{ sprint.velocity }}</td>
+            <td class="narrow-col">
+              <b-badge :variant="getVariantForSprintStatus(sprint)">{{ getNameForSprintStatus(sprint) }}</b-badge>
+            </td>
+            <td class="narrow-col">
+              <b-icon
+                v-if="canChange(sprint)"
+                icon="x-lg"
+                @click="deleteSprint(sprint)"
+                class="center-and-clickable"
+              ></b-icon>
+            </td>
+          </tr>
+        </tbody>
+        <tbody v-else>
+          <tr>
+            <td class="text-muted text-center" colspan="6">
+              No sprints yet
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 

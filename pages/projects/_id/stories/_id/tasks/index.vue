@@ -8,70 +8,60 @@
       </nuxt-link>
     </div>
 
-    <table class="table table-hover mt-3 w-100">
-      <thead>
-        <tr>
-          <th scope="col">Title</th>
-          <th scope="col">Description</th>
-          <th scope="col">Hours</th>
-          <th scope="col">Assigned to</th>
-          <th scope="col">Done</th>
-          <th scope="col"></th>
-        </tr>
-      </thead>
-      <tbody v-if="tasks.length">
-        <tr v-for="task of tasks" :key="task.id">
-          <td>
-            <nuxt-link :to="{ path: `tasks/${task.id}` }">
-              {{ task.title }}
-            </nuxt-link>
-          </td>
-          <td>{{ task.description | limit(100) }}</td>
-          <td>{{ task.hours }}</td>
-          <td>
-            <span v-if="task.status === 'ASSIGNED'">
-              {{ task.assignedTo.username }}
-            </span>
-            <span v-else class="text-muted">
-              Nobody
-            </span>
-          </td>
-          <td>
-            <b-button
-              v-if="task.done"
-              size="sm"
-              variant="success"
-              disabled
-            >
-              Yes
-            </b-button>
-            <b-button
-              v-else
-              size="sm"
-              variant="danger"
-              disabled
-            >
-              No
-            </b-button>
-          </td>
-          <td class="narrow-col">
-            <b-icon
-              v-if="hasPermission"
-              icon="x-lg"
-              @click="deleteTask(task)"
-              class="center-and-clickable"
-            ></b-icon>
-          </td>
-        </tr>
-      </tbody>
-      <tbody v-else>
-        <tr>
-          <td class="text-muted text-center" colspan="6">
-            No tasks yet
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table class="table table-hover mt-3">
+        <thead>
+          <tr>
+            <th scope="col">Title</th>
+            <th scope="col">Description</th>
+            <th scope="col">Hours</th>
+            <th scope="col">Assigned to</th>
+            <th scope="col">Status</th>
+            <th scope="col">Done</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody v-if="tasks.length">
+          <tr v-for="task of tasks" :key="task.id">
+            <td>
+              <nuxt-link :to="{ path: `tasks/${task.id}` }">
+                {{ task.title }}
+              </nuxt-link>
+            </td>
+            <td>{{ task.description | limit(100) }}</td>
+            <td>{{ task.hours }}</td>
+            <td>
+              <span v-if="task.status === 'ASSIGNED'">
+                {{ task.assignedTo.username }}
+              </span>
+              <span v-else class="text-muted">
+                Nobody
+              </span>
+            </td>
+            <td>{{ task.status }}</td>
+            <td>
+              <b-badge v-if="task.done" variant="success">Yes</b-badge>
+              <b-badge v-else variant="danger">No</b-badge>
+            </td>
+            <td class="narrow-col">
+              <b-icon
+                v-if="hasPermission"
+                icon="x-lg"
+                @click="deleteTask(task)"
+                class="center-and-clickable"
+              ></b-icon>
+            </td>
+          </tr>
+        </tbody>
+        <tbody v-else>
+          <tr>
+            <td class="text-muted text-center" colspan="7">
+              No tasks yet
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
