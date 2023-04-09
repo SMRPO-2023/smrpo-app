@@ -19,107 +19,128 @@
     </p>
     <div v-if="isSprintActive(sprint)">
       <h2 class="pt-3">Stories in sprint</h2>
-      <table class="table table-hover mt-3 w-100">
-        <thead>
-          <tr>
-            <th scope="col">Title</th>
-            <th scope="col">Description</th>
-            <th scope="col">Business value</th>
-            <th scope="col">Priority</th>
-            <th scope="col">Acceptance test</th>
-            <th scope="col">Points</th>
-            <th scope="col"></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="story of sprint.UserStories" :key="story.id">
-            <td>
-              <a> #{{ story.id }} - {{ story.title }} </a>
-            </td>
-            <td>{{ story.description | limit(100) }}</td>
-            <td>{{ story.businessValue }}</td>
 
-            <td>
-              <b-button
-                id="dropdown-right"
-                right
-                :variant="getVariantForPriority(story.priority)"
-              >
-                {{ getNameForPriority(story.priority) }}
-              </b-button>
-            </td>
-
-            <td>{{ story.acceptanceCriteria | limit(100) }}</td>
-            <td>{{ story.points }}</td>
-            <td>
-              <b-input-group size="lg" style="font-scale: 12px">
-                <p class="h3">
-                  <b-button
-                    v-if="isProjectOwner()"
-                    variant="danger"
-                    @click="removeFromSprint(story.id)"
-                    class="center-and-clickable"
-                  >Reject</b-button>
-                  
-                </p>
-              </b-input-group>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="table-responsive">
+        <table class="table table-hover mt-3">
+          <thead>
+            <tr>
+              <th scope="col">Title</th>
+              <th scope="col">Description</th>
+              <th scope="col">Business value</th>
+              <th scope="col">Priority</th>
+              <th scope="col">Acceptance test</th>
+              <th scope="col">Points</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody v-if="sprint.UserStories.length">
+            <tr v-for="story of sprint.UserStories" :key="story.id">
+              <td>
+                <a> #{{ story.id }} - {{ story.title }} </a>
+              </td>
+              <td>{{ story.description | limit(100) }}</td>
+              <td>{{ story.businessValue }}</td>
+  
+              <td>
+                <b-button
+                  id="dropdown-right"
+                  right
+                  :variant="getVariantForPriority(story.priority)"
+                >
+                  {{ getNameForPriority(story.priority) }}
+                </b-button>
+              </td>
+  
+              <td>{{ story.acceptanceCriteria | limit(100) }}</td>
+              <td>{{ story.points }}</td>
+              <td>
+                <b-input-group size="lg" style="font-scale: 12px">
+                  <p class="h3">
+                    <b-button
+                      v-if="isProjectOwner()"
+                      variant="danger"
+                      @click="removeFromSprint(story.id)"
+                      class="center-and-clickable"
+                    >Reject</b-button>
+                    
+                  </p>
+                </b-input-group>
+              </td>
+            </tr>
+          </tbody>
+          <tbody v-else>
+            <tr>
+              <td class="text-muted text-center" colspan="7">
+                No stories in this sprint yet
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <hr>
       <h4 class="d-flex justify-content-end mr-5">Sum : {{currentLoad}} / {{ velocity }}</h4>
+      
       <br>
+      
       <div v-if="isScrumMaster()">
-      <h2 class="pt-3">Stories</h2>
-      <table class="table table-hover mt-3 w-100">
-        <thead>
-          <tr>
-            <th scope="col">Title</th>
-            <th scope="col">Description</th>
-            <th scope="col">Business value</th>
-            <th scope="col">Priority</th>
-            <th scope="col">Acceptance test</th>
-            <th scope="col">Points</th>
-            <th scope="col"></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="story of addableStories" :key="story.id">
-            <td>
-              <nuxt-link :to="{ path: `stories/${story.id}` }">
-                #{{ story.id }} - {{ story.title }}
-              </nuxt-link>
-            </td>
-            <td>{{ story.description | limit(100) }}</td>
-            <td>{{ story.businessValue }}</td>
+        <h2 class="pt-3">Stories</h2>
 
-            <td>
-              <b-button
-                id="dropdown-right"
-                right
-                :variant="getVariantForPriority(story.priority)"
-              >
-                {{ getNameForPriority(story.priority) }}
-              </b-button>
-            </td>
-
-            <td>{{ story.acceptanceCriteria | limit(100) }}</td>
-            <td>{{ story.points }}</td>
-            <td>
-              <b-input-group size="lg" style="font-scale: 12px" v-if="canBeAdded(story.points)">
-                <p class="h3">
-                  <b-icon
-                    icon="arrow-up-circle"
-                    @click="moveToSprint(story.id)"
-                    class="center-and-clickable"
-                  ></b-icon>
-                </p>
-              </b-input-group>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+        <div class="table-responsive">
+          <table class="table table-hover mt-3">
+            <thead>
+              <tr>
+                <th scope="col">Title</th>
+                <th scope="col">Description</th>
+                <th scope="col">Business value</th>
+                <th scope="col">Priority</th>
+                <th scope="col">Acceptance test</th>
+                <th scope="col">Points</th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+            <tbody v-if="addableStories.length">
+              <tr v-for="story of addableStories" :key="story.id">
+                <td>
+                  <nuxt-link :to="{ path: `stories/${story.id}` }">
+                    #{{ story.id }} - {{ story.title }}
+                  </nuxt-link>
+                </td>
+                <td>{{ story.description | limit(100) }}</td>
+                <td>{{ story.businessValue }}</td>
+                <td>
+                  <b-button
+                    id="dropdown-right"
+                    right
+                    :variant="getVariantForPriority(story.priority)"
+                  >
+                    {{ getNameForPriority(story.priority) }}
+                  </b-button>
+                </td>
+  
+                <td>{{ story.acceptanceCriteria | limit(100) }}</td>
+                <td>{{ story.points }}</td>
+                <td>
+                  <b-input-group size="lg" style="font-scale: 12px" v-if="canBeAdded(story.points)">
+                    <p class="h3">
+                      <b-icon
+                        icon="arrow-up-circle"
+                        @click="moveToSprint(story.id)"
+                        class="center-and-clickable"
+                      ></b-icon>
+                    </p>
+                  </b-input-group>
+                </td>
+              </tr>
+            </tbody>
+            <tbody v-else>
+              <tr>
+                <td class="text-muted text-center" colspan="7">
+                  No more addable stories left
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>

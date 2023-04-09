@@ -8,57 +8,67 @@
             <b-button variant="primary">Create</b-button>
           </nuxt-link>
         </div>
-        <table class="table table-hover mt-3 w-100">
-          <thead>
-            <tr>
-              <th scope="col">Title</th>
-              <th scope="col">Description</th>
-              <th scope="col">Project owner</th>
-              <th scope="col">Scrum master</th>
-              <th scope="col">Developers</th>
-              <th scope="col" v-if="isAdmin"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="project of projects" :key="project.id">
-              <td>
-                <nuxt-link :to="{ path: `projects/${project.id}` }">{{
-                  project.title
-                }}</nuxt-link>
-              </td>
-              <td>
-                <span style="white-space: pre-line">{{
-                  project.documentation
-                }}</span>
-              </td>
-              <td>
-                <span v-if="project.projectOwner">{{
-                  project.projectOwner.username
-                }}</span>
-              </td>
-              <td>
-                <span v-if="project.scrumMaster">{{
-                  project.scrumMaster.username
-                }}</span>
-              </td>
-              <td>
-                <b-button
-                  variant="primary"
-                  v-if="hasPermission(project)"
-                  @click="showUsers(project.id)"
-                  >Developers</b-button
-                >
-              </td>
-              <td v-if="isAdmin">
-                <b-icon
-                  icon="x-lg"
-                  @click="deleteProject(project)"
-                  class="center-and-clickable"
-                ></b-icon>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+
+        <div class="table-responsive">
+          <table class="table table-hover mt-3">
+            <thead>
+              <tr>
+                <th scope="col">Title</th>
+                <th scope="col">Description</th>
+                <th scope="col">Project owner</th>
+                <th scope="col">Scrum master</th>
+                <th scope="col">Developers</th>
+                <th scope="col" v-if="isAdmin"></th>
+              </tr>
+            </thead>
+            <tbody v-if="projects.length">
+              <tr v-for="project of projects" :key="project.id">
+                <td>
+                  <nuxt-link :to="{ path: `projects/${project.id}` }">{{
+                    project.title
+                  }}</nuxt-link>
+                </td>
+                <td>
+                  <span style="white-space: pre-line">{{
+                    project.documentation
+                  }}</span>
+                </td>
+                <td>
+                  <span v-if="project.projectOwner">{{
+                    project.projectOwner.username
+                  }}</span>
+                </td>
+                <td>
+                  <span v-if="project.scrumMaster">{{
+                    project.scrumMaster.username
+                  }}</span>
+                </td>
+                <td>
+                  <b-button
+                    variant="primary"
+                    v-if="hasPermission(project)"
+                    @click="showUsers(project.id)"
+                    >Developers</b-button
+                  >
+                </td>
+                <td v-if="isAdmin">
+                  <b-icon
+                    icon="x-lg"
+                    @click="deleteProject(project)"
+                    class="center-and-clickable"
+                  ></b-icon>
+                </td>
+              </tr>
+            </tbody>
+            <tbody v-else>
+              <tr>
+                <td class="text-muted text-center" :colspan="isAdmin ? 6 : 5">
+                  No projects yet
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </b-col>
     </b-row>
 

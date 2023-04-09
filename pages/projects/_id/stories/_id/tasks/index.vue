@@ -8,71 +8,84 @@
       </nuxt-link>
     </div>
 
-    <table class="table table-hover mt-3 w-100">
-      <thead>
-        <tr>
-          <th scope="col">Title</th>
-          <th scope="col">Description</th>
-          <th scope="col">Hours</th>
-          <th scope="col">Assigned to</th>
-          <th scope="col">Done</th>
-          <th scope="col"></th>
-        </tr>
-      </thead>
-      <tbody v-if="tasks.length">
-        <tr v-for="task of tasks" :key="task.id">
-          <td>
-            <nuxt-link :to="{ path: `tasks/${task.id}` }">
-              {{ task.title }}
-            </nuxt-link>
-          </td>
-          <td>{{ task.description | limit(100) }}</td>
-          <td>{{ task.hours }}</td>
-          <td>
-            <span v-if="task.status === 'ASSIGNED'">
-              {{ task.assignedTo.username }}
-            </span>
-            <span v-else class="text-muted">
-              Nobody
-            </span>
-          </td>
-          <td>
-            <b-button
-              v-if="task.done"
-              size="sm"
-              variant="success"
-              disabled
-            >
-              Yes
-            </b-button>
-            <b-button
-              v-else
-              size="sm"
-              variant="danger"
-              disabled
-            >
-              No
-            </b-button>
-          </td>
-          <td class="narrow-col">
-            <b-icon
-              v-if="hasPermission"
-              icon="x-lg"
-              @click="deleteTask(task)"
-              class="center-and-clickable"
-            ></b-icon>
-          </td>
-        </tr>
-      </tbody>
+    <div class="table-responsive">
+      <table class="table table-hover mt-3">
+        <thead>
+          <tr>
+            <th scope="col">Title</th>
+            <th scope="col">Description</th>
+            <th scope="col">Hours</th>
+            <th scope="col">Assigned to</th>
+            <th scope="col">Status</th>
+            <th scope="col">Done</th>
+            <th scope="col"></th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody v-if="tasks.length">
+          <tr v-for="task of tasks" :key="task.id">
+            <td>
+              <nuxt-link :to="{ path: `tasks/${task.id}` }">
+                {{ task.title }}
+              </nuxt-link>
+            </td>
+            <td>{{ task.description | limit(100) }}</td>
+            <td>{{ task.hours }}</td>
+            <td>
+              <span v-if="task.status !== 'UNASSIGNED'">
+                {{ task.assignedTo?.username }} 
+                <span class="text-muted" v-if="isMyTask(task)"> (you)</span>
+              </span>
+              <span v-else class="text-muted">
+                Nobody
+              </span>
+            </td>
+            <td>
+              <b-badge :variant="getVariantForTaskStatus(task.status)">{{ task.status }}</b-badge>
+            </td>
+            <td>
+              <b-badge v-if="task.done" variant="success">Yes</b-badge>
+              <b-badge v-else variant="danger">No</b-badge>
+            </td>
+            <td>
+              <!-- accept/reject task that was assigned to me -->
+              <b-button-group size="sm" v-if="isMyTask(task) && task.status !== 'UNASSIGNED'">
+                <b-button 
+                  @click="acceptRejectTask(task, true)" 
+                  :disabled="!canAccept(task)"
+                >Accept</b-button>
+                <b-button 
+                  @click="acceptRejectTask(task, false)"
+                  :disabled="!canReject(task)"
+                >Reject</b-button>
+              </b-button-group>
 
-      <tbody v-else>
-        <tr>
-          <td colspan="6" class="text-center text-muted">
-            No tasks yet
-          </td>
-        </tr>
-      </tbody>
-    </table>
+              <!-- self assign empty task -->
+              <b-button 
+                v-else-if="task.status === 'UNASSIGNED'"
+                @click="acceptRejectTask(task, true)"
+                size="sm"
+              >Assign to me</b-button>
+            </td>
+            <td class="narrow-col">
+              <b-icon
+                v-if="hasPermission"
+                icon="x-lg"
+                @click="deleteTask(task)"
+                class="center-and-clickable"
+              ></b-icon>
+            </td>
+          </tr>
+        </tbody>
+        <tbody v-else>
+          <tr>
+            <td class="text-muted text-center" colspan="8">
+              No tasks yet
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -123,6 +136,24 @@ export default {
     this.getTasks();
   },
   methods: {
+    isMyTask(task) {
+      if (!this.currentUser || !task) return false;
+      return task.userId === this.currentUser.id;
+    },
+    canAccept(task) {
+      if (!this.isMyTask(task)) return false;
+      return task.status !== 'ACTIVE' && task.status !== 'FINISHED';
+    },
+    canReject(task) {
+      if (!this.isMyTask(task)) return false;
+      return task.status === 'ASSIGNED' || task.status === 'ACTIVE';
+    },
+    getVariantForTaskStatus(status) {
+      if (status === 'ACTIVE') return "primary"; // task has been accepted
+      else if (status === 'ASSIGNED') return "info"; // task has been assigned to someone
+      else if (status === 'FINISHED') return "success"; // task has been finished
+      else "secondary"; // task is not assigned to anyone
+    },
     async getProjectWithData() {
       if (!this.projectId) return;
 
@@ -142,6 +173,39 @@ export default {
           if (!res) return;
           this.tasks = res;
         })
+    },
+    async acceptRejectTask(task, isAccepting) {
+      let confirmed = false;
+      try {
+        confirmed = await this.$bvModal.msgBoxConfirm(
+          "Are you sure you want to " + (isAccepting ? 'accept' : 'reject') + " this task?",
+          {
+            title: (isAccepting ? 'Accept' : 'Reject') + " task",
+            cancelTitle: "Cancel",
+            okTitle: "Confirm",
+          }
+        );
+      } catch (error) {
+        console.error(error);
+      }
+      if (!confirmed) return;
+
+      this.$axios
+        .$post(`tasks/${task.id}/${isAccepting ? 'accept' : 'reject'}`)
+        .then((res) => {
+          this.$toast.success("Task successfully " + (isAccepting ? 'accepted' : 'rejected'), {
+            duration: 3000,
+          });
+        })
+        .catch((reason) => {
+          console.error(reason);
+          this.$toast.error(
+            "An error has occurred, while " + (isAccepting ? 'accepting' : 'rejecting') + " the task",
+            {
+              duration: 3000,
+            }
+          );
+        });
     },
     async deleteTask(task) {
       let confirmed = false;

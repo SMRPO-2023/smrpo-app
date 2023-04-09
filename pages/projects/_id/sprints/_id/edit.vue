@@ -30,7 +30,7 @@ export default {
       this.$axios
         .$get(`sprints/${this.sprintId}`)
         .then((res) => {
-          this.sprint = res;
+          this.sprint = res.sprint;
         })
         .catch((reason) => {
           console.error(reason);

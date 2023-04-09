@@ -30,7 +30,7 @@ export default {
 
 // table styles
 .center-and-clickable {
-  vertical-align: middle;
+  vertical-align: middle !important;
   text-align: center;
   cursor: pointer;
 }

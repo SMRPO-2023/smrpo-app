@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="d-flex justify-content-between align-items-center">
-      <h1 class="mb-0">Stories</h1>
+      <h1 class="mb-0">Product backlog</h1>
 
       <nuxt-link v-if="hasPermission()" to="stories/create">
         <b-button variant="primary">Create</b-button>
@@ -24,89 +24,92 @@
         >
       </b-button-group>
     </div>
-    <table class="table table-hover mt-3 w-100" v-if="canSee">
-      <thead>
-        <tr>
-          <th scope="col">Title</th>
-          <th scope="col">Description</th>
-          <th scope="col">Business value</th>
-          <th scope="col">Priority</th>
-          <th scope="col">Accepted</th>
-          <th scope="col">Accept</th>
-          <th scope="col">Sprint</th>
-          <th scope="col">Criteria</th>
-          <th scope="col"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="story of stories.stories" :key="story.id">
-          <td>
-            <nuxt-link :to="{ path: `stories/${story.id}` }">
-              #{{ story.id }} - {{ story.title }}
-            </nuxt-link>
-          </td>
-          <td>{{ story.description | limit(100) }}</td>
-          <td>{{ story.businessValue }}</td>
 
-          <td>
-            <b-dropdown
-              id="dropdown-right"
-              size="sm"
-              right
-              :text="getNameForPriority(story.priority)"
-              :variant="getVariantForPriority(story.priority)"
-              :disabled="!canChange(story)"
-            >
-              <b-dropdown-item
-                v-for="priority of priorities"
-                :value="priority.value"
-                :key="priority.value"
-                @click="updatePriority(story, priority)"
+    <div class="table-responsive" v-if="canSee">
+      <table class="table table-hover mt-3">
+        <thead>
+          <tr>
+            <th scope="col">Title</th>
+            <th scope="col">Description</th>
+            <th scope="col">Business value</th>
+            <th scope="col">Priority</th>
+            <th scope="col">Accepted</th>
+            <th scope="col">Accept</th>
+            <th scope="col">Sprint</th>
+            <th scope="col">Criteria</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="story of stories" :key="story.id">
+            <td>
+              <nuxt-link :to="{ path: `stories/${story.id}` }">
+                #{{ story.id }} - {{ story.title }}
+              </nuxt-link>
+            </td>
+            <td>{{ story.description | limit(100) }}</td>
+            <td>{{ story.businessValue }}</td>
+  
+            <td>
+              <b-dropdown
+                id="dropdown-right"
+                size="sm"
+                right
+                :text="getNameForPriority(story.priority)"
+                :variant="getVariantForPriority(story.priority)"
+                :disabled="!canChange(story)"
               >
-                {{ priority.text }}
-              </b-dropdown-item>
-            </b-dropdown>
-          </td>
-          <td>
-            <b-button
-              size="sm"
-              :variant="getVariantForImplemented(!story.acceptanceTest)"
-              disabled
-            >
-              {{ getNameForImplemented(story.acceptanceTest) }}
-            </b-button>
-          </td>
-          <td>
-            <b-button
-              :disabled="!story.canBeAccepted"
-              :variant="getVariantForImplemented(!story.canBeAccepted)"
-              @click="acceptStory(story.id)"
-              v-if="isProjectOwner() || isAdmin"
-            >
-              Accept
-            </b-button>
-          </td>
-          <td>
-            <nuxt-link
-              v-if="story.sprintId"
-              :to="{ path: `/projects/${projectId}/sprints/${story.sprintId}` }"
-            >
-              {{ findSprintName(story.sprintId) }}
-            </nuxt-link>
-          </td>
-          <td>{{ story.acceptanceCriteria | limit(100) }}</td>
-
-          <td>
-            <b-icon
-              v-if="canChange(story)"
-              icon="x-lg"
-              @click="deleteStory(story)"
-              class="center-and-clickable"
-            ></b-icon>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+                <b-dropdown-item
+                  v-for="priority of priorities"
+                  :value="priority.value"
+                  :key="priority.value"
+                  @click="updatePriority(story, priority)"
+                >
+                  {{ priority.text }}
+                </b-dropdown-item>
+              </b-dropdown>
+            </td>
+            <td>
+              <b-button
+                size="sm"
+                :variant="getVariantForImplemented(!story.acceptanceTest)"
+                disabled
+              >
+                {{ getNameForImplemented(story.acceptanceTest) }}
+              </b-button>
+            </td>
+            <td>
+              <b-button
+                :disabled="!story.canBeAccepted"
+                :variant="getVariantForImplemented(!story.canBeAccepted)"
+                @click="acceptStory(story.id)"
+                v-if="isProjectOwner() || isAdmin"
+              >
+                Accept
+              </b-button>
+            </td>
+            <td>
+              <nuxt-link
+                v-if="story.sprintId"
+                :to="{ path: `/projects/${projectId}/sprints/${story.sprintId}` }"
+              >
+                {{ findSprintName(story.sprintId) }}
+              </nuxt-link>
+            </td>
+            <td>{{ story.acceptanceCriteria | limit(100) }}</td>
+  
+            <td>
+              <b-icon
+                v-if="canChange(story)"
+                icon="x-lg"
+                @click="deleteStory(story)"
+                class="center-and-clickable"
+              ></b-icon>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <div class="w-100 text-center text-muted" v-if="!canSee">
       <span
@@ -272,8 +275,8 @@ export default {
         .then((res) => {
           if (!res) return;
 
-          this.allStories = res;
-          this.stories = res;
+          this.allStories = res.stories;
+          this.stories = res.stories;
         });
     },
     async getProjectWithData() {

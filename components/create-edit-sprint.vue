@@ -3,7 +3,7 @@
     <ValidationObserver ref="observer" v-slot="{ handleSubmit }">
       <b-form @submit.stop.prevent="handleSubmit(onSubmit)" class="mt-4">
         <!-- Name -->
-        <ValidationProvider name="name" :rules="{ required: true }" v-slot="v">
+        <ValidationProvider name="name" :rules="{ required: true }" v-slot="v" ref="nameProvider">
           <b-form-group label="Name" label-for="name">
             <b-form-input
               type="text"
@@ -11,6 +11,7 @@
               placeholder="Enter name"
               v-model="form.name"
               :state="getValidationState(v)"
+              :disabled="isSprintActive"
               aria-describedby="name-live-feedback"
             />
             <b-form-invalid-feedback id="name-live-feedback"
@@ -32,6 +33,7 @@
                   id="start"
                   placeholder="Choose start date"
                   v-model="form.start"
+                  @input="onStartChanged"
                   :state="getValidationState(v)"
                   :min="minDate"
                   :max="maxStartDate"
@@ -39,6 +41,7 @@
                   today-button
                   reset-button
                   value-as-date
+                  :disabled="isSprintActive"
                   aria-describedby="start-live-feedback"
                 />
                 <b-form-invalid-feedback id="start-live-feedback"
@@ -67,6 +70,7 @@
                   today-button
                   reset-button
                   value-as-date
+                  :disabled="isSprintActive"
                   aria-describedby="end-live-feedback"
                 />
                 <b-form-invalid-feedback id="end-live-feedback"
@@ -88,16 +92,22 @@
           v-slot="v"
         >
           <b-form-group label="Velocity" label-for="velocity">
-            <b-form-input
-              type="number"
-              id="velocity"
-              placeholder="Enter velocity"
-              v-model="form.velocity"
+            <b-input-group append="points">
+              <b-form-input
+                type="number"
+                id="velocity"
+                placeholder="Enter velocity"
+                v-model="form.velocity"
+                :state="getValidationState(v)"
+                :step="0.0001"
+                aria-describedby="velocity-live-feedback"
+              />
+            </b-input-group>
+            <b-form-invalid-feedback 
+              id="velocity-live-feedback"
               :state="getValidationState(v)"
-              aria-describedby="velocity-live-feedback"
-            />
-            <b-form-invalid-feedback id="velocity-live-feedback"
-              >{{ v.errors[0] }}
+            >
+              {{ v.errors[0] }}
             </b-form-invalid-feedback>
           </b-form-group>
         </ValidationProvider>
@@ -110,7 +120,7 @@
 
         <div class="text-center">
           <b-button
-            :disabled="!(isScrumMaster || isAdmin)"
+            :disabled="!(isScrumMaster || isAdmin) || hasSprintFinished"
             type="submit"
             variant="primary"
             class="w-50 mt-3"
@@ -156,6 +166,18 @@ export default {
       if (!this.currentUser || !this.project) return false;
       return this.currentUser.id === this.project.scrumMasterId;
     },
+    isSprintActive() {
+      if (!this.sprint) return false;
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      return new Date(this.sprint.start) <= now && new Date(this.sprint.end) >= now;
+    },
+    hasSprintFinished() {
+      if (!this.sprint) return false;
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      return new Date(this.sprint.end) < now;
+    },
   },
   data() {
     return {
@@ -165,7 +187,7 @@ export default {
       error: null,
       responseErrors: [],
       form: {
-        name: 'Sprint ' + new Date().toISOString().split('T')[0],
+        name: 'Sprint ' + new Date().toDateString().split('T')[0],
         start: null,
         end: null,
         velocity: null,
@@ -186,6 +208,12 @@ export default {
     },
     getValidationState({ dirty, validated, valid = null }) {
       return dirty || validated ? valid : null;
+    },
+    async onStartChanged(value) {
+      const dirty = await this.$refs.nameProvider.flags.dirty;
+      if (!dirty) {
+        this.form.name = 'Sprint ' + value.toDateString().split('T')[0];
+      }
     },
     async getProject() {
       if (!this.projectId) return;
@@ -228,11 +256,11 @@ export default {
             if (data && data.message instanceof Array) {
               this.responseErrors = data.message;
             }
-            this.error = "Wrong input, while creating sprint";
+            this.error = "Wrong input, while updating sprint";
           } else {
             this.error = data?.message;
           }
-          this.$toast.error("An error has occurred, while creating sprint", {
+          this.$toast.error("An error has occurred, while updating sprint", {
             duration: 3000,
           });
         });
@@ -269,14 +297,18 @@ export default {
   },
   watch: { 
     sprint: function(value) {
-      // fill form data
       if (value) {
+        // fill form data
         this.form = {
           name: value.name,
           start: new Date(value.start),
           end: new Date(value.end),
           velocity: value.velocity,
         };
+        // check if active and set min date to null to skip validation conflict
+        if (this.isSprintActive) {
+          this.minDate = null;
+        }
       }
     }
   }

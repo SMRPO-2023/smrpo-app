@@ -2,8 +2,11 @@
 <template>
   <b-container fluid>
     <b-row>
-      <b-col offset-lg="2" lg="8" cols="12" class="my-3">
+      <b-col class="my-3" cols="12" offset-lg="1" lg="10" offset-xl="2" xl="8">
         <div>
+          <!-- Project -->
+          <span>{{ getProjectTitle }}</span>
+          <b-icon icon="chevron-right" />
           <b-dropdown
             id="projects-navigation-dropdown"
             size="sm"
@@ -21,6 +24,8 @@
           </b-dropdown>
 
           <template v-if="sprintId">
+            <b-icon icon="chevron-right" />
+            <span>{{ getSprintTitle }}</span>
             <b-icon icon="chevron-right" />
             <b-dropdown
               id="sprints-navigation-dropdown"
@@ -41,6 +46,8 @@
 
           <template v-if="storyId">
             <b-icon icon="chevron-right" />
+            <span>{{ getUserStoryTitle }}</span>
+            <b-icon icon="chevron-right" />
             <b-dropdown
               id="stories-navigation-dropdown"
               size="sm"
@@ -60,16 +67,18 @@
 
           <template v-if="storyId">
             <b-icon icon="chevron-right" />
-            <b-dropdown
-              id="stories-navigation-dropdown"
-              size="sm"
-              :text="getActiveTab('userStory')"
+            <span>{{ getTaskTitle }}</span>
+            <b-icon icon="chevron-right" />
+            <b-dropdown 
+              id="stories-navigation-dropdown" 
+              size="sm" 
+              :text="getActiveTab('task')"
             >
-              <template v-for="tab of userStoryTabs">
-                <b-dropdown-item
-                  v-if="tab.show"
-                  :key="tab.name"
-                  :to="{ path: tab.path }"
+              <template v-for="tab of taskTabs">
+                <b-dropdown-item 
+                  v-if="tab.show" 
+                  :key="tab.name" 
+                  :to="{ path: tab.path }" 
                   :exact="tab.exact"
                   >{{ tab.name }}</b-dropdown-item
                 >
@@ -83,7 +92,7 @@
     </b-row>
     <hr class="mt-0 mb-4" />
     <b-row>
-      <b-col offset-lg="2" lg="8" cols="12">
+      <b-col cols="12" offset-lg="1" lg="10" offset-xl="2" xl="8">
         <NuxtChild />
       </b-col>
     </b-row>
@@ -116,17 +125,31 @@ export default {
       if (!this.currentUser || !this.project) return false;
       return this.currentUser.id === this.project.scrumMasterId;
     },
-    hasSprintStarted() {
+    hasSprintFinished() {
       if (!this.sprint) return false;
       const now = new Date();
-      const start = new Date(this.sprint.start);
-      start.setHours(0, 0, 0, 0);
       now.setHours(0, 0, 0, 0);
-      return start <= now;
+      return new Date(this.sprint.end) < now;
     },
     canChangeUserStory() {
       if (!this.userStory) return false;
       return !this.userStory.acceptanceTest && this.userStory.sprintId === null;
+    },
+    getProjectTitle() {
+      if (!this.project) return "";
+      return this.project.title;
+    },
+    getSprintTitle() {
+      if (!this.sprint) return "";
+      return this.sprint.name;
+    },
+    getUserStoryTitle() {
+      if (!this.userStory) return "";
+      return this.userStory.title;
+    },
+    getTaskTitle() {
+      if (!this.task) return "";
+      return this.task.title;
     },
     projectTabs() {
       return [
@@ -137,19 +160,13 @@ export default {
           show: true,
         },
         {
-          name: "Active stories",
-          path: `/projects/${this.projectId}/active`,
-          exact: false, // because we have a nested route
-          show: true,
-        },
-        {
           name: "Edit",
           path: `/projects/${this.projectId}/edit`,
           exact: true,
           show: this.isAdmin || this.isScrumMaster,
         },
         {
-          name: "Stories",
+          name: "Product backlog",
           path: `/projects/${this.projectId}/stories`,
           exact: false, // because we have a nested route
           show: true,
@@ -160,7 +177,12 @@ export default {
           exact: false, // because we have a nested route
           show: true,
         },
-        
+        {
+          name: "Sprint backlog",
+          path: `/projects/${this.projectId}/sprint-backlog`,
+          exact: true,
+          show: true,
+        },
       ];
     },
     sprintTabs() {
@@ -175,7 +197,7 @@ export default {
           name: "Edit",
           path: `/projects/${this.projectId}/sprints/${this.sprintId}/edit`,
           exact: true,
-          show: (this.isAdmin || this.isScrumMaster) && !this.hasSprintStarted,
+          show: (this.isAdmin || this.isScrumMaster) && !this.hasSprintFinished,
         },
       ];
     },
@@ -262,7 +284,7 @@ export default {
       if (!this.sprintId) return;
 
       this.$axios.$get(`sprints/${this.sprintId}`).then((res) => {
-        this.sprint = res;
+        this.sprint = res.sprint;
       });
     },
     async getUserStory() {
@@ -285,4 +307,11 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+a:hover {
+  text-decoration: underline;
+}
+a {
+  color: black !important;
+}
+</style>

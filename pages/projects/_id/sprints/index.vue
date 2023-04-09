@@ -7,46 +7,58 @@
         <b-button variant="primary">Create</b-button>
       </nuxt-link>
     </div>
-    <table class="table table-hover mt-3 w-100">
-      <thead>
-        <tr>
-          <th scope="col">Name</th>
-          <th scope="col">Start</th>
-          <th scope="col">End</th>
-          <th scope="col">Velocity</th>
-          <th scope="col"></th>
-          <th scope="col"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="sprint of sprints" :key="sprint.id">
-          <td>
-            <nuxt-link
-              v-if="hasPermission()"
-              :to="{ path: `sprints/${sprint.id}` }"
-            >
-              {{ sprint.name }}
-            </nuxt-link>
 
-            <span v-if="!hasPermission()">
-              {{ sprint.name }}
-            </span>
-          </td>
-          <td>{{ formatDate(sprint.start) }}</td>
-          <td>{{ formatDate(sprint.end) }}</td>
-          <td class="narrow-col">{{ sprint.velocity }}</td>
-          <td class="narrow-col"><b-badge v-if="isSprintActive(sprint)" variant="primary">Active</b-badge></td>
-          <td class="narrow-col">
-            <b-icon
-              v-if="canChange(sprint)"
-              icon="x-lg"
-              @click="deleteSprint(sprint)"
-              class="center-and-clickable"
-            ></b-icon>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table class="table table-hover mt-3">
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Start</th>
+            <th scope="col">End</th>
+            <th scope="col">Velocity</th>
+            <th scope="col"></th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody v-if="sprints.length">
+          <tr v-for="sprint of sprints" :key="sprint.id">
+            <td>
+              <nuxt-link
+                v-if="hasPermission()"
+                :to="{ path: `sprints/${sprint.id}` }"
+              >
+                {{ sprint.name }}
+              </nuxt-link>
+  
+              <span v-if="!hasPermission()">
+                {{ sprint.name }}
+              </span>
+            </td>
+            <td>{{ formatDate(sprint.start) }}</td>
+            <td>{{ formatDate(sprint.end) }}</td>
+            <td>{{ sprint.velocity }}</td>
+            <td class="narrow-col">
+              <b-badge :variant="getVariantForSprintStatus(sprint)">{{ getNameForSprintStatus(sprint) }}</b-badge>
+            </td>
+            <td class="narrow-col">
+              <b-icon
+                v-if="canChange(sprint)"
+                icon="x-lg"
+                @click="deleteSprint(sprint)"
+                class="center-and-clickable"
+              ></b-icon>
+            </td>
+          </tr>
+        </tbody>
+        <tbody v-else>
+          <tr>
+            <td class="text-muted text-center" colspan="6">
+              No sprints yet
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -104,13 +116,30 @@ export default {
       now.setHours(0, 0, 0, 0);
       return new Date(sprint.start) <= now && new Date(sprint.end) >= now;
     },
+    hasSprintFinished(sprint) {
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      return new Date(sprint.end) < now;
+    },
+    getVariantForSprintStatus(sprint) {
+      if (this.isSprintActive(sprint)) return "primary";
+      else if (this.hasSprintFinished(sprint)) return "danger";
+      else return;
+    },
+    getNameForSprintStatus(sprint) {
+      if (this.isSprintActive(sprint)) return "Active";
+      else if (this.hasSprintFinished(sprint)) return "Finished";
+      else return;
+    },
     async getProjectWithData() {
       if (!this.projectId) return;
 
       await this.$axios.$get(`project/${this.projectId}`).then((res) => {
         if (!res) return;
         this.project = res;
-        this.sprints = this.project.sprints;
+        this.sprints = this.project.sprints.sort((a, b) => {
+          return new Date(a.start) - new Date(b.start);
+        });
       });
     },
     async deleteSprint(sprint) {

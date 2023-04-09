@@ -23,7 +23,7 @@
     <p>
       <span class="title">Assigned to:</span> <span>
           <template v-if="task.status === 'ASSIGNED'">
-            {{ task.assignedTo.username }}
+            {{ task.assignedTo?.username }}
           </template>
           <span v-else class="text-muted">
             Nobody

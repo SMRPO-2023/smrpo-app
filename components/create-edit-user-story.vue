@@ -97,6 +97,7 @@
               placeholder="Enter points"
               v-model="form.points"
               :state="getValidationState(v)"
+              :step="0.0001"
               aria-describedby="points-live-feedback"
             />
             <b-form-invalid-feedback id="points-live-feedback"
@@ -235,7 +236,7 @@ export default {
           title: this.form.title,
           description: this.form.description,
           priority: this.form.priority,
-          points: parseInt(this.form.points),
+          points: parseFloat(this.form.points),
           projectId: this.projectId,
           businessValue: parseInt(this.form.value),
           acceptanceCriteria: this.form.acceptanceCriteria,
@@ -280,7 +281,7 @@ export default {
           title: this.form.title,
           description: this.form.description,
           priority: this.form.priority,
-          points: parseInt(this.form.points),
+          points: parseFloat(this.form.points),
           projectId: this.projectId,
           businessValue: parseInt(this.form.value),
           acceptanceCriteria: this.form.acceptanceCriteria,
