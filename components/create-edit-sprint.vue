@@ -227,44 +227,10 @@ export default {
       if (!this.projectId) return;
 
       if (this.sprintId && this.sprint) {
-        if (this.isSprintActive) {
-          await this.updateSprintVelocity();
-        } else {
-          await this.updateSprint();
-        }
+        await this.updateSprint();
       } else {
         await this.createSprint();
       }
-    },
-    async updateSprintVelocity() {
-      // TODO: wait for backend to implement this
-      await this.$axios
-        .$put(`sprints/${this.sprintId}/velocity`, {
-          velocity: +this.form.velocity,
-        })
-        .then((res) => {
-          this.error = null;
-          this.responseErrors = [];
-          this.$toast.success("Sprint information successfully updated", {
-            duration: 3000,
-          });
-        })
-        .catch((error) => {
-          const status = error?.response?.status;
-          const data = error?.response?.data;
-          // some instances of errors return main message along with array of detailed shorter messages
-          if (status && status === 400) {
-            if (data && data.message instanceof Array) {
-              this.responseErrors = data.message;
-            }
-            this.error = "Wrong input, while creating sprint";
-          } else {
-            this.error = data?.message;
-          }
-          this.$toast.error("An error has occurred, while creating sprint", {
-            duration: 3000,
-          });
-        });
     },
     async updateSprint() {
       await this.$axios
@@ -290,11 +256,11 @@ export default {
             if (data && data.message instanceof Array) {
               this.responseErrors = data.message;
             }
-            this.error = "Wrong input, while creating sprint";
+            this.error = "Wrong input, while updating sprint";
           } else {
             this.error = data?.message;
           }
-          this.$toast.error("An error has occurred, while creating sprint", {
+          this.$toast.error("An error has occurred, while updating sprint", {
             duration: 3000,
           });
         });
@@ -331,14 +297,18 @@ export default {
   },
   watch: { 
     sprint: function(value) {
-      // fill form data
       if (value) {
+        // fill form data
         this.form = {
           name: value.name,
           start: new Date(value.start),
           end: new Date(value.end),
           velocity: value.velocity,
         };
+        // check if active and set min date to null to skip validation conflict
+        if (this.isSprintActive) {
+          this.minDate = null;
+        }
       }
     }
   }
