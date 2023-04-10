@@ -142,14 +142,14 @@ export default {
     },
     canAccept(task) {
       if (!this.isMyTask(task)) return false;
-      return task.status !== 'ACTIVE' && task.status !== 'FINISHED';
+      return task.status !== 'ACCEPTED' && task.status !== 'FINISHED';
     },
     canReject(task) {
       if (!this.isMyTask(task)) return false;
-      return task.status === 'ASSIGNED' || task.status === 'ACTIVE';
+      return task.status === 'ASSIGNED' || task.status === 'ACCEPTED';
     },
     getVariantForTaskStatus(status) {
-      if (status === 'ACTIVE') return "primary"; // task has been accepted
+      if (status === 'ACCEPTED') return "primary"; // task has been accepted
       else if (status === 'ASSIGNED') return "info"; // task has been assigned to someone
       else if (status === 'FINISHED') return "success"; // task has been finished
       else "secondary"; // task is not assigned to anyone

@@ -222,7 +222,7 @@ export default {
           hours: parseFloat(this.form.hours),
           userId: this.form.userId,
           userStoryId: this.storyId,
-          status: this.form.userId ? this.isTaskSelfAssigned ? 'ACTIVE' : 'ASSIGNED' : 'UNASSIGNED',
+          status: this.form.userId ? this.isTaskSelfAssigned ? 'ACCEPTED' : 'ASSIGNED' : 'UNASSIGNED',
         })
         .then(async (res) => {
           await this.$router.replace(`/projects/${this.projectId}/stories/${this.storyId}/tasks`);
@@ -242,7 +242,7 @@ export default {
           hours: parseFloat(this.form.hours),
           userId: this.form.userId,
           userStoryId: this.storyId,
-          status: this.form.userId ? this.isTaskSelfAssigned ? 'ACTIVE' : 'ASSIGNED' : 'UNASSIGNED',
+          status: this.form.userId ? this.isTaskSelfAssigned ? 'ACCEPTED' : 'ASSIGNED' : 'UNASSIGNED',
         })
         .then(async (res) => {
           this.error = null;
