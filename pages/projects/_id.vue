@@ -23,6 +23,7 @@
             </template>
           </b-dropdown>
 
+          <!-- Sprint -->
           <template v-if="sprintId">
             <b-icon icon="chevron-right" />
             <span>{{ getSprintTitle }}</span>
@@ -44,6 +45,7 @@
             </b-dropdown>
           </template>
 
+          <!-- User story -->
           <template v-if="storyId">
             <b-icon icon="chevron-right" />
             <span>{{ getUserStoryTitle }}</span>
@@ -65,12 +67,13 @@
             </b-dropdown>
           </template>
 
-          <template v-if="storyId">
+          <!-- Task -->
+          <template v-if="taskId">
             <b-icon icon="chevron-right" />
             <span>{{ getTaskTitle }}</span>
             <b-icon icon="chevron-right" />
             <b-dropdown 
-              id="stories-navigation-dropdown" 
+              id="tasks-navigation-dropdown" 
               size="sm" 
               :text="getActiveTab('task')"
             >
@@ -85,8 +88,6 @@
               </template>
             </b-dropdown>
           </template>
-
-          
         </div>
       </b-col>
     </b-row>

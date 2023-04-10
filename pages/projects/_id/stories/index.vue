@@ -34,7 +34,7 @@
             <th scope="col">Business value</th>
             <th scope="col">Priority</th>
             <th scope="col">Accepted</th>
-            <th scope="col">Accept</th>
+            <th scope="col" v-if="isProjectOwner() || isAdmin">Accept</th>
             <th scope="col">Sprint</th>
             <th scope="col">Criteria</th>
             <th scope="col"></th>
@@ -72,18 +72,17 @@
             <td>
               <b-button
                 size="sm"
-                :variant="getVariantForImplemented(!story.acceptanceTest)"
+                :variant="getVariantForImplemented(story.acceptanceTest)"
                 disabled
               >
                 {{ getNameForImplemented(story.acceptanceTest) }}
               </b-button>
             </td>
-            <td>
+            <td v-if="isProjectOwner() || isAdmin">
               <b-button
                 :disabled="!story.canBeAccepted"
-                :variant="getVariantForImplemented(!story.canBeAccepted)"
+                :variant="getVariantForImplemented(story.canBeAccepted)"
                 @click="acceptStory(story.id)"
-                v-if="isProjectOwner() || isAdmin"
               >
                 Accept
               </b-button>

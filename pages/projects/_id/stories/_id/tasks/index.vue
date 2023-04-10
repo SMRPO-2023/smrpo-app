@@ -91,9 +91,11 @@
 
 <script>
 import { mapGetters } from "vuex";
+import priorities from "@/mixins/priorities";
 
 export default {
   name: "tasks",
+  mixins: [priorities],
   computed: {
     ...mapGetters({
       isAdmin: "user/isAdmin",
@@ -147,12 +149,6 @@ export default {
     canReject(task) {
       if (!this.isMyTask(task)) return false;
       return task.status === 'ASSIGNED' || task.status === 'ACCEPTED';
-    },
-    getVariantForTaskStatus(status) {
-      if (status === 'ACCEPTED') return "primary"; // task has been accepted
-      else if (status === 'ASSIGNED') return "info"; // task has been assigned to someone
-      else if (status === 'FINISHED') return "success"; // task has been finished
-      else "secondary"; // task is not assigned to anyone
     },
     async getProjectWithData() {
       if (!this.projectId) return;
