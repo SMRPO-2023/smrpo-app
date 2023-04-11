@@ -33,8 +33,13 @@
             <td>{{ task.hours }}</td>
             <td>
               <span v-if="task.status !== 'UNASSIGNED'">
-                {{ task.assignedTo?.username }} 
-                <span class="text-muted" v-if="isMyTask(task)"> (you)</span>
+                <template v-if="task.assignedTo && task.userId">
+                  {{ task.assignedTo?.username }} 
+                  <span class="text-muted" v-if="isMyTask(task)"> (you)</span>
+                </template>
+                <span v-else class="text-muted">
+                  Unknown
+                </span>
               </span>
               <span v-else class="text-muted">
                 Nobody
@@ -189,6 +194,12 @@ export default {
       this.$axios
         .$post(`tasks/${task.id}/${isAccepting ? 'accept' : 'reject'}`)
         .then((res) => {
+          if (!res) return;
+          // find and replace updated task from tasks array
+          const index = this.tasks.findIndex((t) => t.id === res.id);
+          this.tasks.splice(index, 1, res);
+          console.log(res);
+
           this.$toast.success("Task successfully " + (isAccepting ? 'accepted' : 'rejected'), {
             duration: 3000,
           });

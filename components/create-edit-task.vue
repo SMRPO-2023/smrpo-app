@@ -247,6 +247,7 @@ export default {
         .then(async (res) => {
           this.error = null;
           this.responseErrors = [];
+          this.updateBreadcrumbs(this.taskId);
           this.$toast.success("Task information successfully updated", {
             duration: 3000,
           });
@@ -270,6 +271,9 @@ export default {
       this.$toast.error("An error has occurred, while " + errorActionMessage, {
         duration: 3000,
       });
+    },
+    updateBreadcrumbs(id) {
+      this.$store.commit("route-id/setTaskId", id)
     },
   },
   watch: { 

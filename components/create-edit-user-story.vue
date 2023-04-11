@@ -244,6 +244,7 @@ export default {
         .then(async (res) => {
           this.error = null;
           this.responseErrors = [];
+          this.updateBreadcrumbs(this.storyId);
           this.$toast.success("User story successfully updated", {
             duration: 3000,
           });
@@ -308,6 +309,9 @@ export default {
             }
           );
         });
+    },
+    updateBreadcrumbs(id) {
+      this.$store.commit("route-id/setStoryId", id)
     },
   },
   watch: { 

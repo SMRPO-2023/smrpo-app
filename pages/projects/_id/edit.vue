@@ -286,6 +286,7 @@ export default {
         .then((res) => {
           this.error = null;
           this.responseErrors = [];
+          this.updateBreadcrumbs(this.id);
           this.$toast.success("Project information successfully updated", {
             duration: 3000,
           });
@@ -310,6 +311,9 @@ export default {
             duration: 3000,
           });
         });
+    },
+    updateBreadcrumbs(id) {
+      this.$store.commit("route-id/setProjectId", id)
     },
     async getUsers() {
       this.$axios

@@ -298,11 +298,23 @@ export default {
     async getTask() {
       if (!this.taskId) return;
 
-      this.$axios
-        .$get(`tasks/${this.taskId}`)
-        .then((res) => {
-          this.task = res;
-        });
+      this.$axios.$get(`tasks/${this.taskId}`).then((res) => {
+        this.task = res;
+      });
+    },
+  },
+  watch: {
+    projectId() {
+      this.getProject();
+    },
+    sprintId() {
+      this.getSprint();
+    },
+    storyId() {
+      this.getUserStory();
+    },
+    taskId() {
+      this.getTask();
     },
   },
 };

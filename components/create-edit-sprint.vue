@@ -244,6 +244,7 @@ export default {
         .then((res) => {
           this.error = null;
           this.responseErrors = [];
+          this.updateBreadcrumbs(this.sprintId);
           this.$toast.success("Sprint information successfully updated", {
             duration: 3000,
           });
@@ -293,7 +294,10 @@ export default {
             duration: 3000,
           });
         });
-    }
+    },
+    updateBreadcrumbs(id) {
+      this.$store.commit("route-id/setSprintId", id)
+    },
   },
   watch: { 
     sprint: function(value) {
