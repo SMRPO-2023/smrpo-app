@@ -313,7 +313,7 @@ export default {
         });
     },
     updateBreadcrumbs(id) {
-      this.$store.commit("route-id/setProjectId", id)
+      this.$store.commit("route-id/setProjectId", +id)
     },
     async getUsers() {
       this.$axios

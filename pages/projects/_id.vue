@@ -126,6 +126,16 @@ export default {
       if (!this.currentUser || !this.project) return false;
       return this.currentUser.id === this.project.scrumMasterId;
     },
+    isDeveloper() {
+      if (!this.currentUser || !this.project) return false;
+      return this.project.developers.find((u) => u.user.id === this.currentUser.id);
+    },
+    isSprintActive() {
+      if (!this.sprint) return false;
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      return new Date(this.sprint.start) <= now && new Date(this.sprint.end) >= now;
+    },
     hasSprintFinished() {
       if (!this.sprint) return false;
       const now = new Date();
@@ -135,6 +145,10 @@ export default {
     canChangeUserStory() {
       if (!this.userStory) return false;
       return !this.userStory.acceptanceTest && this.userStory.sprintId === null;
+    },
+    isUserStoryAddedToSprint() {
+      if (!this.userStory) return false;
+      return this.userStory.sprintId !== null;
     },
     getProjectTitle() {
       if (!this.project) return "";
@@ -238,7 +252,7 @@ export default {
           name: "Edit",
           path: `/projects/${this.projectId}/stories/${this.storyId}/tasks/${this.taskId}/edit`,
           exact: true,
-          show: true,
+          show: (this.isAdmin || this.isScrumMaster || this.isDeveloper) && this.isUserStoryAddedToSprint && this.isSprintActive,
         },
       ];
     },
@@ -256,6 +270,21 @@ export default {
     this.getSprint();
     this.getUserStory();
     this.getTask();
+  },
+  created() {
+    // subscribe to store entity id changes
+    // and refresh the data for possible changes to title/name
+    this.unsubscribe = this.$store.subscribe((mutation, state) => {
+      if (mutation.type === "route-id/setProjectId") {
+        this.getProject();
+      } else if (mutation.type === "route-id/setSprintId") {
+        this.getSprint();
+      } else if (mutation.type === "route-id/setStoryId") {
+        this.getUserStory();
+      } else if (mutation.type === "route-id/setTaskId") {
+        this.getTask();
+      }
+    });
   },
   methods: {
     getActiveTab(type) {
@@ -303,19 +332,8 @@ export default {
       });
     },
   },
-  watch: {
-    projectId() {
-      this.getProject();
-    },
-    sprintId() {
-      this.getSprint();
-    },
-    storyId() {
-      this.getUserStory();
-    },
-    taskId() {
-      this.getTask();
-    },
+  beforeDestroy() {
+    this.unsubscribe();
   },
 };
 </script>

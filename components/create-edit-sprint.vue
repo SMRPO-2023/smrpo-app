@@ -296,7 +296,7 @@ export default {
         });
     },
     updateBreadcrumbs(id) {
-      this.$store.commit("route-id/setSprintId", id)
+      this.$store.commit("route-id/setSprintId", +id)
     },
   },
   watch: { 

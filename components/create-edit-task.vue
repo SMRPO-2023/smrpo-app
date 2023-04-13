@@ -273,7 +273,7 @@ export default {
       });
     },
     updateBreadcrumbs(id) {
-      this.$store.commit("route-id/setTaskId", id)
+      this.$store.commit("route-id/setTaskId", +id)
     },
   },
   watch: { 

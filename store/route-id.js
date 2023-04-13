@@ -7,6 +7,8 @@ export const state = () => ({
 
 export const mutations = {
   setProjectId(state, id) {
+    // state = { ...state, projectId: id }
+    // state = Object.assign({}, state, { projectId: id })
     state.projectId = id
   },
   setStoryId(state, id) {
