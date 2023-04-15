@@ -18,7 +18,7 @@
       <span class="title">Velocity:</span> <span>{{ velocity }}</span>
     </p>
     <div v-if="isSprintActive(sprint)">
-      <h2 class="pt-3">Stories in sprint</h2>
+      <h2 class="pt-3">Stories in current sprint</h2>
 
       <div class="table-responsive">
         <table class="table table-hover mt-3">
