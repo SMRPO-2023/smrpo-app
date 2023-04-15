@@ -59,7 +59,7 @@
                     <b-button
                       v-if="isProjectOwner()"
                       variant="danger"
-                      @click="removeFromSprint(story.id)"
+                      @click="rejectPrompt(story.id)"
                       class="center-and-clickable"
                     >Reject</b-button>
                     
@@ -143,6 +143,28 @@
         </div>
       </div>
     </div>
+    <b-modal ref="reject-modal" id="reject-modal" hide-footer>
+      <template #modal-title> Reject</template>
+      <div class="d-block d-flex pb-3">
+        Please submit a reason for the rejection.
+      </div>
+      <b-form-group label="" label-for="">
+        <b-form-textarea
+            type="text"
+            id="comment"
+            placeholder="Enter comment"
+            v-model="comment"
+            aria-describedby="input-1-live-feedback"
+        />
+      </b-form-group>
+      <div class=" w-100 d-flex justify-content-end pb-2 pt-4">
+        <b-button class=" w-25 p-2 mr-2"  @click="$bvModal.hide('reject-modal')"
+        >Cancel</b-button>
+        <b-button class=" w-25 p-2"  @click="$bvModal.hide('reject-modal'), removeFromSprint()"
+        >Submit</b-button>
+      </div>
+      
+    </b-modal>
   </div>
 </template>
 
@@ -176,6 +198,9 @@ export default {
       velocity: null,
       currentLoad: null,
       project: null,
+      currentStoryId: null,
+      comment: null,
+      error: null,
     };
   },
   async mounted() {
@@ -186,6 +211,13 @@ export default {
    
   },
   methods: {
+    getValidationState({ dirty, validated, valid = null }) {
+      return dirty || validated ? valid : null;
+    },
+    async rejectPrompt(storyId) {
+      this.currentStoryId = storyId;
+      this.$refs["reject-modal"].show();
+    },
     isProjectOwner() {
       if (!this.currentUser || !this.project) return false;
       if (this.isAdmin){
@@ -221,23 +253,26 @@ export default {
         return new Date(sprint.start) <= now && new Date(sprint.end) >= now;
       }
     },
-    async removeFromSprint(storyId) {
+    async removeFromSprint() {
       await this.$axios
-        .$post(`user-stories/remove-from-sprint/${storyId}`)
-        .then(async (res) => {
-          this.getSprint();
-          this.$toast.success("Story removed from sprint.", {
-            duration: 3000,
-          });
+            .$post(`user-stories/reject/${this.currentStoryId}`, {
+            "message": this.comment,
         })
-        .catch((error) => {
-          this.$toast.error(
-            "An error has occurred, while removing story from sprint.",
-            {
-              duration: 3000,
-            }
-          );
-        });
+            .then(async (res) => {
+              this.getSprint();
+              this.comment = null;
+              this.$toast.success("Story removed from sprint.", {
+                duration: 3000,
+              });
+            })
+          .catch((error) => {
+              this.$toast.error(
+                "An error has occurred, while removing story from sprint.",
+                {
+                  duration: 3000,
+                }
+              );
+      });
     },
     async moveToSprint(storyId) {
       await this.$axios
