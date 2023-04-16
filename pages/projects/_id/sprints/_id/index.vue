@@ -20,7 +20,7 @@
     <div>
       <!---------------------  Unrealized stories  ------------------------------------>
       
-      <div >
+      <div v-if="isSprintActive(sprint)">
       <h2 class="pt-3">Stories in current sprint</h2>
 
       <div class="table-responsive">
