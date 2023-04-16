@@ -118,7 +118,7 @@ export default {
       storyId: "route-id/getStoryId",
       taskId: "route-id/getTaskId",
     }),
-    isProjectOwner() {
+    isProductOwner() {
       if (!this.currentUser || !this.project) return false;
       return this.currentUser.id === this.project.projectOwnerId;
     },
@@ -179,6 +179,12 @@ export default {
           path: `/projects/${this.projectId}/edit`,
           exact: true,
           show: this.isAdmin || this.isScrumMaster,
+        },
+        {
+          name: "Wall",
+          path: `/projects/${this.projectId}/wall`,
+          exact: true,
+          show: true,
         },
         {
           name: "Product backlog",

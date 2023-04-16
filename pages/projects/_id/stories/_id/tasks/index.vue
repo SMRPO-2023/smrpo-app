@@ -74,7 +74,7 @@
             </td>
             <td class="narrow-col">
               <b-icon
-                v-if="hasPermission"
+                v-if="hasPermission && canDelete(task)"
                 icon="x-lg"
                 @click="deleteTask(task)"
                 class="center-and-clickable"
@@ -154,6 +154,10 @@ export default {
     canReject(task) {
       if (!this.isMyTask(task)) return false;
       return task.status === 'ASSIGNED' || task.status === 'ACCEPTED';
+    },
+    canDelete(task) {
+      if (!task) return false;
+      return task.status === 'UNASSIGNED' || task.status === 'ASSIGNED';
     },
     async getProjectWithData() {
       if (!this.projectId) return;

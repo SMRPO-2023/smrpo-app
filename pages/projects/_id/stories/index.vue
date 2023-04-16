@@ -34,7 +34,7 @@
             <th scope="col">Business value</th>
             <th scope="col">Priority</th>
             <th scope="col">Accepted</th>
-            <th scope="col" v-if="isProjectOwner() || isAdmin">Accept</th>
+            <th scope="col" v-if="isProductOwner() || isAdmin">Accept</th>
             <th scope="col">Sprint</th>
             <th scope="col">Criteria</th>
             <th scope="col"></th>
@@ -78,7 +78,7 @@
                 {{ getNameForImplemented(story.acceptanceTest) }}
               </b-button>
             </td>
-            <td v-if="isProjectOwner() || isAdmin">
+            <td v-if="isProductOwner() || isAdmin">
               <b-button
                 :disabled="!story.canBeAccepted"
                 :variant="getVariantForImplemented(story.canBeAccepted)"
@@ -187,7 +187,7 @@ export default {
         this.isAdmin
       );
     },
-    isProjectOwner() {
+    isProductOwner() {
       return this.currentUser.id === this.project.projectOwnerId;
     },
     findSprintName(sprintId) {

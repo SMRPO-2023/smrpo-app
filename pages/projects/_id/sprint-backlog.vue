@@ -222,7 +222,7 @@ export default {
           this.sprint = res;
         })
         .catch((error) => {
-          this.handleSubmitError("An error has occurred, while getting sprint information");
+          this.handleFetchError(error, "An error has occurred, while getting sprint information");
         });
     },
     async getUserStories() {
@@ -241,7 +241,7 @@ export default {
           this.showAllTasks();
         })
         .catch((error) => {
-          this.handleSubmitError("An error has occurred, while getting user stories");
+          this.handleFetchError(error, "An error has occurred, while getting user stories");
         });
     },
     refreshStories() {
@@ -259,8 +259,8 @@ export default {
         }
       });
     },
-    handleFetchError(message) {
-      console.error(reason);
+    handleFetchError(error, message) {
+      console.error(error);
       this.$toast.error(message, { duration: 3000, });
     },
   },

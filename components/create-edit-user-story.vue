@@ -173,7 +173,7 @@ export default {
       projectId: "route-id/getProjectId",
       storyId: "route-id/getStoryId",
     }),
-    isProjectOwner() {
+    isProductOwner() {
       if (!this.currentUser || !this.project) return false;
       return this.currentUser.id === this.project.projectOwnerId;
     },
@@ -182,7 +182,7 @@ export default {
       return this.currentUser.id === this.project.scrumMasterId;
     },
     hasPermission() {
-      return this.isAdmin || this.isProjectOwner || this.isScrumMaster;
+      return this.isAdmin || this.isProductOwner || this.isScrumMaster;
     },
   },
   data() {

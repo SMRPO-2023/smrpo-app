@@ -60,7 +60,7 @@
                 <b-input-group size="lg" style="font-scale: 12px;">
                   <p class="h3">
                     <b-button
-                      v-if="isProjectOwner()"
+                      v-if="isProductOwner()"
                       variant="success"
                       :disabled=!story.canBeAccepted
                       @click="acceptPrompt(story.id)"
@@ -69,7 +69,7 @@
                   </p>
                   <p class="h3">
                     <b-button
-                      v-if="isProjectOwner()"
+                      v-if="isProductOwner()"
                       variant="danger"
                       @click="rejectPrompt(story.id)"
                       class="center-and-clickable"
@@ -315,7 +315,7 @@ export default {
       this.currentStoryId = storyId;
       this.$refs["accept-modal"].show();
     },
-    isProjectOwner() {
+    isProductOwner() {
       if (!this.currentUser || !this.project) return false;
       if (this.isAdmin){
         return true;

@@ -98,9 +98,9 @@ export default {
       return this.hasPermission() && !this.hasSprintStarted(sprint.start);
     },
     hasPermission() {
-      return this.isAdmin || this.isScrumMaster || this.isProjectOwner();
+      return this.isAdmin || this.isScrumMaster || this.isProductOwner();
     },
-    isProjectOwner() {
+    isProductOwner() {
       if (!this.currentUser || !this.project) return false;
       return this.currentUser.id === this.project.projectOwnerId;
     },
