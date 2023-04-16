@@ -20,7 +20,7 @@
     <div>
       <!---------------------  Unrealized stories  ------------------------------------>
       
-      <div v-if="isSprintActive(sprint)">
+      <div>
       <h2 class="pt-3">Stories in current sprint</h2>
 
       <div class="table-responsive">
@@ -57,7 +57,16 @@
               <td>{{ story.acceptanceCriteria | limit(100) }}</td>
               <td>{{ story.points }}</td>
               <td>
-                <b-input-group size="lg" style="font-scale: 12px">
+                <b-input-group size="lg" style="font-scale: 12px;">
+                  <p class="h3">
+                    <b-button
+                      v-if="isProjectOwner()"
+                      variant="success"
+                      :disabled=!story.canBeAccepted
+                      @click="acceptPrompt(story.id)"
+                      class="center-and-clickable"
+                    >Accept</b-button>
+                  </p>
                   <p class="h3">
                     <b-button
                       v-if="isProjectOwner()"
@@ -65,7 +74,6 @@
                       @click="rejectPrompt(story.id)"
                       class="center-and-clickable"
                     >Reject</b-button>
-                    
                   </p>
                 </b-input-group>
               </td>
@@ -86,7 +94,6 @@
       
       <!---------------------  Realized stories  ------------------------------------>
       <div v-if="isSprintActive(sprint)">
-      <hr>
       <h2 class="pt-3">Realized stories in sprint       
         <v-btn @click="realizedToggle = !realizedToggle">
           <b-icon
@@ -213,8 +220,9 @@
       </div>
       <!---------------------  Adding stories  ------------------------------------>
     </div>
+    <!---------------------  Moddel reject  ------------------------------------>
     <b-modal ref="reject-modal" id="reject-modal" hide-footer>
-      <template #modal-title> Reject</template>
+      <template #modal-title>Reject</template>
       <div class="d-block d-flex pb-3">
         Please submit a reason for the rejection.
       </div>
@@ -228,13 +236,27 @@
         />
       </b-form-group>
       <div class=" w-100 d-flex justify-content-end pb-2 pt-4">
-        <b-button class=" w-25 p-2 mr-2"  @click="$bvModal.hide('reject-modal')"
+        <b-button class=" w-25 p-2 mr-2 btn-danger"  @click="$bvModal.hide('reject-modal')"
         >Cancel</b-button>
-        <b-button class=" w-25 p-2"  @click="$bvModal.hide('reject-modal'), removeFromSprint()"
+        <b-button class=" w-25 p-2 btn-success"  @click="$bvModal.hide('reject-modal'), removeFromSprint()"
         >Submit</b-button>
       </div>
-      
     </b-modal>
+    <!---------------------  Moddel reject  ------------------------------------>
+    <!---------------------  Moddel accept  ------------------------------------>
+    <b-modal ref="accept-modal" id="accept-modal" hide-footer>
+      <template #modal-title>Accept</template>
+      <div class="d-block d-flex pb-3">
+        Are you sure you want to accept this story?
+      </div>
+      <div class=" w-100 d-flex justify-content-end pb-2 pt-4">
+        <b-button class=" w-25 p-2 mr-2 btn-danger"  @click="$bvModal.hide('accept-modal')"
+        >Cancel</b-button>
+        <b-button class=" w-25 p-2 btn-success"  @click="$bvModal.hide('accept-modal'), acceptStory()"
+        >Accept</b-button>
+      </div>
+    </b-modal>
+    <!---------------------  Moddel accept  ------------------------------------>
   </div>
 </template>
 
@@ -289,6 +311,10 @@ export default {
       this.currentStoryId = storyId;
       this.$refs["reject-modal"].show();
     },
+    async acceptPrompt(storyId) {
+      this.currentStoryId = storyId;
+      this.$refs["accept-modal"].show();
+    },
     isProjectOwner() {
       if (!this.currentUser || !this.project) return false;
       if (this.isAdmin){
@@ -323,6 +349,27 @@ export default {
         now.setHours(0, 0, 0, 0);
         return new Date(sprint.start) <= now && new Date(sprint.end) >= now;
       }
+    },
+    async acceptStory() {
+      await this.$axios
+            .$post(`user-stories/accept/${this.currentStoryId}`, {
+            "message": this.comment,
+        })
+            .then(async (res) => {
+              this.getSprint();
+              this.comment = null;
+              this.$toast.success("Story has been accepted.", {
+                duration: 3000,
+              });
+            })
+          .catch((error) => {
+              this.$toast.error(
+                "An error has occurred, while accepting story.",
+                {
+                  duration: 3000,
+                }
+              );
+      });
     },
     async removeFromSprint() {
       await this.$axios
