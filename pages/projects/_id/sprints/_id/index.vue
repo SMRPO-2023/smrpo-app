@@ -17,8 +17,11 @@
     <p>
       <span class="title">Velocity:</span> <span>{{ velocity }}</span>
     </p>
-    <div v-if="isSprintActive(sprint)">
-      <h2 class="pt-3">Stories in sprint</h2>
+    <div>
+      <!---------------------  Unrealized stories  ------------------------------------>
+      
+      <div v-if="isSprintActive(sprint)">
+      <h2 class="pt-3">Stories in current sprint</h2>
 
       <div class="table-responsive">
         <table class="table table-hover mt-3">
@@ -33,8 +36,8 @@
               <th scope="col"></th>
             </tr>
           </thead>
-          <tbody v-if="sprint.UserStories.length">
-            <tr v-for="story of sprint.UserStories" :key="story.id">
+          <tbody v-if="unrealizedStories.length">
+            <tr v-for="story of unrealizedStories" :key="story.id">
               <td>
                 <a> #{{ story.id }} - {{ story.title }} </a>
               </td>
@@ -59,7 +62,7 @@
                     <b-button
                       v-if="isProjectOwner()"
                       variant="danger"
-                      @click="removeFromSprint(story.id)"
+                      @click="rejectPrompt(story.id)"
                       class="center-and-clickable"
                     >Reject</b-button>
                     
@@ -77,12 +80,78 @@
           </tbody>
         </table>
       </div>
-      <hr>
-      <h4 class="d-flex justify-content-end mr-5">Sum : {{currentLoad}} / {{ velocity }}</h4>
-      
+      </div>
+      <!---------------------  Unrealized stories  ------------------------------------>
       <br>
       
-      <div v-if="isScrumMaster()">
+      <!---------------------  Realized stories  ------------------------------------>
+      <div v-if="isSprintActive(sprint)">
+      <hr>
+      <h2 class="pt-3">Realized stories in sprint       
+        <v-btn @click="realizedToggle = !realizedToggle">
+          <b-icon
+              icon="caret-down-fill"
+              class="center-and-clickable"
+          ></b-icon>
+        </v-btn>
+      </h2>
+      <b-collapse id="collapse-realized" class="mt-2" v-model="realizedToggle">
+      <div class="table-responsive">
+        <table class="table table-hover mt-3">
+          <thead>
+            <tr>
+              <th scope="col">Title</th>
+              <th scope="col">Description</th>
+              <th scope="col">Business value</th>
+              <th scope="col">Priority</th>
+              <th scope="col">Acceptance test</th>
+              <th scope="col">Points</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody v-if="realizedStories.length">
+            <tr v-for="story of realizedStories" :key="story.id">
+              <td>
+                <a> #{{ story.id }} - {{ story.title }} </a>
+              </td>
+              <td>{{ story.description | limit(100) }}</td>
+              <td>{{ story.businessValue }}</td>
+  
+              <td>
+                <b-button
+                  id="dropdown-right"
+                  right
+                  :variant="getVariantForPriority(story.priority)"
+                >
+                  {{ getNameForPriority(story.priority) }}
+                </b-button>
+              </td>
+  
+              <td>{{ story.acceptanceCriteria | limit(100) }}</td>
+              <td>{{ story.points }}</td>
+              <td>
+              </td>
+            </tr>
+          </tbody>
+          <tbody v-else>
+            <tr>
+              <td class="text-muted text-center" colspan="7">
+                No stories in this sprint yet
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      </b-collapse>
+      <hr>
+      <h4 class="d-flex justify-content-end mr-5">Sum : {{currentLoad}} / {{ velocity }}</h4>
+      </div>
+      <!---------------------  Realized stories  ------------------------------------>
+      
+      
+      <!---------------------  Adding stories  ------------------------------------>
+      <div v-if="isScrumMaster() && isSprintActive(sprint)">
+        
         <h2 class="pt-3">Stories</h2>
 
         <div class="table-responsive">
@@ -142,7 +211,30 @@
           </table>
         </div>
       </div>
+      <!---------------------  Adding stories  ------------------------------------>
     </div>
+    <b-modal ref="reject-modal" id="reject-modal" hide-footer>
+      <template #modal-title> Reject</template>
+      <div class="d-block d-flex pb-3">
+        Please submit a reason for the rejection.
+      </div>
+      <b-form-group label="" label-for="">
+        <b-form-textarea
+            type="text"
+            id="comment"
+            placeholder="Enter comment"
+            v-model="comment"
+            aria-describedby="input-1-live-feedback"
+        />
+      </b-form-group>
+      <div class=" w-100 d-flex justify-content-end pb-2 pt-4">
+        <b-button class=" w-25 p-2 mr-2"  @click="$bvModal.hide('reject-modal')"
+        >Cancel</b-button>
+        <b-button class=" w-25 p-2"  @click="$bvModal.hide('reject-modal'), removeFromSprint()"
+        >Submit</b-button>
+      </div>
+      
+    </b-modal>
   </div>
 </template>
 
@@ -168,6 +260,8 @@ export default {
     return {
       id: null,
       stories: [],
+      unrealizedStories: [],
+      realizedStories: [],
       addableStories: [],
       sprint: null,
       name: null,
@@ -176,16 +270,25 @@ export default {
       velocity: null,
       currentLoad: null,
       project: null,
+      currentStoryId: null,
+      comment: null,
+      error: null,
+      realizedToggle: true,
     };
   },
   async mounted() {
     this.id = this.$route.params.id;
     if (!this.id) return;
     this.getSprint();
-    
-   
   },
   methods: {
+    getValidationState({ dirty, validated, valid = null }) {
+      return dirty || validated ? valid : null;
+    },
+    async rejectPrompt(storyId) {
+      this.currentStoryId = storyId;
+      this.$refs["reject-modal"].show();
+    },
     isProjectOwner() {
       if (!this.currentUser || !this.project) return false;
       if (this.isAdmin){
@@ -221,23 +324,26 @@ export default {
         return new Date(sprint.start) <= now && new Date(sprint.end) >= now;
       }
     },
-    async removeFromSprint(storyId) {
+    async removeFromSprint() {
       await this.$axios
-        .$post(`user-stories/remove-from-sprint/${storyId}`)
-        .then(async (res) => {
-          this.getSprint();
-          this.$toast.success("Story removed from sprint.", {
-            duration: 3000,
-          });
+            .$post(`user-stories/reject/${this.currentStoryId}`, {
+            "message": this.comment,
         })
-        .catch((error) => {
-          this.$toast.error(
-            "An error has occurred, while removing story from sprint.",
-            {
-              duration: 3000,
-            }
-          );
-        });
+            .then(async (res) => {
+              this.getSprint();
+              this.comment = null;
+              this.$toast.success("Story removed from sprint.", {
+                duration: 3000,
+              });
+            })
+          .catch((error) => {
+              this.$toast.error(
+                "An error has occurred, while removing story from sprint.",
+                {
+                  duration: 3000,
+                }
+              );
+      });
     },
     async moveToSprint(storyId) {
       await this.$axios
@@ -280,12 +386,54 @@ export default {
           );
         });
     },
+    async getUnRealizedStories(sprintId) {
+      this.$axios
+        .$get(`user-stories/unrealized-with-sprint`,{
+          params: {
+            "sprint-id": sprintId,
+          },
+        })
+        .then((res) => {
+          this.unrealizedStories = res;
+        })
+        .catch((reason) => {
+          console.error(reason);
+          this.$toast.error(
+            "An error has occurred, while getting sprint information",
+            {
+              duration: 3000,
+            }
+          );
+        });
+    },
+    async getRealizedStories(sprintId) {
+      this.$axios
+        .$get(`user-stories/realized`,{
+          params: {
+            "sprint-id": sprintId,
+          },
+        })
+        .then((res) => {
+          this.realizedStories = res;
+        })
+        .catch((reason) => {
+          console.error(reason);
+          this.$toast.error(
+            "An error has occurred, while getting sprint information",
+            {
+              duration: 3000,
+            }
+          );
+        });
+    },
     async getSprint() {
       this.$axios
         .$get(`sprints/${this.id}`)
         .then((res) => {
           this.getAddableStories(res.sprint.projectId);
           this.getProject(res.sprint.projectId);
+          this.getRealizedStories(res.sprint.id)
+          this.getUnRealizedStories(res.sprint.id)
           this.sprint = res.sprint;
           this.name = res.sprint.name;
           this.start = res.sprint.start;

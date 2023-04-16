@@ -36,11 +36,11 @@
           </b-form-group>
         </ValidationProvider>
         <ValidationProvider
-          name="project owner"
+          name="product owner"
           :rules="{ required: false }"
           v-slot="v"
         >
-          <b-form-group label="Project owner" label-for="owner">
+          <b-form-group label="Product owner" label-for="owner">
             <b-form-select
               id="projectOwner"
               v-model="form.projectOwnerId"

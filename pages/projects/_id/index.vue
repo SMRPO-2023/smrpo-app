@@ -11,7 +11,7 @@
     </p>
     <p style="white-space: pre-line">{{ form.documentation }}</p>
     <p>
-      <span class="title">Project owner : </span>
+      <span class="title">Product owner : </span>
       <span
         >{{ form.projectOwnerUsername }}
         <span v-if="form.projectOwnerUsername == null"> / </span></span

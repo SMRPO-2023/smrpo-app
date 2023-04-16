@@ -32,11 +32,23 @@
     <p v-if="story.sprintId">
       <span class="title">Sprint:</span> <nuxt-link :to="{ path: `/projects/${story.projectId}/sprints/${story.sprintId}` }">{{ story.sprintId }}</nuxt-link>
     </p>
+    <br>
+    <h2 class="pb-3">Comments</h2>
+    <div v-for="comment of story.comments" :key="comment.id">
+      <div class="card"><div class="font-weight-bold h5 pb-2">{{comment.User.username}}</div>
+      <div class="pb-3">{{comment.message}}</div>
+      <div class="date">{{formatDateTime(comment.createdAt)}}</div>
+    </div>
+    </div>
+
   </div>
 </template>
 
 <script>
+import datetime from "@/mixins/datetime";
+
 export default {
+  mixins: [datetime],
   name: "view-user-story",
   data() {
     return {
@@ -86,5 +98,19 @@ export default {
   margin-left: 0;
   margin-right: 0;
   font-weight: bold;
+}
+
+.card{
+  background: #f2f0f2;
+  padding: 2rem;
+  margin-bottom: 1rem;
+  border: none;
+  border-radius: 25px;
+}
+
+.date {
+  display: block;
+  font-size: .80em;
+  color: #909090;
 }
 </style>

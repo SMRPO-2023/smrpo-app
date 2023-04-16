@@ -327,8 +327,14 @@ export default {
 
       this.$axios
         .$put(`user-stories/${story.id}`, {
-          ...story,
           priority: priority.value,
+          title: story.title,
+          description: story.description,
+          points: story.points,
+          acceptanceTest: story.acceptanceTest,
+          projectId: story.projectId,
+          businessValue: story.businessValue,
+          acceptanceCriteria: story.acceptanceCriteria
         })
         .then((res) => {
           for (const story of this.stories) {
