@@ -4,7 +4,15 @@
       Sprint backlog<template v-if="sprint">: {{ sprint.name }}</template>
     </h1>
 
-    <div class="d-flex justify-content-end pb-3" v-if="sprint">
+    <div class="d-flex justify-content-end align-items-center pb-3" v-if="sprint">
+      <b-form-checkbox
+        id="show-accepted-checkbox"
+        v-model="showAcceptedStories"
+        name="show-accepted-checkbox"
+        class="mr-3"
+      >
+        Show accepted stories
+      </b-form-checkbox>
       <b-button-group>
         <b-button 
           @click="filterBy('mine')" 
@@ -67,45 +75,27 @@
 
         <template v-if="story.Task.length">
           <b-card-text 
-            class="text-muted mb-n2 position-relative" 
+            class="text-muted mb-n2 position-relative d-flex justify-content-between" 
             style="z-index: 1"
-          >Tasks</b-card-text>
-          <ul class="list-group list-group-flush">
-            <template v-for="task of story.Task">
-              <li 
-                v-if="canShowTask(task)" 
-                class="list-group-item pl-0 py-2 d-flex justify-content-between align-items-center"
-              >
-                <b-row cols="3" class="w-100">
-                  <!-- Task title -->
-                  <b-col cols="6">
-                    <b-icon icon="caret-right-fill"></b-icon>
-                    <nuxt-link :to="{ path: `/projects/${story.projectId}/stories/${story.id}/tasks/${task.id}` }">
-                      {{ task.title }}
-                    </nuxt-link>
-                  </b-col>
-  
-                  <!-- Task hours -->
-                  <b-col cols="2">
-                    <b-avatar icon="clock" size="sm"></b-avatar>
-                    <span>{{ task.hours }}h</span>
-                  </b-col>
-                  
-                  <!-- Task developer and status -->
-                  <b-col cols="4">
-                    <template v-if="task.status !== 'UNASSIGNED'">
-                      <b-avatar size="sm"></b-avatar>
-                      <span>{{ task.assignedTo?.username }}</span>
-                    </template>
-                    <b-badge 
-                      :variant="getVariantForTaskStatus(task.status)"
-                      :class="task.status !== 'UNASSIGNED' ? 'ml-1' : null"
-                    >{{ task.status }}</b-badge>
-                  </b-col>
-                </b-row>
-              </li>
-            </template>
-          </ul>
+          >
+            <span>Tasks</span>
+            <a class="cursor-pointer">
+              <small v-if="story.numFinishedTasks" v-b-toggle="`story-tasks-collapse-${story.id}`">
+                <span class="when-open">Hide</span><span class="when-closed">Show</span> finished
+              </small>
+            </a>
+          </b-card-text>
+          <task-list 
+            :story="story" 
+            :tasks="getStoryUnfinishedFilteredTasks(story)" 
+          />
+          <b-collapse :id="`story-tasks-collapse-${story.id}`">
+            <small>Finished</small>
+            <task-list 
+              :story="story" 
+              :tasks="getStoryFinishedFilteredTasks(story)" 
+            />
+          </b-collapse>
         </template>
       </b-card>
 
@@ -142,21 +132,38 @@ export default {
     return {
       tasksFilterState: "all",
       tasksDisplayDict: new Map(), // dictionary of tasks, where each task has property to show or not
-      anyStoriesMatchFilter: false,
+      anyStoriesMatchFilter: true,
+      showAcceptedStories: false,
+      allStories: [],
       stories: [],
       sprint: null,
     };
   },
   async mounted() {
-    this.getSprint();
+    await this.getSprint();
+    await this.getUserStories();
   },
   methods: {
+    getStoryUnfinishedFilteredTasks(story) {
+      if (!story?.Task?.length) return [];
+      return story.Task.filter((task) => !task.done && this.taskMatchesFilter(task));
+    },
+    getStoryFinishedFilteredTasks(story) {
+      if (!story?.Task?.length) return [];
+      return story.Task.filter((task) => task.done && this.taskMatchesFilter(task));
+    },
+    /**
+     * Tells if the story has any tasks that match the current filter
+     * Used to determine if the story from the list should be displayed
+     */
     hasStoryAnyRelevantTasks(story) {
+      if (!story?.Task?.length) return false;
       return story.Task.some((task) => {
-        return this.canShowTask(task);
+        return this.taskMatchesFilter(task);
       });
     },
-    canShowTask(task) {
+    taskMatchesFilter(task) {
+      if (!this.stories || !task) return false;
       return this.tasksDisplayDict.get(task.id);
     },
     isMyTask(task) {
@@ -204,7 +211,7 @@ export default {
       }
     },
     async getSprint() {
-      this.$axios
+      await this.$axios
         .$get(`sprints/active-sprint`,{
           params: {
             "project-id": this.projectId,
@@ -212,20 +219,55 @@ export default {
         })
         .then((res) => {
           if (!res) return;
-
           this.sprint = res;
-          this.stories = res.UserStories;
+        })
+        .catch((error) => {
+          this.handleSubmitError("An error has occurred, while getting sprint information");
+        });
+    },
+    async getUserStories() {
+      if (!this.projectId || !this.sprint) return;
+      this.$axios
+        .$get(`user-stories`, {
+          params: {
+            "project-id": this.projectId,
+            "sprint-id": this.sprint.id,
+          },
+        })
+        .then((res) => {
+          if (!res) return;
+          this.allStories = res.stories;
+          this.refreshStories();
           this.showAllTasks();
         })
-        .catch((reason) => {
-          console.error(reason);
-          this.$toast.error(
-            "An error has occurred, while getting sprint information",
-            {
-              duration: 3000,
-            }
-          );
+        .catch((error) => {
+          this.handleSubmitError("An error has occurred, while getting user stories");
         });
+    },
+    refreshStories() {
+      this.stories = this.allStories
+      .filter((story) => this.showAcceptedStories || !story.acceptanceTest)
+      .sort((a, b) => {
+        if (!a.acceptanceTest && b.acceptanceTest) return -1;
+        else if (a.acceptanceTest && !b.acceptanceTest) return 1;
+        else if (a.acceptanceTest === b.acceptanceTest) {
+          const aPriority = this.getPriorityOrdinal(a.priority);
+          const bPriority = this.getPriorityOrdinal(b.priority);
+          if (aPriority < bPriority) return -1;
+          else if (aPriority > bPriority) return 1;
+          else return 0;
+        }
+      });
+    },
+    handleFetchError(message) {
+      console.error(reason);
+      this.$toast.error(message, { duration: 3000, });
+    },
+  },
+  watch: {
+    showAcceptedStories() {
+      this.refreshStories();
+      this.filterBy(this.tasksFilterState);
     },
   },
 };
@@ -242,5 +284,9 @@ export default {
 }
 a {
   color: black !important;
+}
+.collapsed > .when-open,
+.not-collapsed > .when-closed {
+  display: none;
 }
 </style>

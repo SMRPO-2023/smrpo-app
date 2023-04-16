@@ -36,6 +36,12 @@ export default {
           return "light";
       }
     },
+    /**
+     * Returns the priority as an integer, where 1 is the highest priority
+     */
+    getPriorityOrdinal(priority) {
+      return this.priorities.findIndex((p) => p.value === priority) + 1;
+    },
     getNameForPriority(priority) {
       return this.priorities.find((p) => p.value === priority).text;
     },
