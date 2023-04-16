@@ -20,7 +20,7 @@
     <div>
       <!---------------------  Unrealized stories  ------------------------------------>
       
-      <div v-if="unrealizedStories.length">
+      <div >
       <h2 class="pt-3">Stories in current sprint</h2>
 
       <div class="table-responsive">
@@ -80,8 +80,6 @@
           </tbody>
         </table>
       </div>
-      <hr>
-      <h4 class="d-flex justify-content-end mr-5">Sum : {{currentLoad}} / {{ velocity }}</h4>
       </div>
       <!---------------------  Unrealized stories  ------------------------------------>
       <br>
@@ -90,14 +88,14 @@
       <div v-if="isSprintActive(sprint)">
       <hr>
       <h2 class="pt-3">Realized stories in sprint       
-        <v-btn v-b-toggle.collapse-realized >
+        <v-btn @click="realizedToggle = !realizedToggle">
           <b-icon
               icon="caret-down-fill"
               class="center-and-clickable"
           ></b-icon>
         </v-btn>
       </h2>
-      <b-collapse id="collapse-realized" class="mt-2">
+      <b-collapse id="collapse-realized" class="mt-2" v-model="realizedToggle">
       <div class="table-responsive">
         <table class="table table-hover mt-3">
           <thead>
@@ -132,17 +130,6 @@
               <td>{{ story.acceptanceCriteria | limit(100) }}</td>
               <td>{{ story.points }}</td>
               <td>
-                <b-input-group size="lg" style="font-scale: 12px">
-                  <p class="h3">
-                    <b-button
-                      v-if="isProjectOwner()"
-                      variant="danger"
-                      @click="rejectPrompt(story.id)"
-                      class="center-and-clickable"
-                    >Reject</b-button>
-                    
-                  </p>
-                </b-input-group>
               </td>
             </tr>
           </tbody>
@@ -156,13 +143,15 @@
         </table>
       </div>
       </b-collapse>
+      <hr>
+      <h4 class="d-flex justify-content-end mr-5">Sum : {{currentLoad}} / {{ velocity }}</h4>
       </div>
       <!---------------------  Realized stories  ------------------------------------>
       
       
       <!---------------------  Adding stories  ------------------------------------>
       <div v-if="isScrumMaster() && isSprintActive(sprint)">
-        <hr>
+        
         <h2 class="pt-3">Stories</h2>
 
         <div class="table-responsive">
@@ -284,6 +273,7 @@ export default {
       currentStoryId: null,
       comment: null,
       error: null,
+      realizedToggle: true,
     };
   },
   async mounted() {
