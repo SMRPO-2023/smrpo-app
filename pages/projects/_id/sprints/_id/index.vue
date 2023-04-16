@@ -17,7 +17,10 @@
     <p>
       <span class="title">Velocity:</span> <span>{{ velocity }}</span>
     </p>
-    <div v-if="isSprintActive(sprint)">
+    <div>
+      <!---------------------  Unrealized stories  ------------------------------------>
+      
+      <div v-if="unrealizedStories.length">
       <h2 class="pt-3">Stories in current sprint</h2>
 
       <div class="table-responsive">
@@ -33,8 +36,8 @@
               <th scope="col"></th>
             </tr>
           </thead>
-          <tbody v-if="sprint.UserStories.length">
-            <tr v-for="story of sprint.UserStories" :key="story.id">
+          <tbody v-if="unrealizedStories.length">
+            <tr v-for="story of unrealizedStories" :key="story.id">
               <td>
                 <a> #{{ story.id }} - {{ story.title }} </a>
               </td>
@@ -79,10 +82,87 @@
       </div>
       <hr>
       <h4 class="d-flex justify-content-end mr-5">Sum : {{currentLoad}} / {{ velocity }}</h4>
-      
+      </div>
+      <!---------------------  Unrealized stories  ------------------------------------>
       <br>
       
-      <div v-if="isScrumMaster()">
+      <!---------------------  Realized stories  ------------------------------------>
+      <div v-if="isSprintActive(sprint)">
+      <hr>
+      <h2 class="pt-3">Realized stories in sprint       
+        <v-btn v-b-toggle.collapse-realized >
+          <b-icon
+              icon="caret-down-fill"
+              class="center-and-clickable"
+          ></b-icon>
+        </v-btn>
+      </h2>
+      <b-collapse id="collapse-realized" class="mt-2">
+      <div class="table-responsive">
+        <table class="table table-hover mt-3">
+          <thead>
+            <tr>
+              <th scope="col">Title</th>
+              <th scope="col">Description</th>
+              <th scope="col">Business value</th>
+              <th scope="col">Priority</th>
+              <th scope="col">Acceptance test</th>
+              <th scope="col">Points</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody v-if="realizedStories.length">
+            <tr v-for="story of realizedStories" :key="story.id">
+              <td>
+                <a> #{{ story.id }} - {{ story.title }} </a>
+              </td>
+              <td>{{ story.description | limit(100) }}</td>
+              <td>{{ story.businessValue }}</td>
+  
+              <td>
+                <b-button
+                  id="dropdown-right"
+                  right
+                  :variant="getVariantForPriority(story.priority)"
+                >
+                  {{ getNameForPriority(story.priority) }}
+                </b-button>
+              </td>
+  
+              <td>{{ story.acceptanceCriteria | limit(100) }}</td>
+              <td>{{ story.points }}</td>
+              <td>
+                <b-input-group size="lg" style="font-scale: 12px">
+                  <p class="h3">
+                    <b-button
+                      v-if="isProjectOwner()"
+                      variant="danger"
+                      @click="rejectPrompt(story.id)"
+                      class="center-and-clickable"
+                    >Reject</b-button>
+                    
+                  </p>
+                </b-input-group>
+              </td>
+            </tr>
+          </tbody>
+          <tbody v-else>
+            <tr>
+              <td class="text-muted text-center" colspan="7">
+                No stories in this sprint yet
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      </b-collapse>
+      </div>
+      <!---------------------  Realized stories  ------------------------------------>
+      
+      
+      <!---------------------  Adding stories  ------------------------------------>
+      <div v-if="isScrumMaster() && isSprintActive(sprint)">
+        <hr>
         <h2 class="pt-3">Stories</h2>
 
         <div class="table-responsive">
@@ -142,6 +222,7 @@
           </table>
         </div>
       </div>
+      <!---------------------  Adding stories  ------------------------------------>
     </div>
     <b-modal ref="reject-modal" id="reject-modal" hide-footer>
       <template #modal-title> Reject</template>
@@ -190,6 +271,8 @@ export default {
     return {
       id: null,
       stories: [],
+      unrealizedStories: [],
+      realizedStories: [],
       addableStories: [],
       sprint: null,
       name: null,
@@ -207,8 +290,6 @@ export default {
     this.id = this.$route.params.id;
     if (!this.id) return;
     this.getSprint();
-    
-   
   },
   methods: {
     getValidationState({ dirty, validated, valid = null }) {
@@ -315,12 +396,54 @@ export default {
           );
         });
     },
+    async getUnRealizedStories(sprintId) {
+      this.$axios
+        .$get(`user-stories/unrealized-with-sprint`,{
+          params: {
+            "sprint-id": sprintId,
+          },
+        })
+        .then((res) => {
+          this.unrealizedStories = res;
+        })
+        .catch((reason) => {
+          console.error(reason);
+          this.$toast.error(
+            "An error has occurred, while getting sprint information",
+            {
+              duration: 3000,
+            }
+          );
+        });
+    },
+    async getRealizedStories(sprintId) {
+      this.$axios
+        .$get(`user-stories/realized`,{
+          params: {
+            "sprint-id": sprintId,
+          },
+        })
+        .then((res) => {
+          this.realizedStories = res;
+        })
+        .catch((reason) => {
+          console.error(reason);
+          this.$toast.error(
+            "An error has occurred, while getting sprint information",
+            {
+              duration: 3000,
+            }
+          );
+        });
+    },
     async getSprint() {
       this.$axios
         .$get(`sprints/${this.id}`)
         .then((res) => {
           this.getAddableStories(res.sprint.projectId);
           this.getProject(res.sprint.projectId);
+          this.getRealizedStories(res.sprint.id)
+          this.getUnRealizedStories(res.sprint.id)
           this.sprint = res.sprint;
           this.name = res.sprint.name;
           this.start = res.sprint.start;
