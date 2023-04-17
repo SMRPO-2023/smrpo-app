@@ -245,7 +245,7 @@
       <div class=" w-100 d-flex justify-content-end pb-2 pt-4">
         <b-button class=" w-25 p-2 mr-2 btn-danger"  @click="$bvModal.hide('reject-modal')"
         >Cancel</b-button>
-        <b-button class=" w-25 p-2 btn-success"  @click="$bvModal.hide('reject-modal') && removeFromSprint()"
+        <b-button class=" w-25 p-2 btn-success"  @click="removeFromSprint() && $bvModal.hide('reject-modal')"
         >Submit</b-button>
       </div>
     </b-modal>
