@@ -18,7 +18,7 @@
                 <b-input
                   type="text"
                   id="email"
-                  placeholder="Email address"
+                  placeholder="E-mail or username"
                   v-model="form.email"
                   :state="getValidationState(v)"
                   aria-describedby="input-3-live-feedback"

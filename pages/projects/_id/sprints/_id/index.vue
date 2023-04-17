@@ -39,7 +39,9 @@
           <tbody v-if="unrealizedStories.length">
             <tr v-for="story of unrealizedStories" :key="story.id">
               <td>
-                <a> #{{ story.id }} - {{ story.title }} </a>
+                <nuxt-link :to="{ path: `/projects/${story.projectId}/stories/${story.id}` }">
+                  #{{ story.id }} - {{ story.title }}
+                </nuxt-link>
               </td>
               <td>{{ story.description | limit(100) }}</td>
               <td>{{ story.businessValue }}</td>
@@ -94,13 +96,14 @@
 
       <!---------------------  Realized stories  ------------------------------------>
       <div v-if="isSprintActive(sprint)">
-      <h2 class="pt-3">Realized stories in sprint       
-        <b-btn @click="realizedToggle = !realizedToggle">
-          <b-icon
-              icon="caret-down-fill"
-              class="center-and-clickable"
-          ></b-icon>
-        </b-btn>
+      <h2 
+        @click="realizedToggle = !realizedToggle" 
+        class="pt-3 cursor-pointer">
+        <span>Realized stories in sprint</span>
+        <b-icon
+          :icon="realizedToggle ? 'caret-up-fill' : 'caret-down-fill'"
+          font-scale="0.75"
+        ></b-icon>
       </h2>
       <b-collapse id="collapse-realized" class="mt-2" v-model="realizedToggle">
       <div class="table-responsive">
@@ -119,7 +122,9 @@
           <tbody v-if="realizedStories.length">
             <tr v-for="story of realizedStories" :key="story.id">
               <td>
-                <a> #{{ story.id }} - {{ story.title }} </a>
+                <nuxt-link :to="{ path: `/projects/${story.projectId}/stories/${story.id}` }">
+                  #{{ story.id }} - {{ story.title }}
+                </nuxt-link>
               </td>
               <td>{{ story.description | limit(100) }}</td>
               <td>{{ story.businessValue }}</td>
@@ -177,7 +182,7 @@
             <tbody v-if="addableStories.length">
               <tr v-for="story of addableStories" :key="story.id">
                 <td>
-                  <nuxt-link :to="{ path: `stories/${story.id}` }">
+                  <nuxt-link :to="{ path: `/projects/${story.projectId}/stories/${story.id}` }">
                     #{{ story.id }} - {{ story.title }}
                   </nuxt-link>
                 </td>
