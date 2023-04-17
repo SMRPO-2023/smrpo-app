@@ -19,7 +19,7 @@
     </p>
     <div>
       <!---------------------  Unrealized stories  ------------------------------------>
-      
+
       <div>
       <h2 class="pt-3">Stories in current sprint</h2>
 
@@ -43,7 +43,7 @@
               </td>
               <td>{{ story.description | limit(100) }}</td>
               <td>{{ story.businessValue }}</td>
-  
+
               <td>
                 <b-button
                   id="dropdown-right"
@@ -53,11 +53,11 @@
                   {{ getNameForPriority(story.priority) }}
                 </b-button>
               </td>
-  
+
               <td>{{ story.acceptanceCriteria | limit(100) }}</td>
               <td>{{ story.points }}</td>
               <td>
-                <b-input-group size="lg" style="font-scale: 12px;">
+                <b-input-group size="lg" style="font-size: 12px">
                   <p class="h3">
                     <b-button
                       v-if="isProductOwner()"
@@ -91,16 +91,16 @@
       </div>
       <!---------------------  Unrealized stories  ------------------------------------>
       <br>
-      
+
       <!---------------------  Realized stories  ------------------------------------>
       <div v-if="isSprintActive(sprint)">
-      <h2 class="pt-3">Realized stories in sprint       
-        <v-btn @click="realizedToggle = !realizedToggle">
+      <h2 class="pt-3">Realized stories in sprint
+        <b-btn @click="realizedToggle = !realizedToggle">
           <b-icon
               icon="caret-down-fill"
               class="center-and-clickable"
           ></b-icon>
-        </v-btn>
+        </b-btn>
       </h2>
       <b-collapse id="collapse-realized" class="mt-2" v-model="realizedToggle">
       <div class="table-responsive">
@@ -123,7 +123,7 @@
               </td>
               <td>{{ story.description | limit(100) }}</td>
               <td>{{ story.businessValue }}</td>
-  
+
               <td>
                 <b-button
                   id="dropdown-right"
@@ -133,7 +133,7 @@
                   {{ getNameForPriority(story.priority) }}
                 </b-button>
               </td>
-  
+
               <td>{{ story.acceptanceCriteria | limit(100) }}</td>
               <td>{{ story.points }}</td>
               <td>
@@ -154,11 +154,11 @@
       <h4 class="d-flex justify-content-end mr-5">Sum : {{currentLoad}} / {{ velocity }}</h4>
       </div>
       <!---------------------  Realized stories  ------------------------------------>
-      
-      
+
+
       <!---------------------  Adding stories  ------------------------------------>
       <div v-if="isScrumMaster() && isSprintActive(sprint)">
-        
+
         <h2 class="pt-3">Stories</h2>
 
         <div class="table-responsive">
@@ -192,11 +192,11 @@
                     {{ getNameForPriority(story.priority) }}
                   </b-button>
                 </td>
-  
+
                 <td>{{ story.acceptanceCriteria | limit(100) }}</td>
                 <td>{{ story.points }}</td>
                 <td>
-                  <b-input-group size="lg" style="font-scale: 12px" v-if="canBeAdded(story.points)">
+                  <b-input-group size="lg" style="font-size: 12px" v-if="canBeAdded(story.points)">
                     <p class="h3">
                       <b-icon
                         icon="arrow-up-circle"
@@ -220,7 +220,7 @@
       </div>
       <!---------------------  Adding stories  ------------------------------------>
     </div>
-    <!---------------------  Moddel reject  ------------------------------------>
+    <!---------------------  Model reject  ------------------------------------>
     <b-modal ref="reject-modal" id="reject-modal" hide-footer>
       <template #modal-title>Reject</template>
       <div class="d-block d-flex pb-3">
@@ -238,12 +238,12 @@
       <div class=" w-100 d-flex justify-content-end pb-2 pt-4">
         <b-button class=" w-25 p-2 mr-2 btn-danger"  @click="$bvModal.hide('reject-modal')"
         >Cancel</b-button>
-        <b-button class=" w-25 p-2 btn-success"  @click="$bvModal.hide('reject-modal'), removeFromSprint()"
+        <b-button class=" w-25 p-2 btn-success"  @click="$bvModal.hide('reject-modal') && removeFromSprint()"
         >Submit</b-button>
       </div>
     </b-modal>
-    <!---------------------  Moddel reject  ------------------------------------>
-    <!---------------------  Moddel accept  ------------------------------------>
+    <!---------------------  Model reject  ------------------------------------>
+    <!---------------------  Model accept  ------------------------------------>
     <b-modal ref="accept-modal" id="accept-modal" hide-footer>
       <template #modal-title>Accept</template>
       <div class="d-block d-flex pb-3">
@@ -252,11 +252,11 @@
       <div class=" w-100 d-flex justify-content-end pb-2 pt-4">
         <b-button class=" w-25 p-2 mr-2 btn-danger"  @click="$bvModal.hide('accept-modal')"
         >Cancel</b-button>
-        <b-button class=" w-25 p-2 btn-success"  @click="$bvModal.hide('accept-modal'), acceptStory()"
+        <b-button class=" w-25 p-2 btn-success"  @click="$bvModal.hide('accept-modal') && acceptStory()"
         >Accept</b-button>
       </div>
     </b-modal>
-    <!---------------------  Moddel accept  ------------------------------------>
+    <!---------------------  Model accept  ------------------------------------>
   </div>
 </template>
 
@@ -338,10 +338,7 @@ export default {
       });
     },
     canBeAdded(points) {
-      if(this.currentLoad + points < this.velocity){
-        return true;
-      }
-      return false;
+      return this.currentLoad + points <= this.velocity
     },
     isSprintActive(sprint) {
       if(sprint != null){
@@ -355,14 +352,14 @@ export default {
             .$post(`user-stories/accept/${this.currentStoryId}`, {
             "message": this.comment,
         })
-            .then(async (res) => {
-              this.getSprint();
+            .then(async () => {
+              await this.getSprint();
               this.comment = null;
               this.$toast.success("Story has been accepted.", {
                 duration: 3000,
               });
             })
-          .catch((error) => {
+          .catch(() => {
               this.$toast.error(
                 "An error has occurred, while accepting story.",
                 {
@@ -376,14 +373,14 @@ export default {
             .$post(`user-stories/reject/${this.currentStoryId}`, {
             "message": this.comment,
         })
-            .then(async (res) => {
-              this.getSprint();
+            .then(async () => {
+              await this.getSprint();
               this.comment = null;
               this.$toast.success("Story removed from sprint.", {
                 duration: 3000,
               });
             })
-          .catch((error) => {
+          .catch(() => {
               this.$toast.error(
                 "An error has occurred, while removing story from sprint.",
                 {
@@ -398,13 +395,13 @@ export default {
           sprintId: parseInt(this.id),
           stories: [storyId],
         })
-        .then(async (res) => {
-          this.getSprint();
+        .then(async () => {
+          await this.getSprint();
           this.$toast.success("Story moved to sprint.", {
             duration: 3000,
           });
         })
-        .catch((error) => {
+        .catch(() => {
           this.$toast.error(
             "An error has occurred, while adding story to sprint.",
             {
