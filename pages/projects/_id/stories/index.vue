@@ -1,13 +1,13 @@
 <template>
   <div>
-    <div class="d-flex justify-content-between align-items-center">
+    <div class="d-flex justify-content-between align-items-center mb-3">
       <h1 class="mb-0">Product backlog</h1>
 
       <nuxt-link v-if="hasPermission()" to="stories/create">
         <b-button variant="primary">Create</b-button>
       </nuxt-link>
     </div>
-    <div class="d-flex justify-content-end pb-3 pt-3" v-if="canSee">
+    <div class="d-flex justify-content-end pb-3" v-if="canSee">
       <b-button-group>
         <b-button variant="warning" @click="showFutureReleases()"
           >Feature releases</b-button

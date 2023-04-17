@@ -11,7 +11,7 @@
           <ValidationObserver ref="observer" v-slot="{ handleSubmit }">
             <b-form @submit.stop.prevent="handleSubmit(onSubmit)">
               <ValidationProvider
-                name="email address"
+                name="e-mail or username"
                 :rules="{ required: true }"
                 v-slot="v"
               >

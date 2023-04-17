@@ -73,62 +73,69 @@
         </ValidationProvider>
 
         <br />
-        <h5>Project developers</h5>
-        <table class="table table-hover mt-3 w-25">
-          <thead>
-            <td>
-              <tr>
-                Username
-              </tr>
-            </td>
-          </thead>
-          <tbody>
-            <tr v-for="developer of projectDevelopers" :key="developer.id">
-              <td>
-                {{ developer.user.username }}
-              </td>
 
-              <td>
+        <h5>Project developers</h5>
+        <div>
+          <b-card-group 
+            v-if="projectDevelopers.length" 
+            columns
+          >
+            <b-card
+              v-for="developer of projectDevelopers"
+              :key="developer.id"
+              class="p-3"
+              no-body
+            >
+              <div class="d-flex align-items-center">
+                <b-avatar 
+                  :text="getUserInitials(developer.user)" 
+                  size="sm" 
+                  class="mr-2"
+                ></b-avatar>
+                <b-card-text class="flex-grow-1 mb-0">
+                  {{ developer.user.username }}
+                </b-card-text>
                 <b-icon
                   icon="x-lg"
                   @click="removeMember(developer.id)"
-                  class="center-and-clickable"
+                  class="cursor-pointer"
                 ></b-icon>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+              </div>
+            </b-card>
+          </b-card-group>
+          <div v-else class="text-muted">No members</div>
+        </div>
 
         <br />
+
         <h5>Add developer</h5>
-        <ValidationProvider
-          name="scrum master"
-          :rules="{ required: false }"
-          v-slot="v"
-        >
-          <b-form-group label-for="owner">
-            <b-form-select
-              id="addMember"
-              v-model="form.member"
-              :options="users"
-              :state="getValidationState(v)"
-              aria-describedby="input-1-live-feedback"
-              class="w-25"
-            ></b-form-select>
-            <b-form-invalid-feedback id="input-1-live-feedback"
-              >{{ v.errors[0] }}
-            </b-form-invalid-feedback>
-          </b-form-group>
-        </ValidationProvider>
-        <div class="text-center">
+        <div class="d-flex flex-grow-1 align-items-center">
+          <ValidationProvider
+            name="add developer"
+            :rules="{ required: false }"
+            v-slot="v"
+            ref="addMemberProvider"
+            class="w-25"
+          >
+            <b-form-group class="mb-0">
+              <b-form-select
+                id="addMember"
+                v-model="form.member"
+                :options="users"
+                :state="getValidationState(v)"
+              ></b-form-select>
+            </b-form-group>
+          </ValidationProvider>
+          
           <b-button
             variant="primary"
-            class="d-flex align-item-left w-20 mt-3"
             @click="addMember"
-            >Add</b-button
-          >
+            class="ml-3"
+          >Add</b-button>
         </div>
+
         <br />
+
         <div v-if="error" class="text-center text-danger">{{ error }}</div>
         <ul v-if="responseErrors.length > 0" class="text-danger">
           <li v-for="err of responseErrors">{{ err }}</li>
@@ -147,12 +154,14 @@
 <script>
 import { BIcon } from "bootstrap-vue";
 import { mapGetters } from "vuex";
+import avatar from "@/mixins/avatar";
 
 export default {
   name: "edit-project",
   components: {
     BIcon,
   },
+  mixins: [avatar],
   data() {
     return {
       id: null,
@@ -191,7 +200,7 @@ export default {
       let confirmed = false;
       try {
         confirmed = await this.$bvModal.msgBoxConfirm(
-          "Are you sure you want to remove this member?",
+          "Are you sure you want to remove this developer?",
           {
             title: "Remove",
             cancelTitle: "Cancel",
@@ -210,13 +219,13 @@ export default {
           this.projectDevelopers = this.projectDevelopers.filter(
             (p) => p.id !== id
           );
-          this.$toast.success("Member successfully removed", {
+          this.$toast.success("Developer successfully removed", {
             duration: 3000,
           });
         })
         .catch((reason) => {
           console.error(reason);
-          this.$toast.error("An error has occurred, while removing member.", {
+          this.$toast.error("An error has occurred, while removing developer.", {
             duration: 3000,
           });
         });
@@ -231,14 +240,18 @@ export default {
           this.error = null;
           this.responseErrors = [];
           this.getProject();
-          this.$toast.success("New member added", {
+          // reset form
+          this.$refs.addMemberProvider.reset(); // not working
+          this.form.member = null;
+          console.log(this.$refs.addMemberProvider);
+          this.$toast.success("New developer added", {
             duration: 3000,
           });
         })
         .catch((reason) => {
           console.error(reason);
           this.$toast.error(
-            "An error has occurred, while adding new member. Make sure member isn't project owner, or already a member.",
+            "An error has occurred, while adding new developer. Make sure developer isn't project owner, or already a developer.",
             {
               duration: 3000,
             }
@@ -252,9 +265,6 @@ export default {
       this.$axios
         .$get(`project/${this.id}`)
         .then((res) => {
-          // this.user = res;
-          // if (!res) return;
-
           this.form.title = res?.title;
           this.form.documentation = res?.documentation;
           if (res?.projectOwner !== null) {
@@ -337,12 +347,6 @@ export default {
 </script>
 
 <style scoped>
-.center-and-clickable {
-  vertical-align: middle;
-  text-align: center;
-  cursor: pointer;
-}
-
 tbody > tr:hover > td > a {
   text-decoration: underline;
 }

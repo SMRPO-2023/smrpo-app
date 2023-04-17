@@ -28,20 +28,31 @@
       <p>
         <span class="title">Developers</span>
       </p>
-      <table class="table table-hover mt-3 w-100">
-        <thead>
-          <tr>
-            <th scope="col">Username</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="member of projectDevelopers" :key="member.id">
-            <td>
-              {{ member.user.username }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div>
+        <b-card-group 
+          v-if="projectDevelopers.length" 
+          columns
+        >
+          <b-card
+            v-for="developer of projectDevelopers"
+            :key="developer.id"
+            class="p-3"
+            no-body
+          >
+            <div class="d-flex align-items-center">
+              <b-avatar 
+                :text="getUserInitials(developer.user)" 
+                size="sm" 
+                class="mr-2"
+              ></b-avatar>
+              <b-card-text>
+                {{ developer.user.username }}
+              </b-card-text>
+            </div>
+          </b-card>
+        </b-card-group>
+        <div v-else class="text-muted">No members</div>
+      </div>
     </div>
   </div>
 </template>
@@ -49,12 +60,14 @@
 <script>
 import { BIcon } from "bootstrap-vue";
 import { mapGetters } from "vuex";
+import avatar from "@/mixins/avatar";
 
 export default {
   name: "view-project",
   components: {
     BIcon,
   },
+  mixins: [avatar],
   data() {
     return {
       id: null,

@@ -27,13 +27,13 @@ export default {
     getNameForRole(role) {
       return this.roles.find((r) => r.value === role).text;
     },
-    getVariantForProjectRole(isProductOwner, isScrumMaster, isDeveloper, isAdmin) {
+    getVariantForProjectRole(isProductOwner, isScrumMaster, isDeveloper, isAdmin, darkTheme = false) {
       if (isProductOwner) {
         return "warning";
       } else if (isScrumMaster) {
         return "primary";
       } else if (isDeveloper) {
-        return "dark";
+        return darkTheme ? "light" : "dark";
       } else if (isAdmin) {
         return "danger";
       } else {
