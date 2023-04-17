@@ -96,7 +96,7 @@
                   {{ developer.user.username }}
                 </b-card-text>
                 <b-icon
-                  v-i-tooltip.hover title="Remove developer"
+                  v-b-tooltip.hover title="Remove developer"
                   icon="x-lg"
                   @click="removeMember(developer.id)"
                   class="cursor-pointer"

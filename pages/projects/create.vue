@@ -109,7 +109,7 @@
                       {{ getUserById(developer).username }}
                     </b-card-text>
                     <b-icon
-                      v-i-tooltip.hover title="Remove developer"
+                      v-b-tooltip.hover title="Remove developer"
                       icon="x-lg"
                       @click="removeMember(developer)"
                       class="cursor-pointer"
@@ -131,7 +131,7 @@
                 ></b-form-select>
               </b-form-group>
               <b-button
-                v-i-tooltip.hover title="Add developer"
+                v-b-tooltip.hover title="Add developer"
                 variant="primary"
                 @click="addMember"
                 class="ml-3"

@@ -74,7 +74,7 @@
             </td>
             <td class="narrow-col">
               <b-icon
-                v-i-tooltip.hover title="Delete task"
+                v-b-tooltip.hover title="Delete task"
                 v-if="hasPermission && canDelete(task)"
                 icon="x-lg"
                 @click="deleteTask(task)"

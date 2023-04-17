@@ -54,7 +54,7 @@
                 </td>
                 <td v-if="isAdmin">
                   <b-icon
-                    v-i-tooltip.hover title="Delete project"
+                    v-b-tooltip.hover title="Delete project"
                     icon="x-lg"
                     @click="deleteProject(project)"
                     class="center-and-clickable"

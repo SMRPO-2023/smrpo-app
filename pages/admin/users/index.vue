@@ -22,7 +22,7 @@
             <tbody>
               <tr v-for="user of users" :key="user.id">
                 <td>
-                  <nuxt-link v-i-tooltip.hover title="Edit user" :to="{ path: `users/${user.id}` }"
+                  <nuxt-link v-b-tooltip.hover title="Edit user" :to="{ path: `users/${user.id}` }"
                     >{{ user.firstname }} {{ user.lastname }}</nuxt-link
                   >
                 </td>

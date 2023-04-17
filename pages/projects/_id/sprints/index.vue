@@ -42,7 +42,7 @@
             </td>
             <td class="narrow-col">
               <b-icon
-                v-i-tooltip.hover title="Delete sprint"
+                v-b-tooltip.hover title="Delete sprint"
                 v-if="canChange(sprint)"
                 icon="x-lg"
                 @click="deleteSprint(sprint)"
