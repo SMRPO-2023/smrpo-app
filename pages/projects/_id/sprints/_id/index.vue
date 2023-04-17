@@ -1,6 +1,9 @@
 <template>
   <div>
-    <h1>View sprint</h1>
+    <h1>View sprint <b-badge :variant="getVariantForSprintStatus(sprint)">{{ getNameForSprintStatus(sprint) }}</b-badge></h1>
+
+      
+
     <br />
 
     <p>
@@ -19,9 +22,8 @@
     </p>
     <div>
       <!---------------------  Unrealized stories  ------------------------------------>
-
       <div>
-      <h2 class="pt-3">Stories in current sprint</h2>
+      <h2 class="pt-3">Stories in <span v-if="isSprintActive(sprint)">current</span> sprint</h2>
 
       <div class="table-responsive">
         <table class="table table-hover mt-3">
@@ -309,6 +311,21 @@ export default {
     this.getSprint();
   },
   methods: {
+    getVariantForSprintStatus(sprint) {
+      if (this.isSprintActive(sprint)) return "primary";
+      else if (this.hasSprintFinished()) return "danger";
+      else return;
+    },
+    getNameForSprintStatus(sprint) {
+      if (this.isSprintActive(sprint)) return "Active";
+      else if (this.hasSprintFinished()) return "Finished";
+      else return;
+    },
+    hasSprintFinished() {
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      return new Date(this.end) < now;
+    },
     getValidationState({ dirty, validated, valid = null }) {
       return dirty || validated ? valid : null;
     },
