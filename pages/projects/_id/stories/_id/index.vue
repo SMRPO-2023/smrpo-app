@@ -35,9 +35,19 @@
     <br>
     <h2 class="pb-3">Comments</h2>
     <div v-for="comment of story.comments" :key="comment.id">
-      <div class="card"><div class="font-weight-bold h5 pb-2">{{comment.User.username}}</div>
-      <div class="pb-3">{{comment.message}}</div>
-      <div class="date">{{formatDateTime(comment.createdAt)}}</div>
+      <div class="card">
+      <div class="d-flex">
+          <div class="d-flex flex-column justify-content-between">
+            <div class="d-flex align-items-center">
+              <b class="mr-2">{{ comment.User.firstname }} {{ comment.User.lastname }}</b>
+            </div>
+            <span class="text-muted">{{ formatDateTimeFull(comment.createdAt) }}</span>
+          </div>
+        </div>
+        <!-- Body -->
+        <div class="mt-3">
+          <p class="clamp mb-0">{{ comment.message }}</p>
+        </div>
     </div>
     </div>
 
