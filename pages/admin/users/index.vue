@@ -5,7 +5,7 @@
         <div class="d-flex justify-content-between align-items-center">
           <h1 class="mb-0">Users</h1>
           <nuxt-link to="users/create">
-            <b-button variant="primary">Create</b-button>
+            <b-button variant="primary" v-b-tooltip.hover title="Create user">Create</b-button>
           </nuxt-link>
         </div>
 
@@ -22,7 +22,7 @@
             <tbody>
               <tr v-for="user of users" :key="user.id">
                 <td>
-                  <nuxt-link :to="{ path: `users/${user.id}` }"
+                  <nuxt-link v-i-tooltip.hover title="Edit user" :to="{ path: `users/${user.id}` }"
                     >{{ user.firstname }} {{ user.lastname }}</nuxt-link
                   >
                 </td>
@@ -47,6 +47,7 @@
                 </td>
                 <td>
                   <b-icon
+                    v-b-tooltip.hover title="Delete user"
                     icon="x-lg"
                     @click="deleteUser(user)"
                     class="center-and-clickable"

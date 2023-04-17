@@ -4,7 +4,7 @@
       <h1 class="mb-0">Sprints</h1>
 
       <nuxt-link v-if="isScrumMaster || isAdmin" to="sprints/create">
-        <b-button variant="primary">Create</b-button>
+        <b-button v-b-tooltip.hover title="Create sprint" variant="primary">Create</b-button>
       </nuxt-link>
     </div>
 
@@ -24,13 +24,13 @@
           <tr v-for="sprint of sprints" :key="sprint.id">
             <td>
               <nuxt-link
-                v-if="hasPermission(sprint)"
+                v-if="canEdit(sprint)"
                 :to="{ path: `sprints/${sprint.id}` }"
               >
                 {{ sprint.name }}
               </nuxt-link>
   
-              <span v-if="!hasPermission(sprint)">
+              <span v-if="!canEdit(sprint)">
                 {{ sprint.name }}
               </span>
             </td>
@@ -42,6 +42,7 @@
             </td>
             <td class="narrow-col">
               <b-icon
+                v-i-tooltip.hover title="Delete sprint"
                 v-if="canChange(sprint)"
                 icon="x-lg"
                 @click="deleteSprint(sprint)"
@@ -98,6 +99,9 @@ export default {
       return this.hasPermission(sprint) && !this.hasSprintStarted(sprint.start);
     },
     hasPermission(sprint) {
+      return this.isAdmin || this.isScrumMaster || this.isProductOwner();
+    },
+    canEdit(sprint){
       if(!this.isSprintInFuture(sprint)){
         return this.isAdmin || this.isScrumMaster || this.isProductOwner();
       }

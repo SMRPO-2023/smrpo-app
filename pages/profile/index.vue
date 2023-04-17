@@ -5,7 +5,7 @@
         <div class="d-flex justify-content-between align-items-center">
           <h1>Your profile</h1>
           <nuxt-link to="profile/edit">
-            <b-button variant="primary">Edit</b-button>
+            <b-button variant="primary" v-b-tooltip.hover title="Edit profile">Edit</b-button>
           </nuxt-link>
         </div>
         <div class="mt-3"><b>Username:</b> {{ user.username }}</div>

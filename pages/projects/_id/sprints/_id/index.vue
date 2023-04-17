@@ -64,6 +64,7 @@
                 <b-input-group size="lg" style="font-size: 12px">
                   <p class="h3">
                     <b-button
+                      v-b-tooltip.hover title="Accept this story"
                       v-if="isProductOwner()"
                       variant="success"
                       :disabled=!story.canBeAccepted
@@ -73,6 +74,7 @@
                   </p>
                   <p class="h3">
                     <b-button
+                    v-b-tooltip.hover title="Reject this story"
                       v-if="isProductOwner()"
                       variant="danger"
                       @click="rejectPrompt(story.id)"
@@ -203,7 +205,7 @@
                 <td>{{ story.acceptanceCriteria | limit(100) }}</td>
                 <td>{{ story.points }}</td>
                 <td>
-                  <b-input-group size="lg" style="font-size: 12px" v-if="canBeAdded(story.points)">
+                  <b-input-group v-b-tooltip.hover title="Move story to sprint" size="lg" style="font-size: 12px" v-if="canBeAdded(story.points)">
                     <p class="h3">
                       <b-icon
                         icon="arrow-up-circle"
@@ -257,7 +259,7 @@
         Are you sure you want to accept this story?
       </div>
       <div class=" w-100 d-flex justify-content-end pb-2 pt-4">
-        <b-button class=" w-25 p-2 mr-2 btn-danger"  @click="$bvModal.hide('accept-modal')"
+        <b-button class=" w-25 p-2 mr-2 btn-danger"  @click="$bvModal.hide('accept-modal') "
         >Cancel</b-button>
         <b-button class=" w-25 p-2 btn-success"  @click="$bvModal.hide('accept-modal') && acceptStory()"
         >Accept</b-button>

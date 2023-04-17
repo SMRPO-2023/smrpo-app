@@ -4,7 +4,7 @@
       <h1 class="mb-0">Product backlog</h1>
 
       <nuxt-link v-if="hasPermission()" to="stories/create">
-        <b-button variant="primary">Create</b-button>
+        <b-button v-b-tooltip.hover title="Create user story" variant="primary">Create</b-button>
       </nuxt-link>
     </div>
     <div class="d-flex justify-content-end pb-3" v-if="canSee">

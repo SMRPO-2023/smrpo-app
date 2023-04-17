@@ -5,7 +5,7 @@
         <div class="d-flex justify-content-between align-items-center">
           <h1 class="mb-0">Projects</h1>
           <nuxt-link v-if="isAdmin" to="projects/create">
-            <b-button variant="primary">Create</b-button>
+            <b-button v-b-tooltip.hover title="Create project" variant="primary">Create</b-button>
           </nuxt-link>
         </div>
 
@@ -24,7 +24,7 @@
             <tbody v-if="projects.length">
               <tr v-for="project of projects" :key="project.id">
                 <td>
-                  <nuxt-link :to="{ path: `projects/${project.id}` }">{{
+                  <nuxt-link v-l-tooltip.hover title="View project" :to="{ path: `projects/${project.id}` }">{{
                     project.title
                   }}</nuxt-link>
                 </td>
@@ -45,6 +45,7 @@
                 </td>
                 <td>
                   <b-button
+                    v-b-tooltip.hover title="List of developers"
                     variant="primary"
                     v-if="hasPermission(project)"
                     @click="showUsers(project.id)"
@@ -53,6 +54,7 @@
                 </td>
                 <td v-if="isAdmin">
                   <b-icon
+                    v-i-tooltip.hover title="Delete project"
                     icon="x-lg"
                     @click="deleteProject(project)"
                     class="center-and-clickable"

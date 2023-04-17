@@ -96,6 +96,7 @@
                   {{ developer.user.username }}
                 </b-card-text>
                 <b-icon
+                  v-i-tooltip.hover title="Remove developer"
                   icon="x-lg"
                   @click="removeMember(developer.id)"
                   class="cursor-pointer"
@@ -128,6 +129,7 @@
           </ValidationProvider>
           
           <b-button
+            v-b-tooltip.hover title="Add developer"
             variant="primary"
             @click="addMember"
             class="ml-3"

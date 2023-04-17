@@ -4,7 +4,7 @@
       <h1 class="mb-0">Tasks</h1>
 
       <nuxt-link v-if="canCreate" to="tasks/create">
-        <b-button variant="primary">Create</b-button>
+        <b-button v-b-tooltip.hover title="Add task" variant="primary">Create</b-button>
       </nuxt-link>
     </div>
 
@@ -74,6 +74,7 @@
             </td>
             <td class="narrow-col">
               <b-icon
+                v-i-tooltip.hover title="Delete task"
                 v-if="hasPermission && canDelete(task)"
                 icon="x-lg"
                 @click="deleteTask(task)"
