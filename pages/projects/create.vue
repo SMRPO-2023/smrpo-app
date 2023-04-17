@@ -2,7 +2,10 @@
   <b-container fluid>
     <b-row>
       <b-col offset-lg="2" lg="8" cols="12" class="my-3">
-        <h1>New project</h1>
+        <h1 class="d-flex align-items-center">
+          <back-btn />
+          <span>New project</span>
+        </h1>
 
         <ValidationObserver ref="observer" v-slot="{ handleSubmit }">
           <b-form @submit.stop.prevent="handleSubmit(onSubmit)" class="mt-4">
@@ -81,55 +84,58 @@
                 </b-form-invalid-feedback>
               </b-form-group>
             </ValidationProvider>
+            
             <br />
-            <h5>Project developers</h5>
-            <table class="table table-hover mt-3 w-25">
-              <tbody>
-                <tr v-for="developer of projectDevelopers" :key="developer.id">
-                  <td>
-                    {{ getUserById(developer).username }}
-                  </td>
 
-                  <td>
+            <h5>Project developers</h5>
+            <div>
+              <b-card-group 
+                v-if="projectDevelopers.length" 
+                columns
+              >
+                <b-card
+                  v-for="developer of projectDevelopers"
+                  :key="developer.id"
+                  class="p-3"
+                  no-body
+                >
+                  <div class="d-flex align-items-center">
+                    <b-avatar 
+                      :text="getUserInitials(getUserById(developer))" 
+                      size="sm" 
+                      class="mr-2"
+                    ></b-avatar>
+                    <b-card-text class="flex-grow-1 mb-0">
+                      {{ getUserById(developer).username }}
+                    </b-card-text>
                     <b-icon
                       icon="x-lg"
                       @click="removeMember(developer)"
-                      class="center-and-clickable"
+                      class="cursor-pointer"
                     ></b-icon>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                  </div>
+                </b-card>
+              </b-card-group>
+              <div v-else class="text-muted">No members</div>
+            </div>
 
             <br />
             <h5>Add developer</h5>
-            <ValidationProvider
-              name="scrum master"
-              :rules="{ required: false }"
-              v-slot="v"
-            >
-              <b-form-group label-for="owner">
+            <div class="d-flex flex-grow-1 align-items-center">
+              <b-form-group class="mb-0 w-25">
                 <b-form-select
                   id="addMember"
                   v-model="form.member"
                   :options="users"
-                  :state="getValidationState(v)"
-                  aria-describedby="input-1-live-feedback"
-                  class="w-25"
                 ></b-form-select>
-                <b-form-invalid-feedback id="input-1-live-feedback"
-                  >{{ v.errors[0] }}
-                </b-form-invalid-feedback>
               </b-form-group>
-            </ValidationProvider>
-            <div class="text-center">
               <b-button
                 variant="primary"
-                class="d-flex align-item-left w-20 mt-3"
                 @click="addMember"
-                >Add</b-button
-              >
+                class="ml-3"
+              >Add</b-button>
             </div>
+
             <br />
 
             <div class="text-center">
@@ -145,8 +151,11 @@
 </template>
 
 <script>
+import avatar from "@/mixins/avatar";
+
 export default {
   name: "create-project",
+  mixins: [avatar],
   data() {
     return {
       error: null,
@@ -211,13 +220,15 @@ export default {
     },
     addMember() {
       if (this.form.member == 0) {
-        this.$toast.error("Please choose a member.", {
+        this.$toast.error("Please choose a developer.", {
           duration: 3000,
         });
       } else if (!this.projectDevelopers.includes(this.form.member)) {
         this.projectDevelopers.push(this.form.member);
+        // reset form
+        this.form.member = 0;
       } else {
-        this.$toast.error("This user is already a member", {
+        this.$toast.error("This user is already a developer", {
           duration: 3000,
         });
       }

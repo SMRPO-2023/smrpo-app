@@ -74,34 +74,34 @@
 
     <b-modal ref="user-modal" id="user-modal" hide-footer>
       <template #modal-title> Members</template>
-      <div class="d-block d-flex">
-        <table class="table table-hover mt-3 w-100">
-          <thead>
-            <tr>
-              <th scope="col">Username</th>
-            </tr>
-          </thead>
-          <tbody v-if="getProjectDevelopers(currentProjectId).length > 0">
-            <tr
-              v-for="projectUsers of getProjectDevelopers(currentProjectId)"
-              :key="projectUsers?.id"
-            >
-              <td>
-                {{ projectUsers?.username }}
-              </td>
-            </tr>
-          </tbody>
-          <tbody v-else>
-            <tr>
-              <td>No members</td>
-            </tr>
-          </tbody>
-        </table>
+      <div>
+        <b-card-group 
+          v-if="getProjectDevelopers(currentProjectId).length" 
+          columns
+        >
+          <b-card
+            v-for="developer of getProjectDevelopers(currentProjectId)"
+            :key="developer.id"
+            class="p-3"
+            no-body
+          >
+            <div class="d-flex align-items-center">
+              <b-avatar size="sm" class="mr-2"></b-avatar>
+              <b-card-text>
+                {{ developer.username }}
+              </b-card-text>
+            </div>
+          </b-card>
+        </b-card-group>
+        <div v-else class="text-muted text-center">No members</div>
       </div>
 
-      <b-button class="mt-3" block @click="$bvModal.hide('user-modal')"
-        >Close</b-button
-      >
+      <b-button 
+        class="mt-3" 
+        block 
+        @click="$bvModal.hide('user-modal')"
+      >Close
+      </b-button>
     </b-modal>
   </b-container>
 </template>

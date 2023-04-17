@@ -16,6 +16,16 @@
 
       <!-- Right aligned nav items -->
       <b-navbar-nav class="ml-auto">
+        <!-- user project role status -->
+        <b-badge 
+          v-if="this.projectId && this.project"
+          class="align-self-center"
+          :variant="getVariantForProjectRole(isProductOwner, isScrumMaster, isDeveloper, isAdmin, true)"
+        >
+          {{ getNameForProjectRole(isProductOwner, isScrumMaster, isDeveloper, isAdmin) }}
+        </b-badge>
+
+        <!-- user dropdown -->
         <b-nav-item-dropdown right>
           <template #button-content>
             <em>{{ user.firstname }} {{ user.lastname }}</em>
@@ -39,11 +49,12 @@
 
 <script>
 import datetime from "@/mixins/datetime";
+import roles from "@/mixins/roles";
 import { mapActions, mapGetters } from "vuex";
 
 export default {
   name: "navbar",
-  mixins: [datetime],
+  mixins: [datetime, roles],
   async mounted() {
     // get logged in user
     const userId = localStorage.getItem("userId");
@@ -58,8 +69,29 @@ export default {
       firstLogin: "user/getLastLogin",
       isAdmin: "user/isAdmin",
       isNormalUser: "user/isNormalUser",
+      projectId: "route-id/getProjectId",
     }),
     ...mapActions(["user/unsetUser", "user/fetchUser"]),
+    isProductOwner() {
+      if (!this.user || !this.project) return false;
+      return this.user.id === this.project.projectOwnerId;
+    },
+    isScrumMaster() {
+      if (!this.user || !this.project) return false;
+      return this.user.id === this.project.scrumMasterId;
+    },
+    isDeveloper() {
+      if (!this.user || !this.project) return false;
+      return this.project.developers.find((u) => u.user.id === this.user.id);
+    },
+  },
+  data() {
+    return {
+      project: null,
+    };
+  },
+  created() {
+    this.getProject();
   },
   methods: {
     async logout() {
@@ -67,6 +99,14 @@ export default {
       localStorage.removeItem("userId");
       await this.$store.dispatch("user/unsetUser");
       await this.$router.replace("/login");
+    },
+    async getProject() {
+      if (!this.projectId) return;
+
+      await this.$axios.$get(`project/${this.projectId}`).then((res) => {
+        if (!res) return;
+        this.project = res;
+      });
     },
   },
 };

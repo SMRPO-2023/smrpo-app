@@ -82,13 +82,14 @@ import { BIcon } from "bootstrap-vue";
 import { mapGetters } from "vuex";
 import datetime from "@/mixins/datetime";
 import roles from "@/mixins/roles";
+import avatar from "@/mixins/avatar";
 
 export default {
   name: "project-wall",
   components: {
     BIcon,
   },
-  mixins: [datetime, roles],
+  mixins: [datetime, roles, avatar],
   computed: {
     ...mapGetters({
       currentUser: "user/getUser",
@@ -145,13 +146,6 @@ export default {
     isUserADeveloper(user, project) {
       if (!user || !project) return false;
       return project.developers.find((u) => u.userId === user.id);
-    },
-    getUserInitials(user) {
-      if (!user) return null;
-      const { firstname, lastname } = user;
-      const first = firstname || "";
-      const last = lastname || "";
-      return `${first[0]}${last[0]}`;
     },
     getValidationState({ dirty, validated, valid = null }) {
       return dirty || validated ? valid : null;
