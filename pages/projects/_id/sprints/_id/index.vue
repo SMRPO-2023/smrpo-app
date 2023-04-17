@@ -94,7 +94,7 @@
 
       <!---------------------  Realized stories  ------------------------------------>
       <div v-if="isSprintActive(sprint)">
-      <h2 class="pt-3">Realized stories in sprint
+      <h2 class="pt-3">Realized stories in sprint       
         <b-btn @click="realizedToggle = !realizedToggle">
           <b-icon
               icon="caret-down-fill"

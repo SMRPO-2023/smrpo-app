@@ -46,6 +46,7 @@
       </b-row>
     </div>
 
+    <h2>Latest posts</h2>
     <!-- Posts -->
     <template v-if="posts.length">
       <b-card v-for="post of posts" :key="post.id" class="mb-3">
@@ -69,7 +70,7 @@
       </b-card>
     </template>
     <template v-else>
-      <div class="w-100 text-center text-muted">
+      <div class="text-muted">
         There are no posts yet.
       </div>
     </template>
@@ -159,11 +160,7 @@ export default {
       if (!this.projectId) return;
 
       try {
-        // TODO: remove unnecessary fields when updated on backend
         const res = await this.$axios.$post("posts", {
-          title: "/",
-          content: "/",
-          published: true,
           message: this.form.message,
           projectId: this.projectId,
         });
