@@ -41,24 +41,24 @@
 
         <!-- Hours -->
         <ValidationProvider
-          name="hours"
+          name="estimate"
           :rules="{
             required: true,
             min_value: 0.1,
           }"
           v-slot="v"
         >
-          <b-form-group label="Hours" label-for="hours">
+          <b-form-group label="Estimated hours" label-for="estimate">
             <b-form-input
               type="number"
-              id="hours"
-              placeholder="Enter hours"
-              v-model="form.hours"
+              id="estimate"
+              placeholder="Enter estimated hours"
+              v-model="form.estimate"
               :state="getValidationState(v)"
               :step="0.0001"
-              aria-describedby="hours-live-feedback"
+              aria-describedby="estimate-live-feedback"
             />
-            <b-form-invalid-feedback id="hours-live-feedback"
+            <b-form-invalid-feedback id="estimate-live-feedback"
               >{{ v.errors[0] }}
             </b-form-invalid-feedback>
           </b-form-group>
@@ -170,7 +170,7 @@ export default {
       form: {
         title: null,
         description: null,
-        hours: null,
+        estimate: null,
         userId: null,
       },
     };
@@ -219,7 +219,7 @@ export default {
         .$post("tasks", {
           title: this.form.title,
           description: this.form.description,
-          hours: parseFloat(this.form.hours),
+          estimate: parseFloat(this.form.estimate),
           userId: this.form.userId,
           userStoryId: this.storyId,
           status: this.form.userId ? this.isTaskSelfAssigned ? 'ACCEPTED' : 'ASSIGNED' : 'UNASSIGNED',
@@ -239,7 +239,7 @@ export default {
           id: this.taskId,
           title: this.form.title,
           description: this.form.description,
-          hours: parseFloat(this.form.hours),
+          estimate: parseFloat(this.form.estimate),
           userId: this.form.userId,
           userStoryId: this.storyId,
           status: this.form.userId ? this.isTaskSelfAssigned ? 'ACCEPTED' : 'ASSIGNED' : 'UNASSIGNED',
@@ -283,7 +283,7 @@ export default {
         this.form = {
           title: value.title,
           description: value.description,
-          hours: value.hours,
+          estimate: value.estimate,
           userId: value.userId,
         };
       }

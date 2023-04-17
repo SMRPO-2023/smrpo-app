@@ -13,10 +13,11 @@
       >
         Show accepted stories
       </b-form-checkbox>
-      <b-button-group>
+      <b-button-group size="sm" class="align-items-center flex-wrap">
         <b-button 
           @click="filterBy('mine')" 
           :variant="getVariantForFilterState('mine')"
+          class="no-break"
         >My tasks</b-button>
         <b-button 
           @click="filterBy('all')" 
@@ -31,13 +32,13 @@
           :variant="getVariantForFilterState('assigned')"
         >Assigned</b-button>
         <b-button 
-          @click="filterBy('finished')" 
-          :variant="getVariantForFilterState('finished')"
-        >Finished</b-button>
-        <b-button 
           @click="filterBy('active')" 
           :variant="getVariantForFilterState('active')"
         >Active</b-button>
+        <b-button 
+          @click="filterBy('finished')" 
+          :variant="getVariantForFilterState('finished')"
+        >Finished</b-button>
       </b-button-group>
     </div>
 
@@ -48,6 +49,7 @@
         :key="story.id"
         class="mb-3"
       >
+        <!-- Header -->
         <h5 class="card-title">
           <nuxt-link :to="{ path: `/projects/${story.projectId}/stories/${story.id}` }">
             #{{ story.id }} - {{ story.title }}
@@ -67,33 +69,57 @@
           <span class="subtitle-content">Business value: {{ story.businessValue }}</span>
         </h6>
         <hr>
+        <!-- Description -->
         <b-card-text class="text-muted mb-0">Description</b-card-text>
         <b-card-text>{{ story.description | limit(200) }}</b-card-text>
 
+        <!-- Acceptance test -->
         <b-card-text class="text-muted mb-0">Acceptance test</b-card-text>
         <b-card-text>{{ story.acceptanceCriteria | limit(200) }}</b-card-text>
 
+        <!-- Tasks -->
         <template v-if="story.Task.length">
+          <!-- Header -->
           <b-card-text 
             class="text-muted mb-n2 position-relative d-flex justify-content-between" 
             style="z-index: 1"
           >
-            <span>Tasks</span>
-            <a class="cursor-pointer">
-              <small v-if="story.numFinishedTasks" v-b-toggle="`story-tasks-collapse-${story.id}`">
+            <span>
+              <nuxt-link :to="{ path: `/projects/${story.projectId}/stories/${story.id}/tasks` }" class="muted-link-override">
+                Tasks
+              </nuxt-link>
+              <span 
+                v-if="story.numUnfinishedTasks"
+                :id="`story-tasks-hours-${story.id}`"
+              >({{ getTasksRemainingHours(getStoryUnfinishedFilteredTasks(story)) }}/{{ getTasksTotalSpentHours(getStoryAllFilteredTasks(story)) }}h)</span>
+              <b-tooltip :target="`story-tasks-hours-${story.id}`" triggers="hover">
+                Remaining / Total spent (incl. finished)
+              </b-tooltip>
+            </span>
+            <a v-if="story.numFinishedTasks" class="cursor-pointer">
+              <small v-b-toggle="`story-tasks-collapse-${story.id}`">
                 <span class="when-open">Hide</span><span class="when-closed">Show</span> finished
               </small>
             </a>
           </b-card-text>
+
+          <!-- Unfinished tasks list -->
           <task-list 
+            :project="project"
             :story="story" 
             :tasks="getStoryUnfinishedFilteredTasks(story)" 
+            @taskUpdated="onTaskUpdate"
+            @taskDeleted="onTaskDelete"
           />
+          <!-- Finished tasks list -->
           <b-collapse :id="`story-tasks-collapse-${story.id}`">
             <small>Finished</small>
             <task-list 
+              :project="project"
               :story="story" 
-              :tasks="getStoryFinishedFilteredTasks(story)" 
+              :tasks="getStoryFinishedFilteredTasks(story)"
+              @taskUpdated="onTaskUpdate"
+              @taskDeleted="onTaskDelete"
             />
           </b-collapse>
         </template>
@@ -137,13 +163,36 @@ export default {
       allStories: [],
       stories: [],
       sprint: null,
+      project: null,
     };
   },
   async mounted() {
+    this.getProject();
     await this.getSprint();
     await this.getUserStories();
   },
   methods: {
+    getTasksRemainingHours(tasks) {
+      if (!tasks?.length) return 0;
+      return tasks.reduce((prev, curr) => prev + this.getRemainingHours(curr), 0);
+    },
+    getTasksTotalSpentHours(tasks) {
+      if (!tasks?.length) return 0;
+      return tasks.reduce((prev, curr) => prev + this.getTotalSpentHours(curr), 0);
+    },
+    getRemainingHours(task) {
+      if (!task?.timeLogs?.length) return 0;
+      const remaining = task.timeLogs.slice().sort((a, b) => b.createdAt - a.createdAt)[0]?.remainingHours || 0;
+      return this.round(remaining);
+    },
+    getTotalSpentHours(task) {
+      if (!task?.timeLogs?.length) return 0;
+      const total = task.timeLogs.reduce((prev, curr) => prev + curr.hours, 0);
+      return this.round(total);
+    },
+    round(num) {
+      return Math.round(num * 10) / 10;
+    },
     getStoryUnfinishedFilteredTasks(story) {
       if (!story?.Task?.length) return [];
       return story.Task.filter((task) => !task.done && this.taskMatchesFilter(task));
@@ -151,6 +200,10 @@ export default {
     getStoryFinishedFilteredTasks(story) {
       if (!story?.Task?.length) return [];
       return story.Task.filter((task) => task.done && this.taskMatchesFilter(task));
+    },
+    getStoryAllFilteredTasks(story) {
+      if (!story?.Task?.length) return [];
+      return story.Task.filter((task) => this.taskMatchesFilter(task));
     },
     /**
      * Tells if the story has any tasks that match the current filter
@@ -180,8 +233,8 @@ export default {
       else if (state === 'all') this.showAllTasks();
       else if (state === 'unassigned') this.showUnassignedTasks();
       else if (state === 'assigned') this.showAssignedTasks();
-      else if (state === 'finished') this.showFinishedTasks();
       else if (state === 'active') this.showActiveTasks();
+      else if (state === 'finished') this.showFinishedTasks();
 
       this.anyStoriesMatchFilter = this.stories.some(story => this.hasStoryAnyRelevantTasks(story));
     },
@@ -198,10 +251,10 @@ export default {
       this.setDisplayForTasks(task => task.status === 'ASSIGNED');
     },
     showFinishedTasks() {
-      this.setDisplayForTasks(task => task.status === 'FINISHED');
+      this.setDisplayForTasks(task => task.done);
     },
     showActiveTasks() {
-      this.setDisplayForTasks(task => task.status === 'ACTIVE');
+      this.setDisplayForTasks(task => task.timeLogs.length && task.timeLogs.at(-1).remainingHours > 0);
     },
     setDisplayForTasks(check) {
       for (const story of this.stories) {
@@ -209,6 +262,14 @@ export default {
           this.tasksDisplayDict.set(task.id, check(task));              
         }
       }
+    },
+    async getProject() {
+      if (!this.projectId) return;
+
+      await this.$axios.$get(`project/${this.projectId}`).then((res) => {
+        if (!res) return;
+        this.project = res;
+      });
     },
     async getSprint() {
       await this.$axios
@@ -247,6 +308,7 @@ export default {
     refreshStories() {
       this.stories = this.allStories
       .filter((story) => this.showAcceptedStories || !story.acceptanceTest)
+      .slice()
       .sort((a, b) => {
         if (!a.acceptanceTest && b.acceptanceTest) return -1;
         else if (a.acceptanceTest && !b.acceptanceTest) return 1;
@@ -262,6 +324,15 @@ export default {
     handleFetchError(error, message) {
       console.error(error);
       this.$toast.error(message, { duration: 3000, });
+    },
+    onTaskUpdate(story, task) {
+      // find and replace updated task from tasks array
+      const index = story.Task.findIndex((t) => t.id === task.id);
+      if (index < 0) return;
+      story.Task.splice(index, 1, task);
+    },
+    onTaskDelete(story, task) {
+      story.Task = story.Task.filter((t) => t.id !== task.id);
     },
   },
   watch: {
@@ -288,5 +359,9 @@ a {
 .collapsed > .when-open,
 .not-collapsed > .when-closed {
   display: none;
+}
+
+.muted-link-override {
+  color: #6c757d !important
 }
 </style>

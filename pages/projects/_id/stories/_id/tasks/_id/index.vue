@@ -13,7 +13,7 @@
     <p style="white-space: pre-line">{{ task.description }}</p>
 
     <p>
-      <span class="title">Hours:</span> <span>{{ task.hours }}</span>
+      <span class="title">Estimated hours:</span> <span>{{ task.estimate }}</span>
     </p>
 
     <p>
@@ -22,7 +22,7 @@
 
     <p>
       <span class="title">Assigned to:</span> <span>
-          <template v-if="task.status === 'ASSIGNED'">
+          <template v-if="task.status !== 'UNASSIGNED'">
             {{ task.assignedTo?.username }}
           </template>
           <span v-else class="text-muted">
@@ -49,7 +49,7 @@ export default {
       task: {
         title: null,
         description: null,
-        hours: null,
+        estimate: null,
         status: null,
         userId: null,
         done: null,

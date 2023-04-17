@@ -7,21 +7,28 @@
         <b-button v-b-tooltip.hover title="Create user story" variant="primary">Create</b-button>
       </nuxt-link>
     </div>
-    <div class="d-flex justify-content-end pb-3" v-if="canSee">
-      <b-button-group>
-        <b-button variant="warning" @click="showFutureReleases()"
-          >Feature releases</b-button
-        >
-        <b-button variant="info" @click="showAll()">All</b-button>
-
-        <b-button variant="success" @click="showRealized()">Realized</b-button>
-
-        <b-button variant="warning" @click="showOnSprint()"
-          >Unrealized on sprint</b-button
-        >
-        <b-button variant="danger" @click="showUnrealized()"
-          >Unrealized</b-button
-        >
+    <div class="d-flex justify-content-end align-items-center pb-3" v-if="canSee">
+      <b-button-group  size="sm" class="align-items-center flex-wrap">
+        <b-button 
+          @click="showFutureReleases()" 
+          :variant="getVariantForFilterState('future')"
+        >Feature releases</b-button>
+        <b-button 
+          @click="showAll()" 
+          :variant="getVariantForFilterState('all')"
+        >All</b-button>
+        <b-button 
+          @click="showRealized()" 
+          :variant="getVariantForFilterState('realized')"
+        >Realized</b-button>
+        <b-button 
+          @click="showOnSprint()" 
+          :variant="getVariantForFilterState('unrealizedOnSprint')"
+        >Unrealized on sprint</b-button>
+        <b-button 
+          @click="showUnrealized()" 
+          :variant="getVariantForFilterState('unrealized')"
+        >Unrealized</b-button>
       </b-button-group>
     </div>
 
@@ -138,6 +145,7 @@ export default {
   },
   data() {
     return {
+      tasksFilterState: "all",
       project: null,
       stories: [],
       featureReleases: [],
@@ -159,20 +167,28 @@ export default {
     this.getFutureReleases();
   },
   methods: {
+    getVariantForFilterState(state) {
+      return this.tasksFilterState === state ? "dark" : "secondary";
+    },
     showFutureReleases() {
       this.stories = this.featureReleases;
+      this.tasksFilterState = "future";
     },
     showAll() {
       this.stories = this.allStories;
+      this.tasksFilterState = "all";
     },
     showOnSprint() {
       this.stories = this.storiesUnrealizedSprint;
+      this.tasksFilterState = "unrealizedOnSprint";
     },
     showUnrealized() {
       this.stories = this.storiesUnrealized;
+      this.tasksFilterState = "unrealized";
     },
     showRealized() {
       this.stories = this.storiesRealized;
+      this.tasksFilterState = "realized";
     },
     canChange(story) {
       return (

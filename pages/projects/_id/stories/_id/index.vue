@@ -33,24 +33,31 @@
       <span class="title">Sprint:</span> <nuxt-link :to="{ path: `/projects/${story.projectId}/sprints/${story.sprintId}` }">{{ story.sprintId }}</nuxt-link>
     </p>
     <br>
-    <h2 class="pb-3">Comments</h2>
-    <div v-for="comment of story.comments" :key="comment.id">
-      <div class="card">
-      <div class="d-flex">
-          <div class="d-flex flex-column justify-content-between">
-            <div class="d-flex align-items-center">
-              <b class="mr-2">{{ comment.User.firstname }} {{ comment.User.lastname }}</b>
+    <h2>Comments</h2>
+    <template v-if="story.comments?.length">
+      <div  
+        v-for="comment of story.comments" 
+        :key="comment.id"
+      >
+        <div class="card">
+          <div class="d-flex">
+            <div class="d-flex flex-column justify-content-between">
+              <div class="d-flex align-items-center">
+                <b class="mr-2">{{ comment.User.firstname }} {{ comment.User.lastname }}</b>
+              </div>
+              <span class="text-muted">{{ formatDateTimeFull(comment.createdAt) }}</span>
             </div>
-            <span class="text-muted">{{ formatDateTimeFull(comment.createdAt) }}</span>
+          </div>
+          <!-- Body -->
+          <div class="mt-3">
+            <p class="clamp mb-0">{{ comment.message }}</p>
           </div>
         </div>
-        <!-- Body -->
-        <div class="mt-3">
-          <p class="clamp mb-0">{{ comment.message }}</p>
-        </div>
+      </div>
+    </template>
+    <div v-else class="text-muted">
+      There are no comments yet.
     </div>
-    </div>
-
   </div>
 </template>
 
@@ -71,6 +78,7 @@ export default {
         sprintId: null,
         businessValue: null,
         acceptanceCriteria: null,
+        comments: [],
       },
     };
   },

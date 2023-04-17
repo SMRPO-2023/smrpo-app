@@ -130,12 +130,6 @@ export default {
       if (!this.currentUser || !this.project) return false;
       return this.project.developers.find((u) => u.user.id === this.currentUser.id);
     },
-    isSprintActive() {
-      if (!this.sprint) return false;
-      const now = new Date();
-      now.setHours(0, 0, 0, 0);
-      return new Date(this.sprint.start) <= now && new Date(this.sprint.end) >= now;
-    },
     hasSprintFinished() {
       if (!this.sprint) return false;
       const now = new Date();
@@ -258,7 +252,7 @@ export default {
           name: "Edit",
           path: `/projects/${this.projectId}/stories/${this.storyId}/tasks/${this.taskId}/edit`,
           exact: true,
-          show: (this.isAdmin || this.isScrumMaster || this.isDeveloper) && this.isUserStoryAddedToSprint && this.isSprintActive,
+          show: (this.isAdmin || this.isScrumMaster || this.isDeveloper) && this.isUserStoryAddedToSprint && this.isSprintActive(this.userStory?.Sprint),
         },
       ];
     },
@@ -293,6 +287,13 @@ export default {
     });
   },
   methods: {
+    isSprintActive(override = null) {
+      const sprint = override || this.sprint;
+      if (!sprint) return false;
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      return new Date(sprint.start) <= now && new Date(sprint.end) >= now;
+    },
     getActiveTab(type) {
       let data = [];
       if (type === "project") data = this.projectTabs;

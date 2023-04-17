@@ -14,11 +14,12 @@
           <tr>
             <th scope="col">Title</th>
             <th scope="col">Description</th>
-            <th scope="col">Hours</th>
+            <th scope="col">Remaining</th>
+            <th scope="col">Total spent</th>
+            <th scope="col">Estimated</th>
             <th scope="col">Assigned to</th>
             <th scope="col">Status</th>
             <th scope="col">Done</th>
-            <th scope="col"></th>
             <th scope="col"></th>
           </tr>
         </thead>
@@ -30,7 +31,9 @@
               </nuxt-link>
             </td>
             <td>{{ task.description | limit(100) }}</td>
-            <td>{{ task.hours }}</td>
+            <td>{{ getRemainingHours(task) }}h</td>
+            <td>{{ getTotalSpentHours(task) }}h</td>
+            <td>{{ task.estimate }}h</td>
             <td>
               <span v-if="task.status !== 'UNASSIGNED'">
                 <template v-if="task.assignedTo && task.userId">
@@ -52,34 +55,13 @@
               <b-badge v-if="task.done" variant="success">Yes</b-badge>
               <b-badge v-else variant="danger">No</b-badge>
             </td>
-            <td>
-              <!-- accept/reject task that was assigned to me -->
-              <b-button-group size="sm" v-if="isMyTask(task) && task.status !== 'UNASSIGNED'">
-                <b-button 
-                  @click="acceptRejectTask(task, true)" 
-                  :disabled="!canAccept(task)"
-                >Accept</b-button>
-                <b-button 
-                  @click="acceptRejectTask(task, false)"
-                  :disabled="!canReject(task)"
-                >Reject</b-button>
-              </b-button-group>
-
-              <!-- self assign empty task -->
-              <b-button 
-                v-else-if="task.status === 'UNASSIGNED'"
-                @click="acceptRejectTask(task, true)"
-                size="sm"
-              >Assign to me</b-button>
-            </td>
             <td class="narrow-col">
-              <b-icon
-                v-b-tooltip.hover title="Delete task"
-                v-if="hasPermission && canDelete(task)"
-                icon="x-lg"
-                @click="deleteTask(task)"
-                class="center-and-clickable"
-              ></b-icon>
+              <tasks-dropdown 
+                :task="task" 
+                :has-permission-to-delete="hasPermission"
+                @taskUpdated="onTaskUpdate"
+                @taskDeleted="onTaskDelete"
+              />
             </td>
           </tr>
         </tbody>
@@ -90,6 +72,15 @@
             </td>
           </tr>
         </tbody>
+        <tfoot v-if="tasks.length" class="font-weight-bold">
+          <tr>
+            <td colspan="2">Total</td>
+            <td>{{ getTasksRemainingHours }}h</td>
+            <td>{{ getTasksTotalSpentHours }}h</td>
+            <td>{{ getTasksEstimatedHours }}h</td>
+            <td colspan="4"></td>
+          </tr>
+        </tfoot>
       </table>
     </div>
   </div>
@@ -130,6 +121,15 @@ export default {
       now.setHours(0, 0, 0, 0);
       return new Date(this.sprint.start) <= now && new Date(this.sprint.end) >= now;
     },
+    getTasksRemainingHours() {
+      return this.tasks.reduce((prev, curr) => prev + this.getRemainingHours(curr), 0);
+    },
+    getTasksTotalSpentHours() {
+      return this.tasks.reduce((prev, curr) => prev + this.getTotalSpentHours(curr), 0);
+    },
+    getTasksEstimatedHours() {
+      return this.tasks.reduce((prev, curr) => prev + curr.estimate, 0);
+    },
   },
   data() {
     return {
@@ -144,21 +144,22 @@ export default {
     this.getTasks();
   },
   methods: {
+    getTotalSpentHours(task) {
+      if (!task?.timeLogs?.length) return 0;
+      const total = task.timeLogs.reduce((prev, curr) => prev + curr.hours, 0);
+      return this.round(total);
+    },
+    getRemainingHours(task) {
+      if (!task?.timeLogs?.length) return 0;
+      const remaining = task.timeLogs.slice().sort((a, b) => b.createdAt - a.createdAt)[0]?.remainingHours || 0;
+      return this.round(remaining);
+    },
+    round(num) {
+      return Math.round(num * 10) / 10;
+    },
     isMyTask(task) {
       if (!this.currentUser || !task) return false;
       return task.userId === this.currentUser.id;
-    },
-    canAccept(task) {
-      if (!this.isMyTask(task)) return false;
-      return task.status !== 'ACCEPTED' && task.status !== 'FINISHED';
-    },
-    canReject(task) {
-      if (!this.isMyTask(task)) return false;
-      return task.status === 'ASSIGNED' || task.status === 'ACCEPTED';
-    },
-    canDelete(task) {
-      if (!task) return false;
-      return task.status === 'UNASSIGNED' || task.status === 'ASSIGNED';
     },
     async getProjectWithData() {
       if (!this.projectId) return;
@@ -180,79 +181,14 @@ export default {
           this.tasks = res;
         })
     },
-    async acceptRejectTask(task, isAccepting) {
-      let confirmed = false;
-      try {
-        confirmed = await this.$bvModal.msgBoxConfirm(
-          "Are you sure you want to " + (isAccepting ? 'accept' : 'reject') + " this task?",
-          {
-            title: (isAccepting ? 'Accept' : 'Reject') + " task",
-            cancelTitle: "Cancel",
-            okTitle: "Confirm",
-          }
-        );
-      } catch (error) {
-        console.error(error);
-      }
-      if (!confirmed) return;
-
-      this.$axios
-        .$post(`tasks/${task.id}/${isAccepting ? 'accept' : 'reject'}`)
-        .then((res) => {
-          if (!res) return;
-          // find and replace updated task from tasks array
-          const index = this.tasks.findIndex((t) => t.id === res.id);
-          this.tasks.splice(index, 1, res);
-          console.log(res);
-
-          this.$toast.success("Task successfully " + (isAccepting ? 'accepted' : 'rejected'), {
-            duration: 3000,
-          });
-        })
-        .catch((reason) => {
-          console.error(reason);
-          this.$toast.error(
-            "An error has occurred, while " + (isAccepting ? 'accepting' : 'rejecting') + " the task",
-            {
-              duration: 3000,
-            }
-          );
-        });
+    onTaskUpdate(task) {
+      // find and replace updated task from tasks array
+      const index = this.tasks.findIndex((t) => t.id === task.id);
+      if (index < 0) return;
+      this.tasks.splice(index, 1, task);
     },
-    async deleteTask(task) {
-      let confirmed = false;
-      try {
-        confirmed = await this.$bvModal.msgBoxConfirm(
-          "Are you sure you want to delete this task?",
-          {
-            title: "Delete",
-            cancelTitle: "Cancel",
-            okTitle: "Confirm",
-          }
-        );
-      } catch (error) {
-        console.error(error);
-      }
-
-      if (!confirmed) return;
-
-      this.$axios
-        .$delete(`tasks/${task.id}`)
-        .then((res) => {
-          this.tasks = this.tasks.filter((t) => t.id !== task.id);
-          this.$toast.success("Task successfully removed", {
-            duration: 3000,
-          });
-        })
-        .catch((reason) => {
-          console.error(reason);
-          this.$toast.error(
-            "An error has occurred, while deleting the task",
-            {
-              duration: 3000,
-            }
-          );
-        });
+    onTaskDelete(task) {
+      this.tasks = this.tasks.filter((t) => t.id !== task.id);
     },
   },
 }

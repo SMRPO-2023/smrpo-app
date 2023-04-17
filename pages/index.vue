@@ -42,4 +42,15 @@ tbody > tr:hover > td > a {
 td > a {
   color: black !important;
 }
+
+.no-break, th {
+  white-space: nowrap;
+}
+
+/* must not be scoped */
+// is used when we want to use only an icon as dropdown toggle
+.simple-dropdown-btn {
+  padding: 0 !important;
+  color: initial !important;
+}
 </style>

@@ -4,21 +4,21 @@
     <br />
 
     <p>
-      <span class="title">Title : </span> <span>{{ form.title }}</span>
+      <span class="title">Title:</span> <span>{{ form.title }}</span>
     </p>
     <p>
-      <span class="title">Description : </span>
+      <span class="title">Description:</span>
     </p>
     <p style="white-space: pre-line">{{ form.documentation }}</p>
     <p>
-      <span class="title">Product owner : </span>
+      <span class="title">Product owner:</span>
       <span
         >{{ form.projectOwnerUsername }}
         <span v-if="form.projectOwnerUsername == null"> / </span></span
       >
     </p>
     <p>
-      <span class="title">Scrum master : </span>
+      <span class="title">Scrum master:</span>
       <span
         >{{ form.scrumMasterUsername }}
         <span v-if="form.scrumMasterUsername == null"> / </span></span
