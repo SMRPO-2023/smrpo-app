@@ -235,7 +235,7 @@ export default {
           path: `/projects/${this.projectId}/stories/${this.storyId}/edit`,
           exact: true,
           show:
-            (this.isAdmin || this.isScrumMaster) &&
+            (this.isAdmin || this.isProductOwner || this.isScrumMaster) &&
             this.canChangeUserStory,
         },
         {
