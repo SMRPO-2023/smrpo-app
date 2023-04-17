@@ -24,13 +24,13 @@
           <tr v-for="sprint of sprints" :key="sprint.id">
             <td>
               <nuxt-link
-                v-if="hasPermission()"
+                v-if="hasPermission(sprint)"
                 :to="{ path: `sprints/${sprint.id}` }"
               >
                 {{ sprint.name }}
               </nuxt-link>
   
-              <span v-if="!hasPermission()">
+              <span v-if="!hasPermission(sprint)">
                 {{ sprint.name }}
               </span>
             </td>
@@ -95,10 +95,13 @@ export default {
   },
   methods: {
     canChange(sprint) {
-      return this.hasPermission() && !this.hasSprintStarted(sprint.start);
+      return this.hasPermission(sprint) && !this.hasSprintStarted(sprint.start);
     },
-    hasPermission() {
-      return this.isAdmin || this.isScrumMaster || this.isProductOwner();
+    hasPermission(sprint) {
+      if(!this.isSprintInFuture(sprint)){
+        return this.isAdmin || this.isScrumMaster || this.isProductOwner();
+      }
+      return false;
     },
     isProductOwner() {
       if (!this.currentUser || !this.project) return false;
@@ -130,6 +133,14 @@ export default {
       if (this.isSprintActive(sprint)) return "Active";
       else if (this.hasSprintFinished(sprint)) return "Finished";
       else return;
+    },
+    isSprintInFuture(sprint){
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      if( new Date(sprint.start) > now){
+        return true;
+      }
+      return false
     },
     async getProjectWithData() {
       if (!this.projectId) return;
