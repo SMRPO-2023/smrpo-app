@@ -139,7 +139,7 @@ export default {
     },
     isDeveloper() {
       if (!this.currentUser || !this.project) return false;
-      return this.project.developers.find((u) => u.user.id === this.currentUser.id);
+      return !!this.project.developers.find((u) => u.user.id === this.currentUser.id);
     },
     hasPermission() {
       return this.isAdmin || this.isScrumMaster || this.isDeveloper
@@ -276,7 +276,7 @@ export default {
       this.$store.commit("route-id/setTaskId", +id)
     },
   },
-  watch: { 
+  watch: {
     task: function(value) {
       // fill form data
       if (value) {
@@ -292,5 +292,5 @@ export default {
 }
 </script>
 
-<style scoped>  
+<style scoped>
 </style>

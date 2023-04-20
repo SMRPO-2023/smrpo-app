@@ -136,6 +136,7 @@ export default {
   },
   data() {
     return {
+      error: null,
       form: {
         role: null,
         username: null,

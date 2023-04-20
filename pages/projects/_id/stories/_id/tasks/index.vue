@@ -37,7 +37,7 @@
             <td>
               <span v-if="task.status !== 'UNASSIGNED'">
                 <template v-if="task.assignedTo && task.userId">
-                  {{ task.assignedTo?.username }} 
+                  {{ task.assignedTo?.username }}
                   <span class="text-muted" v-if="isMyTask(task)"> (you)</span>
                 </template>
                 <span v-else class="text-muted">
@@ -56,8 +56,8 @@
               <b-badge v-else variant="danger">No</b-badge>
             </td>
             <td class="narrow-col">
-              <tasks-dropdown 
-                :task="task" 
+              <tasks-dropdown
+                :task="task"
                 :has-permission-to-delete="hasPermission"
                 @taskUpdated="onTaskUpdate"
                 @taskDeleted="onTaskDelete"
@@ -106,7 +106,7 @@ export default {
     },
     isDeveloper() {
       if (!this.currentUser || !this.project) return false;
-      return this.project.developers.find((u) => u.user.id === this.currentUser.id);
+      return !!this.project.developers.find((u) => u.user.id === this.currentUser.id);
     },
     hasPermission() {
       return this.isAdmin || this.isScrumMaster || this.isDeveloper
@@ -194,5 +194,5 @@ export default {
 }
 </script>
 
-<style scoped>    
+<style scoped>
 </style>

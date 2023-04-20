@@ -72,16 +72,16 @@
             <b-icon icon="chevron-right" />
             <span>{{ getTaskTitle }}</span>
             <b-icon icon="chevron-right" />
-            <b-dropdown 
-              id="tasks-navigation-dropdown" 
-              size="sm" 
+            <b-dropdown
+              id="tasks-navigation-dropdown"
+              size="sm"
               :text="getActiveTab('task')"
             >
               <template v-for="tab of taskTabs">
-                <b-dropdown-item 
-                  v-if="tab.show" 
-                  :key="tab.name" 
-                  :to="{ path: tab.path }" 
+                <b-dropdown-item
+                  v-if="tab.show"
+                  :key="tab.name"
+                  :to="{ path: tab.path }"
                   :exact="tab.exact"
                   >{{ tab.name }}</b-dropdown-item
                 >
@@ -128,7 +128,7 @@ export default {
     },
     isDeveloper() {
       if (!this.currentUser || !this.project) return false;
-      return this.project.developers.find((u) => u.user.id === this.currentUser.id);
+      return !!this.project.developers.find((u) => u.user.id === this.currentUser.id);
     },
     hasSprintFinished() {
       if (!this.sprint) return false;

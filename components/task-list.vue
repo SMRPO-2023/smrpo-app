@@ -1,7 +1,7 @@
 <template>
   <ul class="list-group list-group-flush">
     <template v-for="task of tasks">
-      <li 
+      <li
         class="list-group-item pl-0 py-2 d-flex justify-content-between align-items-center"
       >
         <b-row class="flex-grow-1">
@@ -23,7 +23,7 @@
               Remaining / Total spent / Initial estimate
             </b-tooltip>
           </b-col>
-          
+
           <!-- Task developer and status -->
           <b-col cols="4">
             <b-avatar size="sm"></b-avatar>
@@ -34,13 +34,13 @@
               {{ task.status }}
             </b-badge>
           </b-col>
-          
+
           <!-- Dropdown -->
           <b-col cols="1" class="text-right">
-            <tasks-dropdown 
-              :task="task" 
+            <tasks-dropdown
+              :task="task"
               :small="true"
-              :has-permission-to-delete="hasPermissionToDelete"
+              :has-permission-to-delete="!!hasPermissionToDelete"
               @taskUpdated="onTaskUpdate"
               @taskDeleted="onTaskDelete"
             ></tasks-dropdown>
@@ -88,7 +88,7 @@ export default {
     },
     isDeveloper() {
       if (!this.currentUser || !this.project) return false;
-      return this.project.developers.find((u) => u.user.id === this.currentUser.id);
+      return !!this.project.developers.find((u) => u.user.id === this.currentUser.id);
     },
     hasPermissionToDelete() {
       return this.isAdmin || this.isScrumMaster || this.isDeveloper;

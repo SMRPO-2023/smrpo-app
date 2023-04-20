@@ -17,7 +17,7 @@
       <!-- Right aligned nav items -->
       <b-navbar-nav class="ml-auto">
         <!-- user project role status -->
-        <b-badge 
+        <b-badge
           v-if="this.projectId && this.project"
           class="align-self-center"
           :variant="getVariantForProjectRole(isProductOwner, isScrumMaster, isDeveloper, isAdmin, true)"
@@ -82,7 +82,7 @@ export default {
     },
     isDeveloper() {
       if (!this.user || !this.project) return false;
-      return this.project.developers.find((u) => u.user.id === this.user.id);
+      return !!this.project.developers.find((u) => u.user.id === this.user.id);
     },
   },
   data() {
