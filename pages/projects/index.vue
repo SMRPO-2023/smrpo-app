@@ -24,7 +24,7 @@
             <tbody v-if="projects.length">
               <tr v-for="project of projects" :key="project.id">
                 <td>
-                  <nuxt-link v-l-tooltip.hover title="View project" :to="{ path: `projects/${project.id}` }">{{
+                  <nuxt-link v-b-tooltip.hover title="View project" :to="{ path: `projects/${project.id}` }">{{
                     project.title
                   }}</nuxt-link>
                 </td>
@@ -77,8 +77,8 @@
     <b-modal ref="user-modal" id="user-modal" hide-footer>
       <template #modal-title> Members</template>
       <div>
-        <b-card-group 
-          v-if="getProjectDevelopers(currentProjectId).length" 
+        <b-card-group
+          v-if="getProjectDevelopers(currentProjectId).length"
           columns
         >
           <b-card
@@ -98,9 +98,9 @@
         <div v-else class="text-muted text-center">No members</div>
       </div>
 
-      <b-button 
-        class="mt-3" 
-        block 
+      <b-button
+        class="mt-3"
+        block
         @click="$bvModal.hide('user-modal')"
       >Close
       </b-button>
