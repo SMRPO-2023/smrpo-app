@@ -253,7 +253,7 @@ export default {
         .catch((reason) => {
           console.error(reason);
           this.$toast.error(
-            "An error has occurred, while adding new developer. Make sure developer isn't project owner, or already a developer.",
+            "An error has occurred, while adding new developer. Make sure developer isn't product owner, or already a developer.",
             {
               duration: 3000,
             }

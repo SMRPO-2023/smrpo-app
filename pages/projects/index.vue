@@ -15,7 +15,7 @@
               <tr>
                 <th scope="col">Title</th>
                 <th scope="col">Description</th>
-                <th scope="col">Project owner</th>
+                <th scope="col">Product owner</th>
                 <th scope="col">Scrum master</th>
                 <th scope="col">Developers</th>
                 <th scope="col" v-if="isAdmin"></th>

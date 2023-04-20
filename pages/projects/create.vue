@@ -53,7 +53,7 @@
               :rules="{ required: true }"
               v-slot="v"
             >
-              <b-form-group label="Project owner" label-for="owner">
+              <b-form-group label="Product owner" label-for="owner">
                 <b-form-select
                   id="projectOwner"
                   v-model="form.projectOwnerId"
@@ -259,7 +259,7 @@ export default {
       var valid = true;
       if (this.form.projectOwnerId == this.form.scrumMasterId) {
         this.$toast.error(
-          "Project owner and scrum master can not be the same person.",
+          "Product owner and scrum master can not be the same person.",
           {
             duration: 3000,
           }
@@ -268,7 +268,7 @@ export default {
         return false;
       }
       if (this.form.projectOwnerId == this.form.scrumMasterId) {
-        this.$toast.error("Project owner can not be a member.", {
+        this.$toast.error("Product owner can not be a member.", {
           duration: 3000,
         });
         valid = false;
