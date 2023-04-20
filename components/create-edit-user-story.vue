@@ -238,7 +238,7 @@ export default {
           priority: this.form.priority,
           points: parseFloat(this.form.points),
           projectId: this.projectId,
-          businessValue: parseInt(this.form.value),
+          businessValue: parseInt(this.form.businessValue),
           acceptanceCriteria: this.form.acceptanceCriteria,
         })
         .then(async (res) => {
