@@ -39,6 +39,7 @@
             <th scope="col">Title</th>
             <th scope="col">Description</th>
             <th scope="col">Business value</th>
+            <th scope="col">Points</th>
             <th scope="col">Priority</th>
             <th scope="col">Accepted</th>
             <th scope="col" v-if="isProductOwner() || isAdmin">Accept</th>
@@ -56,6 +57,7 @@
             </td>
             <td>{{ story.description | limit(100) }}</td>
             <td>{{ story.businessValue }}</td>
+            <td>{{ story.points }}</td>
   
             <td>
               <b-dropdown
