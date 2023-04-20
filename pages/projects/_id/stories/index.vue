@@ -26,6 +26,10 @@
           :variant="getVariantForFilterState('unrealizedOnSprint')"
         >Unrealized on sprint</b-button>
         <b-button 
+          @click="showNotEstimated()" 
+          :variant="getVariantForFilterState('notEstimated')"
+        >Not estimated</b-button>
+        <b-button 
           @click="showUnrealized()" 
           :variant="getVariantForFilterState('unrealized')"
         >Unrealized</b-button>
@@ -155,6 +159,7 @@ export default {
       storiesRealized: [],
       storiesUnrealizedSprint: [],
       storiesUnrealized: [],
+      notEstimated: [],
       sprints: [],
       developers: [],
       canSee: false,
@@ -167,6 +172,7 @@ export default {
     this.getUnrealizedSprint();
     this.getUnrealized();
     this.getFutureReleases();
+    this.getNotEstimated();
   },
   methods: {
     getVariantForFilterState(state) {
@@ -187,6 +193,10 @@ export default {
     showUnrealized() {
       this.stories = this.storiesUnrealized;
       this.tasksFilterState = "unrealized";
+    },
+    showNotEstimated() {
+      this.stories = this.notEstimated;
+      this.tasksFilterState = "notEstimated";
     },
     showRealized() {
       this.stories = this.storiesRealized;
@@ -222,6 +232,20 @@ export default {
         .then((res) => {
           if (!res) return;
           this.$router.go(0);
+        });
+    },
+    async getNotEstimated() {
+      if (!this.projectId) return;
+
+      await this.$axios
+        .$get(`user-stories/not-estimated`, {
+          params: {
+            "project-id": this.projectId,
+          },
+        })
+        .then((res) => {
+          if (!res) return;
+          this.notEstimated = res;
         });
     },
     async getFutureReleases() {
