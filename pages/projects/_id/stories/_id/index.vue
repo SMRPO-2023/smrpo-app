@@ -50,7 +50,7 @@
           </div>
           <!-- Body -->
           <div class="mt-3">
-            <p class="clamp mb-0">{{ comment.message }}</p>
+            <pre class="clamp mb-0">{{ comment.message }}</pre>
           </div>
         </div>
       </div>
@@ -130,5 +130,8 @@ export default {
   display: block;
   font-size: .80em;
   color: #909090;
+}
+.clamp {
+  white-space: pre-line;
 }
 </style>
