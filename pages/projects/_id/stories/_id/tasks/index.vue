@@ -63,6 +63,16 @@
                 @taskDeleted="onTaskDelete"
               />
             </td>
+             <td>
+              <h2 class="d-flex align-content-start">
+                <b-icon
+                class="d-flex align-content-start"
+                  v-b-tooltip.hover title="Log time"
+                  variant="success"
+                  icon="plus-circle-fill" 
+                ></b-icon>
+              </h2>
+            </td>
           </tr>
         </tbody>
         <tbody v-else>
