@@ -247,7 +247,7 @@
       <div class=" w-100 d-flex justify-content-end pb-2 pt-4">
         <b-button class=" w-25 p-2 mr-2 btn-danger"  @click="$bvModal.hide('reject-modal')"
         >Cancel</b-button>
-        <b-button class=" w-25 p-2 btn-success"  @click="removeFromSprint() && $bvModal.hide('reject-modal')"
+        <b-button class=" w-25 p-2 btn-success"  @click="removeFromSprint()"
         >Submit</b-button>
       </div>
     </b-modal>
@@ -261,7 +261,7 @@
       <div class=" w-100 d-flex justify-content-end pb-2 pt-4">
         <b-button class=" w-25 p-2 mr-2 btn-danger"  @click="$bvModal.hide('accept-modal') "
         >Cancel</b-button>
-        <b-button class=" w-25 p-2 btn-success"  @click="$bvModal.hide('accept-modal') && acceptStory()"
+        <b-button class=" w-25 p-2 btn-success"  @click="acceptStory()"
         >Accept</b-button>
       </div>
     </b-modal>
@@ -379,6 +379,7 @@ export default {
             .then(async () => {
               await this.getSprint();
               this.comment = null;
+              this.$bvModal.hide('accept-modal')
               this.$toast.success("Story has been accepted.", {
                 duration: 3000,
               });
@@ -400,6 +401,7 @@ export default {
             .then(async () => {
               await this.getSprint();
               this.comment = null;
+              this.$bvModal.hide('reject-modal')
               this.$toast.success("Story removed from sprint.", {
                 duration: 3000,
               });
