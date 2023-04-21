@@ -407,12 +407,21 @@ export default {
               });
             })
           .catch(() => {
+            if(this.comment == null){
+              this.$toast.error(
+                "Comment field is mandatory.",
+                {
+                  duration: 3000,
+                }
+              );
+            }else{
               this.$toast.error(
                 "An error has occurred, while removing story from sprint.",
                 {
                   duration: 3000,
                 }
               );
+            }
       });
     },
     async moveToSprint(storyId) {
