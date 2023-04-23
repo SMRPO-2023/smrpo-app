@@ -4,7 +4,7 @@
       Sprint backlog<template v-if="sprint">: {{ sprint.name }}</template>
     </h1>
 
-    <div class="d-flex justify-content-end align-items-center pb-3" v-if="sprint">
+    <div class="d-flex justify-content-end align-items-center" v-if="sprint">
       <b-form-checkbox
         id="show-accepted-checkbox"
         v-model="showAcceptedStories"
@@ -41,6 +41,30 @@
         >Finished</b-button>
       </b-button-group>
     </div>
+
+    <b-progress 
+      class="my-3" 
+      :max="totalSpentHours - totalRemainingHours" 
+    >
+      <b-progress-bar 
+        id="sprint-tasks-total-spent"
+        :value="totalSpentHours" 
+        :label="getProgressLabel"
+        :variant="getProgressVariant"
+      ></b-progress-bar>
+      <b-progress-bar 
+        id="sprint-tasks-total-remaining"
+        :value="totalRemainingHours"
+        :label="`${totalRemainingHours.toFixed(1)}h`"
+        style="background-color: #e9ecef; color: initial;"
+      ></b-progress-bar>
+      <b-tooltip target="sprint-tasks-total-spent" triggers="hover">
+        Total spent hours
+      </b-tooltip>
+      <b-tooltip target="sprint-tasks-total-remaining" triggers="hover">
+        Total remaining hours
+      </b-tooltip>
+    </b-progress>
 
     <div v-if="sprint">
       <b-card 
@@ -153,6 +177,16 @@ export default {
       isAdmin: "user/isAdmin",
       projectId: "route-id/getProjectId",
     }),
+    getProgressLabel() {
+      if (!this.allStories.length) return null;
+      if (this.totalRemainingHours === 0) return "All done!";
+      return `${totalSpentHours.toFixed(1)}h`;
+    },
+    getProgressVariant() {
+      if (!this.allStories.length) return null;
+      if (this.totalRemainingHours === 0) return "success";
+      return "primary";
+    },
   },
   data() {
     return {
@@ -164,6 +198,8 @@ export default {
       stories: [],
       sprint: null,
       project: null,
+      totalRemainingHours: 0,
+      totalSpentHours: 0,
     };
   },
   async mounted() {
@@ -300,6 +336,8 @@ export default {
           this.allStories = res.stories;
           this.refreshStories();
           this.showAllTasks();
+          this.totalRemainingHours = res.totalRemainingHours;
+          this.totalSpentHours = res.totalSpentHours;
         })
         .catch((error) => {
           this.handleFetchError(error, "An error has occurred, while getting user stories");
