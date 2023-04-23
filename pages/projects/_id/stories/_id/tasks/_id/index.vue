@@ -30,13 +30,6 @@
           </span>
         </span>
     </p>
-
-    <p>
-      <span class="title">Done:</span> <span>
-        <template v-if="task.done">Yes</template>
-        <template v-else>No</template>
-      </span>
-    </p>
   </div>
 </template>
 
@@ -52,7 +45,6 @@ export default {
         estimate: null,
         status: null,
         userId: null,
-        done: null,
       },
     };
   },

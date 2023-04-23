@@ -177,6 +177,7 @@ export default {
       this.$axios
         .$delete(`sprints/${sprint.id}`)
         .then((res) => {
+          if (!res) throw new Error;
           this.sprints = this.sprints.filter((s) => s.id !== sprint.id);
           this.$toast.success("Sprint successfully removed", {
             duration: 3000,

@@ -419,6 +419,7 @@ export default {
       this.$axios
         .$delete(`user-stories/${story.id}`)
         .then((res) => {
+          if (!res) throw new Error;
           this.stories = this.stories.filter((s) => s.id !== story.id);
           this.$toast.success("Story successfully removed", {
             duration: 3000,

@@ -64,7 +64,7 @@ export default {
   mixins: [priorities],
   props: {
     project: {
-      type: Object,
+      type: Object | null,
       required: true
     },
     story: {

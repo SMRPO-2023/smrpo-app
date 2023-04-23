@@ -218,6 +218,7 @@ export default {
       this.$axios
         .$delete(`/project-developers/${id}`)
         .then((res) => {
+          if (!res) throw new Error;
           this.projectDevelopers = this.projectDevelopers.filter(
             (p) => p.id !== id
           );

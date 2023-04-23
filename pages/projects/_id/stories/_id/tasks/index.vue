@@ -19,7 +19,6 @@
             <th scope="col">Estimated</th>
             <th scope="col">Assigned to</th>
             <th scope="col">Status</th>
-            <th scope="col">Done</th>
             <th scope="col"></th>
           </tr>
         </thead>
@@ -50,10 +49,6 @@
             </td>
             <td>
               <b-badge :variant="getVariantForTaskStatus(task.status)">{{ task.status }}</b-badge>
-            </td>
-            <td>
-              <b-badge v-if="task.done" variant="success">Yes</b-badge>
-              <b-badge v-else variant="danger">No</b-badge>
             </td>
             <td class="narrow-col">
               <tasks-dropdown

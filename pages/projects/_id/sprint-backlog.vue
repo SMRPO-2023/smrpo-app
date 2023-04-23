@@ -231,11 +231,11 @@ export default {
     },
     getStoryUnfinishedFilteredTasks(story) {
       if (!story?.Task?.length) return [];
-      return story.Task.filter((task) => !task.done && this.taskMatchesFilter(task));
+      return story.Task.filter((task) => task.status !== 'FINISHED' && this.taskMatchesFilter(task));
     },
     getStoryFinishedFilteredTasks(story) {
       if (!story?.Task?.length) return [];
-      return story.Task.filter((task) => task.done && this.taskMatchesFilter(task));
+      return story.Task.filter((task) => task.status === 'FINISHED' && this.taskMatchesFilter(task));
     },
     getStoryAllFilteredTasks(story) {
       if (!story?.Task?.length) return [];
@@ -287,7 +287,7 @@ export default {
       this.setDisplayForTasks(task => task.status === 'ASSIGNED');
     },
     showFinishedTasks() {
-      this.setDisplayForTasks(task => task.done);
+      this.setDisplayForTasks(task => task.status === 'FINISHED');
     },
     showActiveTasks() {
       this.setDisplayForTasks(task => task.timeLogs.length && task.timeLogs.at(-1).remainingHours > 0);
@@ -335,7 +335,7 @@ export default {
           if (!res) return;
           this.allStories = res.stories;
           this.refreshStories();
-          this.showAllTasks();
+          this.filterBy(this.tasksFilterState); // re-apply the filter, in case the user has changed it while the stories were loading
           this.totalRemainingHours = res.totalRemainingHours;
           this.totalSpentHours = res.totalSpentHours;
         })
@@ -365,12 +365,18 @@ export default {
     },
     onTaskUpdate(story, task) {
       // find and replace updated task from tasks array
-      const index = story.Task.findIndex((t) => t.id === task.id);
-      if (index < 0) return;
-      story.Task.splice(index, 1, task);
+      // const index = story.Task.findIndex((t) => t.id === task.id);
+      // if (index < 0) return;
+      // story.Task.splice(index, 1, task);
+
+      // just refresh stories, because the calculated field for number of finished tasks can change
+      this.getUserStories();
     },
     onTaskDelete(story, task) {
-      story.Task = story.Task.filter((t) => t.id !== task.id);
+      // story.Task = story.Task.filter((t) => t.id !== task.id);
+
+      // just refresh stories, because the calculated field for number of finished tasks can change
+      this.getUserStories();
     },
   },
   watch: {
