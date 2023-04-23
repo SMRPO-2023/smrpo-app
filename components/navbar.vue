@@ -55,14 +55,6 @@ import { mapActions, mapGetters } from "vuex";
 export default {
   name: "navbar",
   mixins: [datetime, roles],
-  async mounted() {
-    // get logged in user
-    const userId = localStorage.getItem("userId");
-    const accessToken = localStorage.getItem("jwt");
-    if (userId && accessToken) {
-      await this.$store.dispatch("user/fetchUser", userId);
-    }
-  },
   computed: {
     ...mapGetters({
       user: "user/getUser",
@@ -90,8 +82,24 @@ export default {
       project: null,
     };
   },
-  created() {
+  async mounted() {
+    // get logged in user
+    const userId = localStorage.getItem("userId");
+    const accessToken = localStorage.getItem("jwt");
+    if (userId && accessToken) {
+      await this.$store.dispatch("user/fetchUser", userId);
+    }
+    // get project
     this.getProject();
+  },
+  created() {
+    // subscribe to store entity id changes
+    // and refresh the data for possible changes to title/name
+    this.unsubscribe = this.$store.subscribe((mutation, state) => {
+      if (mutation.type === "route-id/setProjectId") {
+        this.getProject();
+      }
+    });
   },
   methods: {
     async logout() {
@@ -108,6 +116,9 @@ export default {
         this.project = res;
       });
     },
+  },
+  beforeDestroy() {
+    this.unsubscribe();
   },
 };
 </script>
