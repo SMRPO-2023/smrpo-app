@@ -334,7 +334,7 @@ export default {
           const developer = this.developers[key];
 
           if (this.currentUser.id === developer.user.id) {
-            this.found = true;
+            found = true;
           }
         }
 

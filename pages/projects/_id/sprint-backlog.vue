@@ -58,10 +58,18 @@
         :label="`${totalRemainingHours.toFixed(1)}h`"
         style="background-color: #e9ecef; color: initial;"
       ></b-progress-bar>
-      <b-tooltip target="sprint-tasks-total-spent" triggers="hover">
+      <b-tooltip 
+        target="sprint-tasks-total-spent" 
+        triggers="hover" 
+        :disabled="totalRemainingHours === 0"
+      >
         Total spent hours
       </b-tooltip>
-      <b-tooltip target="sprint-tasks-total-remaining" triggers="hover">
+      <b-tooltip 
+        target="sprint-tasks-total-remaining" 
+        triggers="hover"
+        :disabled="totalRemainingHours === 0"
+      >
         Total remaining hours
       </b-tooltip>
     </b-progress>

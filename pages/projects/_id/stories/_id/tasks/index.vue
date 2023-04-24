@@ -117,13 +117,16 @@ export default {
       return new Date(this.sprint.start) <= now && new Date(this.sprint.end) >= now;
     },
     getTasksRemainingHours() {
-      return this.tasks.reduce((prev, curr) => prev + this.getRemainingHours(curr), 0);
+      const sum = this.tasks.reduce((prev, curr) => prev + this.getRemainingHours(curr), 0);
+      return Math.round(sum * 10) / 10;
     },
     getTasksTotalSpentHours() {
-      return this.tasks.reduce((prev, curr) => prev + this.getTotalSpentHours(curr), 0);
+      const sum = this.tasks.reduce((prev, curr) => prev + this.getTotalSpentHours(curr), 0);
+      return Math.round(sum * 10) / 10;
     },
     getTasksEstimatedHours() {
-      return this.tasks.reduce((prev, curr) => prev + curr.estimate, 0);
+      const sum = this.tasks.reduce((prev, curr) => prev + curr.estimate, 0);
+      return Math.round(sum * 10) / 10;
     },
   },
   data() {
