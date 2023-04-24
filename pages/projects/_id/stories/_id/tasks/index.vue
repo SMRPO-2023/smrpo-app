@@ -139,12 +139,12 @@
           }"
           v-slot="v"
         >
-          <b-form-group label="Hours" label-for="hoursRemaining">
+          <b-form-group label="Hours remaining" label-for="hours remaining">
             <b-input-group append="h">
               <b-form-input
                 type="number"
                 id="hours"
-                placeholder="Enter hours"
+                placeholder="Enter remaining hours"
                 v-model="remainingHours"
                 :state="getValidationState(v)"
                 :step="0.0001"
