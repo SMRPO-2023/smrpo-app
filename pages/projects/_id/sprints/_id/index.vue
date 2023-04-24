@@ -236,21 +236,36 @@
       <div class="d-block d-flex pb-3">
         Please submit a reason for the rejection.
       </div>
-      <b-form-group label="" label-for="">
-        <b-form-textarea
-            type="text"
-            id="comment"
-            placeholder="Enter comment"
-            v-model="comment"
-            aria-describedby="input-1-live-feedback"
-        />
-      </b-form-group>
-      <div class=" w-100 d-flex justify-content-end pb-2 pt-4">
-        <b-button class=" w-25 p-2 mr-2 btn-danger"  @click="$bvModal.hide('reject-modal')"
-        >Cancel</b-button>
-        <b-button class=" w-25 p-2 btn-success"  @click="removeFromSprint()"
-        >Submit</b-button>
-      </div>
+
+      <!-- Comment form -->
+      <ValidationObserver ref="observer" v-slot="{ handleSubmit }">
+        <b-form @submit.stop.prevent="handleSubmit(removeFromSprint)">
+          <ValidationProvider
+            name="comment"
+            :rules="{ required: true }"
+            v-slot="v"
+          >
+            <b-form-group label="" label-for="">
+              <b-form-textarea
+                  id="comment"
+                  placeholder="Enter comment"
+                  v-model="comment"
+                  :state="getValidationState(v)"
+                  aria-describedby="comment-live-feedback"
+              />
+              <b-form-invalid-feedback id="comment-live-feedback"
+                >{{ v.errors[0] }}
+              </b-form-invalid-feedback>
+            </b-form-group>
+          </ValidationProvider>
+          <div class="w-100 d-flex justify-content-end">
+            <b-button variant="secondary" class="mr-2" @click="$bvModal.hide('reject-modal')"
+            >Cancel</b-button>
+            <b-button type="submit" variant="primary"
+            >Submit</b-button>
+          </div>
+        </b-form>
+      </ValidationObserver>
     </b-modal>
     <!---------------------  Model reject  ------------------------------------>
     <!---------------------  Model accept  ------------------------------------>
