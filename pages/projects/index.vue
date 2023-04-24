@@ -30,7 +30,7 @@
                 </td>
                 <td>
                   <span style="white-space: pre-line">{{
-                    project.documentation
+                    project.description
                   }}</span>
                 </td>
                 <td>
