@@ -415,7 +415,7 @@ export default {
             });
           }else{
             res.forEach(element => {
-+              if(element['userId'] == this.currentUser.id && element['status'] == "ACCEPTED"){
+              if(element['userId'] == this.currentUser.id && element['status'] == "ACCEPTED"){
                 element['active'] = true;
               }else{
                 element['active'] = false;
