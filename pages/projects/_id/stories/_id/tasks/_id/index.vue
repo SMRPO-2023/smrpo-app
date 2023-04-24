@@ -31,12 +31,6 @@
         </span>
     </p>
 
-    <p>
-      <span class="title">Done:</span> <span>
-        <template v-if="task.done">Yes</template>
-        <template v-else>No</template>
-      </span>
-    </p>
   <h3 class="pt-5">Time logs</h3>
   <template v-if="task.timeLogs?.length">
     <div class="table-responsive">
