@@ -53,7 +53,7 @@
             </thead>
       
       <tbody>
-        <tr v-for="log of task.timeLogs" :key="log.taskId">
+        <tr v-for="log of task.timeLogs" :key="log.id">
           <td>{{ log.User.username }}</td>
           <td>{{ log.title }}</td>
           <td>{{ log.hours }} h</td>
