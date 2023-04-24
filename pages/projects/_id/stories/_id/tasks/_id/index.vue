@@ -96,7 +96,7 @@
       <ValidationProvider
           name="hours"
           :rules="{
-            min_value: 0.1,
+            min_value: 0,
             max_value: 30,
           }"
           v-slot="v"
@@ -126,7 +126,7 @@
         <ValidationProvider
           name="hoursRemaining"
           :rules="{
-            min_value: 0.1,
+            min_value: 0,
             max_value: 30,
           }"
           v-slot="v"
