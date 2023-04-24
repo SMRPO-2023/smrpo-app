@@ -44,8 +44,20 @@ export default {
         var timeNow = new Date();
         this.time = Math.floor(((timeNow - this.startTime)/1000));
         this.$store.commit("user/setTimerInterval", this.timer);
+        localStorage.setItem("timerInterval", this.timer);
        }, 1000);
       
+    }else if(localStorage.getItem("timerInterval") !== null){
+      clearInterval(this.timerInterval);
+      this.startTime = Date.parse(localStorage.getItem("loggerStartTime"));
+
+      this.timer = setInterval(() => {
+        var timeNow = new Date();
+        this.time = Math.floor(((timeNow - this.startTime)/1000));
+        this.$store.commit("user/setTimerInterval", this.timer);
+        localStorage.setItem("timerInterval", this.timer);
+       }, 1000);
+
     }
   },
   data() {
@@ -76,6 +88,7 @@ export default {
       this.timer = setInterval(() => {
         var timeNow = new Date();
         this.$store.commit("user/setTimerInterval", this.timer);
+        localStorage.setItem("timerInterval", this.timer);
         this.time = Math.floor(((timeNow - this.startTime)/1000));
         }, 1000);
 
