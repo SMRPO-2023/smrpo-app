@@ -9,7 +9,7 @@
     <p>
       <span class="title">Description:</span>
     </p>
-    <p style="white-space: pre-line">{{ form.documentation }}</p>
+    <p style="white-space: pre-line">{{ form.description }}</p>
     <p>
       <span class="title">Product owner:</span>
       <span
@@ -80,7 +80,7 @@ export default {
       passwordType: "password",
       form: {
         title: null,
-        documentation: null,
+        description: null,
         projectOwner: null,
         projectOwnerUsername: null,
         scrumMaster: null,
@@ -112,7 +112,7 @@ export default {
           // if (!res) return;
 
           this.form.title = res?.title;
-          this.form.documentation = res?.documentation;
+          this.form.description = res?.description;
           if (res?.projectOwner !== null) {
             this.form.projectOwner = res?.projectOwner;
             this.form.projectOwnerUsername = res?.projectOwner.username;

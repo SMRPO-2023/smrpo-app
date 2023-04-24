@@ -30,16 +30,16 @@
             </ValidationProvider>
 
             <ValidationProvider
-              name="documentation"
+              name="description"
               v-slot="v"
               :rules="{ required: true }"
             >
-              <b-form-group label="Description" label-for="documentation">
+              <b-form-group label="Description" label-for="description">
                 <b-form-textarea
                   type="text"
-                  id="documentation"
-                  placeholder="Enter documentation"
-                  v-model="form.documentation"
+                  id="description"
+                  placeholder="Enter description"
+                  v-model="form.description"
                   :state="getValidationState(v)"
                   aria-describedby="input-1-live-feedback"
                 />
@@ -171,7 +171,7 @@ export default {
       projectDevelopers: [],
       form: {
         title: null,
-        documentation: null,
+        description: null,
         projectOwnerId: null,
         scrumMasterId: null,
         member: 0,
@@ -292,7 +292,7 @@ export default {
         await this.$axios
           .$post("/project", {
             title: this.form.title,
-            documentation: this.form.documentation,
+            description: this.form.description,
             projectOwnerId: this.form.projectOwnerId,
             scrumMasterId: this.form.scrumMasterId,
           })

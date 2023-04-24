@@ -20,13 +20,13 @@
           </b-form-group>
         </ValidationProvider>
 
-        <ValidationProvider name="documentation" v-slot="v">
-          <b-form-group label="Description" label-for="documentation">
+        <ValidationProvider name="description" v-slot="v">
+          <b-form-group label="Description" label-for="description">
             <b-form-textarea
               type="text"
-              id="documentation"
-              placeholder="documentation"
-              v-model="form.documentation"
+              id="description"
+              placeholder="description"
+              v-model="form.description"
               :state="getValidationState(v)"
               aria-describedby="input-3-live-feedback"
             />
@@ -175,7 +175,7 @@ export default {
       passwordType: "password",
       form: {
         title: null,
-        documentation: null,
+        description: null,
         projectOwnerId: null,
         scrumMasterId: null,
         member: null,
@@ -269,7 +269,7 @@ export default {
         .$get(`project/${this.id}`)
         .then((res) => {
           this.form.title = res?.title;
-          this.form.documentation = res?.documentation;
+          this.form.description = res?.description;
           if (res?.projectOwner !== null) {
             this.form.projectOwnerId = res?.projectOwner.id;
           }
@@ -292,7 +292,7 @@ export default {
       await this.$axios
         .$put(`project/${this.id}`, {
           title: this.form.title,
-          documentation: this.form.documentation,
+          description: this.form.description,
           projectOwnerId: this.form.projectOwnerId,
           scrumMasterId: this.form.scrumMasterId,
         })
