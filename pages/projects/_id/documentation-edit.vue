@@ -75,7 +75,7 @@ export default {
         .$get(`/project/${this.projectId}`)
         .then((res) => {
           this.project = res;
-          this.markdown = this.project.documentation;
+          this.markdown = this.project.documentation  ?? '';
         })
         .catch((reason) => {
           console.error(reason);
