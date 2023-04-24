@@ -4,7 +4,7 @@
 
     <ValidationObserver ref="observer" v-slot="{ handleSubmit }">
       <b-form @submit.stop.prevent="handleSubmit(onSubmit)" class="mt-4">
-        <ValidationProvider name="title" :rules="{ required: true }" v-slot="v">
+        <ValidationProvider name="title" :rules="{ required: true,  min: 3 }" v-slot="v">
           <b-form-group label="Title" label-for="title">
             <b-form-input
               type="text"

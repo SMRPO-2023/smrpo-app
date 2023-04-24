@@ -11,7 +11,7 @@
           <b-form @submit.stop.prevent="handleSubmit(onSubmit)" class="mt-4">
             <ValidationProvider
               name="title"
-              :rules="{ required: true }"
+              :rules="{ required: true,  min: 3}"
               v-slot="v"
             >
               <b-form-group label="Title" label-for="title">
