@@ -3,7 +3,7 @@
         <h1>Documentation</h1>
         <div class="d-flex justify-content-end"><b-button  to="documentation-edit" style=" background: transparent; color:gray; border:none;"><h3><b-icon icon="pencil-fill"></b-icon></h3> </b-button></div>
         <hr>
-        <div v-html="markdownToHtml"> </div>
+        <pre v-html="markdownToHtml"> </pre>
     </div>
 </template>
 
