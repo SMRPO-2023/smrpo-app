@@ -2,10 +2,6 @@
   <div>
     <div class="d-flex justify-content-between align-items-center">
       <h1 class="mb-0">Tasks</h1>
-      <div class="btn-container">
-        <button @click="startT">start</button> <button @click="stopT">stop</button>
-        <stopwatch v-show="this.loggerActive" :running ="running " :resetWhenStart="true" />
-      </div>
       <nuxt-link v-if="canCreate" to="tasks/create">
         <b-button v-b-tooltip.hover title="Add task" variant="primary">Create</b-button>
       </nuxt-link>
@@ -174,6 +170,11 @@
       </div>
     </b-modal>
     <!---------------------  Model stopwatch  ------------------------------------>
+    <div class="btn-container card w-50 mt-5"  v-show="this.loggerActive">
+      <h2>Time log :</h2>
+        <!--<button @click="startT">start</button> <button @click="stopT">stop</button>-->
+        <stopwatch v-show="this.loggerActive" :running ="running " :resetWhenStart="true" />
+    </div>
     </div>
   </div>
 </template>
@@ -255,7 +256,6 @@ export default {
     if(localStorage.getItem("loggerActive") === null){
       localStorage.setItem("loggerActive", this.running);
     }else{
-      alert("loading logger"+ localStorage.getItem("loggerActive"));
       this.running = localStorage.getItem("loggerActive") === 'true';
       this.logger.taskId = localStorage.getItem("loggerTaskId");
     }
@@ -273,10 +273,16 @@ export default {
       //Smaller than a minute
       if(this.time < 60){
         this.time = 60;
+        this.$toast.success("Logged less than 1 minute, rounding up to 1 minute.", {
+            duration: 3000,
+        });
       } 
       //Bigger thanm 15h (15h = 54.000s)
       if(this.time > 54000){
         this.time = 54000;
+        this.$toast.success("Logged more than 15 hours, rounding down to 15 hours.", {
+            duration: 3000,
+        });
       }
       const totalMinutes = Math.floor(this.time / 60);
       this.logger.seconds = (this.time % 60).toString().padStart(2, '0');
@@ -307,7 +313,6 @@ export default {
       return this.running;
     },
     stopT: function() {
-      console.log("Stopping logger")
       this.running = false;
       this.logger.taskId = null;
       this.getTasks();
@@ -318,7 +323,6 @@ export default {
       
     },
     startT: function() {
-      console.log("Starting logger")
       this.running = true;
       this.showLogger();
       //this.running = true;
@@ -340,9 +344,7 @@ export default {
         if(task.userId === this.currentUser.id){
           this.logger.taskId = task.id;
           localStorage.setItem("loggerTaskId", task.id);
-          console.log("Setting logger story Id");
           localStorage.setItem("loggerStoryId", this.storyId);
-          console.log("updating show logger");
           
           this.getTasks();
           this.startT();
@@ -353,16 +355,11 @@ export default {
         }
 
       } 
-      alert(this.isRunning());
     },
     showLogger(){
       var loggerStoryId = localStorage.getItem("loggerStoryId");
-      console.log(loggerStoryId + " ===  "+ this.storyId);
-      console.log(this.running);
-      console.log(loggerStoryId === this.storyId.toString());
       if(loggerStoryId === this.storyId.toString()){
         if(this.running){
-          console.log("Show logger");
           this.loggerActive = true;
           return;
         }else{
@@ -413,17 +410,13 @@ export default {
           if (!res) return;
           this.logger.taskId = localStorage.getItem("loggerTaskId");
           if(this.running){
-            console.log("Disabeling some"+this.running)
-            console.log("Disabeling some"+this.logger.taskId)
             res.forEach(element => {
-              console.log(element['id']+" is not "+this.logger.taskId)
-              console.log(element['id'].toString() == (this.logger.taskId).toString())
               element['active'] = element['id'] == (this.logger.taskId).toString() ? true : false;
             });
           }else{
-            console.log("Disabeling none")
             res.forEach(element => {
-              if(element['userId'] == this.currentUser.id){
+              console.log(element['status'])
+              if(element['userId'] == this.currentUser.id && element['status'] == "ACCEPTED"){
                 element['active'] = true;
               }else{
                 element['active'] = false;
@@ -431,9 +424,6 @@ export default {
               
             });
           }
-
-          console.table(res);
-
           this.tasks = res;
         })
     },
@@ -447,10 +437,6 @@ export default {
       this.tasks = this.tasks.filter((t) => t.id !== task.id);
     },
     async logTime(){
-        console.log("hours fool :"+(this.time / 60 / 60).toFixed(2));
-        console.log((this.time / 60 / 60));
-        console.log((this.time));
-        console.log((this.taskId));
         this.$axios
           .$post(`time-logs/log-hours`,{
             day: new Date(),
@@ -471,7 +457,6 @@ export default {
             });
           })
           .catch((reason) => {
-            console.error(reason);
             this.$toast.error(
               "An error has occurred, while adding the log",
               {
@@ -486,4 +471,12 @@ export default {
 </script>
 
 <style scoped>
+.card{
+  background: #28a745;
+  color: white;
+  padding: 2rem;
+  margin-bottom: 1rem;
+  border: none;
+  border-radius: 25px;
+}
 </style>
