@@ -246,7 +246,6 @@ export default {
           // reset form
           this.$refs.addMemberProvider.reset(); // not working
           this.form.member = null;
-          console.log(this.$refs.addMemberProvider);
           this.$toast.success("New developer added", {
             duration: 3000,
           });

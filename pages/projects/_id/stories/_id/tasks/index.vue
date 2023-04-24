@@ -387,7 +387,7 @@ export default {
     },
     getRemainingHours(task) {
       if (!task?.timeLogs?.length) return 0;
-      const remaining = task.timeLogs.slice().sort((a, b) => b.createdAt - a.createdAt)[0]?.remainingHours || 0;
+      const remaining = task.timeLogs.slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0]?.remainingHours || 0;
       return this.round(remaining);
     },
     round(num) {

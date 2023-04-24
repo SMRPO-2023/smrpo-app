@@ -218,15 +218,17 @@ export default {
   methods: {
     getTasksRemainingHours(tasks) {
       if (!tasks?.length) return 0;
-      return tasks.reduce((prev, curr) => prev + this.getRemainingHours(curr), 0);
+      const sum = tasks.reduce((prev, curr) => prev + this.getRemainingHours(curr), 0);
+      return this.round(sum);
     },
     getTasksTotalSpentHours(tasks) {
       if (!tasks?.length) return 0;
-      return tasks.reduce((prev, curr) => prev + this.getTotalSpentHours(curr), 0);
+      const sum = tasks.reduce((prev, curr) => prev + this.getTotalSpentHours(curr), 0);
+      return this.round(sum);
     },
     getRemainingHours(task) {
       if (!task?.timeLogs?.length) return 0;
-      const remaining = task.timeLogs.slice().sort((a, b) => b.createdAt - a.createdAt)[0]?.remainingHours || 0;
+      const remaining = task.timeLogs.slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0]?.remainingHours || 0;
       return this.round(remaining);
     },
     getTotalSpentHours(task) {
