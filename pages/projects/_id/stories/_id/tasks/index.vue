@@ -18,7 +18,6 @@
             <th scope="col">Estimated</th>
             <th scope="col">Assigned to</th>
             <th scope="col">Status</th>
-            <th scope="col">Done</th>
             <th></th>
             <th scope="col"></th>
           </tr>
@@ -52,11 +51,7 @@
             <td>
               <b-badge :variant="getVariantForTaskStatus(task.status)">{{ task.status }}</b-badge>
             </td>
-            <td>
-              <b-badge v-if="task.done" variant="success">Yes</b-badge>
-              <b-badge v-else variant="danger">No</b-badge>
-            </td>
-            <td > <!--<stopwatch v-if="task.active" :running ="running " :resetWhenStart="true" />--></td>
+            <!-- <td > <stopwatch v-if="task.active" :running ="running " :resetWhenStart="true" /></td> -->
             <td class="narrow-col">
               <tasks-dropdown
                 :task="task"
@@ -65,20 +60,21 @@
                 @taskDeleted="onTaskDelete"
               />
             </td>
-             <td>
-              <h2 class="d-flex align-content-start">
-                <b-button :disabled = "task.active === false" @click="toggle(task)"  style="background-color: Transparent; border: none;">
-                  <h2>                
-                    <b-icon
-                      class="d-flex align-content-start"
-                      v-b-tooltip.hover title="Log time"
-                      variant="success"
-                      icon="stopwatch" 
-                    ></b-icon>
-                  </h2>
-                </b-button>
-                
-              </h2>
+            <td>
+              <b-button 
+                :disabled="task.active === false"
+                @click="toggle(task)"
+                style="background-color: Transparent; border: none;"
+              >
+                <h4>              
+                  <b-icon
+                    class="d-flex align-content-start"
+                    v-b-tooltip.hover title="Log time"
+                    variant="success"
+                    icon="stopwatch" 
+                  ></b-icon>
+                </h4>
+              </b-button>
             </td>
           </tr>
         </tbody>
