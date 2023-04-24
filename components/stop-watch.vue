@@ -37,7 +37,6 @@ export default {
   },
   mounted() {
     if(this.timerInterval !== null){
-      console.log("Found old timer interval creating new one")
       clearInterval(this.timerInterval);
       this.startTime = Date.parse(localStorage.getItem("loggerStartTime"));
 
@@ -45,38 +44,9 @@ export default {
         var timeNow = new Date();
         this.time = Math.floor(((timeNow - this.startTime)/1000));
         this.$store.commit("user/setTimerInterval", this.timer);
-        console.log("New one made and saved ")
        }, 1000);
       
     }
-    /*
-    if(localStorage.getItem("loggerActive") === 'true'){
-        console.log("killing old interval that was"+this.timerInterval);
-        clearInterval(this.timerInterval);
-        console.log("dead old interval that is"+this.timerInterval);
-        this.startTime = Date.parse(localStorage.getItem("loggerStartTime"));
-        console.log("old start time is : "+this.startTime);
-
-        
-        for (var i = 1; i < 99999; i++)
-            window.clearInterval(i);
-
-
-        
-        this.timer = setInterval(() => {
-        var timeNow = new Date();
-        this.time = Math.floor(((timeNow - this.startTime)/1000));
-        console.log("time now is "+timeNow);
-        console.log("start time is "+this.startTime );
-        console.log("calculation "+(timeNow - this.startTime));
-        this.$store.commit("user/setTimerInterval", this.timer);
-        }, 1000);
-
-      
-    }else{
-      console.log("Did not get old timer "+localStorage.getItem("loggerActive"));
-      console.log("Global time interval is "+this.timerInterval)
-    }*/
   },
   data() {
     return { 
@@ -88,17 +58,14 @@ export default {
   },
   methods: {
     stopT: function() {
-      console.log("Clearing global timer"+this.timerInterval) 
       clearInterval(this.timerInterval);
 
-      console.log("Setting localstorage logger status")
       localStorage.setItem("loggerActive", this.running);
 
-      
+
       if (this.restWhenStop) this.resetT();
     },
     startT: function() {
-      console.log("Setting localstorage logger status")
       localStorage.setItem("loggerActive", this.running);
       //localStorage.setItem("taskId", this.logger.taskId);
 
@@ -106,10 +73,8 @@ export default {
       this.startTime = new Date();
       localStorage.setItem("loggerStartTime", this.startTime);
 
-      console.log("Creating new timer interval")
       this.timer = setInterval(() => {
         var timeNow = new Date();
-        console.log("Saving interval "+this.timer)
         this.$store.commit("user/setTimerInterval", this.timer);
         this.time = Math.floor(((timeNow - this.startTime)/1000));
         }, 1000);
@@ -117,7 +82,6 @@ export default {
       
     },
     resetT: function() {
-      console.log("rest")
       this.resetStorage();
       this.startTime = 0;
       this.startTime = 0;
