@@ -2,6 +2,7 @@ export const state = () => ({
   token: null,
   user: null,
   lastLogin: null,
+  timerInterval: null,
 });
 
 export const mutations = {
@@ -14,6 +15,9 @@ export const mutations = {
   setLastLogin(state, value) {
     state.lastLogin = value;
   },
+  setTimerInterval(state, value) {
+    state.timerInterval = value;
+  },
   unsetUser(state, value) {
     state.user = null;
   },
@@ -21,9 +25,15 @@ export const mutations = {
     state.user = null;
   },
   unsetLastLogin(state) {},
+  unsetTimerInterval(state) {
+    state.timerInterval = null;
+  },
 };
 
 export const getters = {
+  getTimerInterval(state) {
+    return state.timerInterval;
+  },
   getUser(state) {
     return state.user;
   },
