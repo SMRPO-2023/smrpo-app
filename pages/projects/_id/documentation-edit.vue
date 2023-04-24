@@ -1,7 +1,10 @@
 <template>
     <div>
         <h1>Edit documentation</h1>
-        <div class="d-flex justify-content-end mb-3"><b-button @click="updateDocumentation()">Save</b-button></div>
+        <div class="d-flex justify-content-end mb-3">
+            <b-button class="mr-3" @click="updateDocumentation()">Save</b-button>
+            <b-button @click="downloadDocumentation()"><h4><b-icon icon="download"></b-icon></h4></b-button>
+        </div>
             <b-form-textarea
             id="documentation"
             placeholder="Enter documentation"
@@ -30,6 +33,19 @@ export default {
     this.getProject();
   },
   methods: {
+    downloadDocumentation(){
+        let text = (this.markdown);
+        let filename = 'documentation.md';
+        let element = document.createElement('a');
+        element.setAttribute('href', 'data:application/md;charset=utf-8,' + encodeURIComponent(text));
+        element.setAttribute('download', filename);
+
+        element.style.display = 'none';
+        document.body.appendChild(element);
+
+        element.click();
+        document.body.removeChild(element);  
+    },
     async getProject() {
       this.$axios
         .$get(`/project/${this.projectId}`)
