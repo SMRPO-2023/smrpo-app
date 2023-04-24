@@ -186,7 +186,6 @@ export default {
         estimate: null,
         status: null,
         userId: null,
-        done: null,
       },
       currentTimeLog: {
         timeLog: null,

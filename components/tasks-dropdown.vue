@@ -13,24 +13,52 @@
       <b-icon icon="three-dots-vertical" class="center-and-clickable"></b-icon>
       <span class="sr-only">Task options</span>
     </template>
+    
+    <!-- <b-dropdown-item> maps into the following form -->
+    <!-- needed to be able to show tooltip when disabled -->
+    <li 
+      v-if="isMyTask" 
+      role="presentation" 
+      id="task-dropdown-item-finish"
+    >
+      <a 
+        role="menuitem" 
+        href="#" 
+        :class="{disabled: !canFinish, 'dropdown-item': true}" 
+        @click="changeTaskAction('finish')"
+      >
+        Mark as done
+      </a>
+    </li>
+
+    <!-- other dropdown items -->
     <b-dropdown-item
       v-if="task.status === 'UNASSIGNED'"
-      @click="acceptRejectTask(true)"
+      @click="changeTaskAction('accept')"
     >Assign to me</b-dropdown-item>
     <b-dropdown-item
       v-if="isMyTask && task.status !== 'UNASSIGNED'"
-      @click="acceptRejectTask(true)" 
+      @click="changeTaskAction('accept')" 
       :disabled="!canAccept"
     >Accept</b-dropdown-item>
     <b-dropdown-item
       v-if="isMyTask && task.status !== 'UNASSIGNED'"
-      @click="acceptRejectTask(false)"
+      @click="changeTaskAction('reject')"
       :disabled="!canReject"
     >Reject</b-dropdown-item>
     <b-dropdown-item 
       v-if="hasPermissionToDelete && canDelete"
       @click="deleteTask"
     >Delete</b-dropdown-item>
+    
+    <!-- dropdown item tooltips -->
+    <b-tooltip 
+      target="task-dropdown-item-finish" 
+      triggers="hover"
+      :disabled="canFinish"
+    >
+      Last logged time must have 0 remaining hours
+    </b-tooltip>
   </b-dropdown>
 </template>
 
@@ -59,13 +87,20 @@ export default {
       currentUser: "user/getUser",
     }),
     dropdownHasItems() {
-      return this.task.status === 'UNASSIGNED' || 
+      if (this.task.status === 'FINISHED') return false;
+      // individual dropdown item conditions
+      return this.isMyTask ||
+            this.task.status === 'UNASSIGNED' || 
             (this.isMyTask && this.task.status !== 'UNASSIGNED') || 
             (this.hasPermissionToDelete && this.canDelete);
     },
     isMyTask() {
       if (!this.currentUser || !this.task) return false;
       return this.task.userId === this.currentUser.id;
+    },
+    canFinish() {
+      if (!this.isMyTask || !this.task.timeLogs.length) return false;
+      return this.task.timeLogs.sort((a, b) => b.id - a.id)[0].remainingHours === 0;
     },
     canAccept() {
       if (!this.isMyTask) return false;
@@ -81,13 +116,16 @@ export default {
     },
   },
   methods: {
-    async acceptRejectTask(isAccepting) {
+    /**
+     * @param action: accept, reject, finish, (assign - is not sent from here)
+     */
+    async changeTaskAction(action) {
       let confirmed = false;
       try {
         confirmed = await this.$bvModal.msgBoxConfirm(
-          "Are you sure you want to " + (isAccepting ? 'accept' : 'reject') + " this task?",
+          "Are you sure you want to " + action + " this task?",
           {
-            title: (isAccepting ? 'Accept' : 'Reject') + " task",
+            title: this.capitalize(action) + " task",
             cancelTitle: "Cancel",
             okTitle: "Confirm",
           }
@@ -98,25 +136,25 @@ export default {
       if (!confirmed) return;
 
       this.$axios
-        .$post(`tasks/${this.task.id}/${isAccepting ? 'accept' : 'reject'}`)
+        .$post(`tasks/${this.task.id}/${action}`)
         .then((res) => {
           if (!res) return;
           this.$emit("taskUpdated", res)
-          this.$toast.success("Task successfully " + (isAccepting ? 'accepted' : 'rejected'), {
+          this.$toast.success("Task successfully " + action + "ed", {
             duration: 3000,
           });
         })
         .catch((reason) => {
           console.error(reason);
           this.$toast.error(
-            "An error has occurred, while " + (isAccepting ? 'accepting' : 'rejecting') + " the task",
+            "An error has occurred, while marking task as " + action + "ed",
             {
               duration: 3000,
             }
           );
         });
     },
-    async deleteTask(task) {
+    async deleteTask() {
       let confirmed = false;
       try {
         confirmed = await this.$bvModal.msgBoxConfirm(
@@ -136,6 +174,7 @@ export default {
       this.$axios
         .$delete(`tasks/${this.task.id}`)
         .then((res) => {
+          if (!res) throw new Error;
           this.$emit("taskDeleted", this.task)
           this.$toast.success("Task successfully removed", {
             duration: 3000,
@@ -150,6 +189,10 @@ export default {
             }
           );
         });
+    },
+    capitalize(str) {
+      const lower = str.toLowerCase();
+      return str.charAt(0).toUpperCase() + lower.slice(1);
     },
   },
 }

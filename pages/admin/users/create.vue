@@ -1,7 +1,7 @@
 <template>
   <b-container fluid>
     <b-row>
-      <b-col offset-lg="2" lg="8" cols="12" class="my-3">
+      <b-col class="my-3" cols="12" offset-lg="1" lg="10" offset-xl="2" xl="8">
         <h1>New user</h1>
 
         <ValidationObserver ref="observer" v-slot="{ handleSubmit }">
