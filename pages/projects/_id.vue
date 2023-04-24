@@ -181,6 +181,12 @@ export default {
           show: true,
         },
         {
+          name: "Documentation",
+          path: `/projects/${this.projectId}/documentation`,
+          exact: true,
+          show: true,
+        },
+        {
           name: "Product backlog",
           path: `/projects/${this.projectId}/stories`,
           exact: false, // because we have a nested route
