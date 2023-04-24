@@ -2,7 +2,7 @@
   <div>
     <h1>View sprint <b-badge :variant="getVariantForSprintStatus(sprint)">{{ getNameForSprintStatus(sprint) }}</b-badge></h1>
 
-      
+
 
     <br />
 
@@ -31,7 +31,7 @@
             <tr>
               <th scope="col">Title</th>
               <th scope="col">Description</th>
-              <th scope="col">Business value</th>
+              <th scope="col" v-html="'Business <br> value'"></th>
               <th scope="col">Priority</th>
               <th scope="col">Acceptance test</th>
               <th scope="col">Points</th>
@@ -100,8 +100,8 @@
 
       <!---------------------  Realized stories  ------------------------------------>
       <div v-if="isSprintActive(sprint)">
-      <h2 
-        @click="realizedToggle = !realizedToggle" 
+      <h2
+        @click="realizedToggle = !realizedToggle"
         class="pt-3 cursor-pointer">
         <span>Realized stories in sprint</span>
         <b-icon
@@ -116,7 +116,7 @@
             <tr>
               <th scope="col">Title</th>
               <th scope="col">Description</th>
-              <th scope="col">Business value</th>
+              <th scope="col" v-html="'Business <br> value'"></th>
               <th scope="col">Priority</th>
               <th scope="col">Acceptance test</th>
               <th scope="col">Points</th>
@@ -176,7 +176,7 @@
               <tr>
                 <th scope="col">Title</th>
                 <th scope="col">Description</th>
-                <th scope="col">Business value</th>
+                <th scope="col" v-html="'Business <br> value'"></th>
                 <th scope="col">Priority</th>
                 <th scope="col">Acceptance test</th>
                 <th scope="col">Points</th>
@@ -189,6 +189,7 @@
                   <nuxt-link :to="{ path: `/projects/${story.projectId}/stories/${story.id}` }">
                     #{{ story.id }} - {{ story.title }}
                   </nuxt-link>
+                  <b-icon v-if="story?.comments.length" icon="exclamation-circle-fill" variant="danger"/>
                 </td>
                 <td>{{ story.description | limit(100) }}</td>
                 <td>{{ story.businessValue }}</td>
