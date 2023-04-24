@@ -39,6 +39,7 @@
               <tr>
                 <th scope="col">Username</th>
                 <th scope="col">Title</th>
+                <th scope="col">Date</th>
                 <th scope="col">Hours</th>
                 <th scope="col">Hours remaining</th>
                 <th scope="col"></th>
@@ -50,6 +51,7 @@
         <tr v-for="log of task.timeLogs" :key="log.id">
           <td>{{ log.User.username }}</td>
           <td>{{ log.title }}</td>
+          <td>{{ formatDate(log.day) }}</td>
           <td>{{ log.hours }} h</td>
           <td>{{ log.remainingHours }} h</td>
           <td>
@@ -171,6 +173,7 @@ import datetime from "@/mixins/datetime";
 export default {
   mixins: [datetime],
   name: "view-task",
+  
   data() {
     return {
       id: null,
@@ -189,6 +192,7 @@ export default {
       }
     };
   },
+  mixins: [datetime],
   computed: {
     ...mapGetters({
       isAdmin: "user/isAdmin",
