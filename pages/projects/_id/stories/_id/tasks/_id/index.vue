@@ -59,7 +59,7 @@
               <b-icon
                 v-b-tooltip.hover title="Edit log"
                 icon="pencil-fill"
-                :class="hasPermission(log) ? 'text-dark' : 'text-secondary'"
+                :variant="getVariant(hasPermission(log))"
                 @click="openEditModal(log)"
               ></b-icon>
             </h3>
@@ -68,7 +68,8 @@
             <h3>
               <b-icon
                 v-b-tooltip.hover title="Remove log"
-                :class="hasPermission(log) ? 'text-dark' : 'text-secondary'"
+                :variant="getVariant(hasPermission(log))"
+                
                 icon="trash-fill" 
                 @click="removeLog(log)"
               ></b-icon>
@@ -205,6 +206,12 @@ export default {
     this.getTask();
   },
   methods: {
+    getVariant(toggle){
+      if(toggle){
+        return "primary";
+      }
+      return "secondary";
+    },
     getValidationState({ dirty, validated, valid = null }) {
       return dirty || validated ? valid : null;
     },

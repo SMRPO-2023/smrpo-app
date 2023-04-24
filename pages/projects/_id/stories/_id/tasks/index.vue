@@ -64,13 +64,14 @@
               <b-button 
                 :disabled="task.active === false"
                 @click="toggle(task)"
-                style="background-color: Transparent; border: none;"
+                :variant="getVariant(task.active)"
+                style="color: white"
               >
                 <h4>              
                   <b-icon
                     class="d-flex align-content-start"
                     v-b-tooltip.hover title="Log time"
-                    variant="success"
+                    
                     icon="stopwatch" 
                   ></b-icon>
                 </h4>
@@ -265,6 +266,12 @@ export default {
     localStorage.removeItem('loggerTime');
   },
   methods: {
+    getVariant(toggle){
+      if(toggle){
+        return "success";
+      }
+      return "secondary";
+    },
     getValidationState({ dirty, validated, valid = null }) {
       return dirty || validated ? valid : null;
     },
