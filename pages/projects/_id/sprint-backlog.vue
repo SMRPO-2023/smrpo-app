@@ -14,45 +14,45 @@
         Show accepted stories
       </b-form-checkbox>
       <b-button-group size="sm" class="align-items-center flex-wrap">
-        <b-button 
-          @click="filterBy('mine')" 
+        <b-button
+          @click="filterBy('mine')"
           :variant="getVariantForFilterState('mine')"
           class="no-break"
         >My tasks</b-button>
-        <b-button 
-          @click="filterBy('all')" 
+        <b-button
+          @click="filterBy('all')"
           :variant="getVariantForFilterState('all')"
         >All</b-button>
-        <b-button 
-          @click="filterBy('unassigned')" 
+        <b-button
+          @click="filterBy('unassigned')"
           :variant="getVariantForFilterState('unassigned')"
         >Unassigned</b-button>
-        <b-button 
-          @click="filterBy('assigned')" 
+        <b-button
+          @click="filterBy('assigned')"
           :variant="getVariantForFilterState('assigned')"
         >Assigned</b-button>
-        <b-button 
-          @click="filterBy('active')" 
+        <b-button
+          @click="filterBy('active')"
           :variant="getVariantForFilterState('active')"
         >Active</b-button>
-        <b-button 
-          @click="filterBy('finished')" 
+        <b-button
+          @click="filterBy('finished')"
           :variant="getVariantForFilterState('finished')"
         >Finished</b-button>
       </b-button-group>
     </div>
 
-    <b-progress 
-      class="my-3" 
-      :max="totalSpentHours - totalRemainingHours" 
+    <b-progress
+      class="my-3"
+      :max="totalSpentHours - totalRemainingHours"
     >
-      <b-progress-bar 
+      <b-progress-bar
         id="sprint-tasks-total-spent"
-        :value="totalSpentHours" 
+        :value="totalSpentHours"
         :label="getProgressLabel"
         :variant="getProgressVariant"
       ></b-progress-bar>
-      <b-progress-bar 
+      <b-progress-bar
         id="sprint-tasks-total-remaining"
         :value="totalRemainingHours"
         :label="`${totalRemainingHours.toFixed(1)}h`"
@@ -67,9 +67,9 @@
     </b-progress>
 
     <div v-if="sprint">
-      <b-card 
+      <b-card
         v-if="hasStoryAnyRelevantTasks(story)"
-        v-for="story of stories" 
+        v-for="story of stories"
         :key="story.id"
         class="mb-3"
       >
@@ -80,11 +80,11 @@
           </nuxt-link>
         </h5>
         <h6 class="card-subtitle mb-2 text-muted">
-          <b-badge 
+          <b-badge
             :variant="getVariantForPriority(story.priority)"
           >{{ getNameForPriority(story.priority) }}</b-badge>
           &middot;
-          <b-badge 
+          <b-badge
             :variant="getVariantForImplemented(story.acceptanceTest)"
           >{{ getLongNameForImplemented(story.acceptanceTest) }}</b-badge>
           &middot;
@@ -104,15 +104,15 @@
         <!-- Tasks -->
         <template v-if="story.Task.length">
           <!-- Header -->
-          <b-card-text 
-            class="text-muted mb-n2 position-relative d-flex justify-content-between" 
+          <b-card-text
+            class="text-muted mb-n2 position-relative d-flex justify-content-between"
             style="z-index: 1"
           >
             <span>
               <nuxt-link :to="{ path: `/projects/${story.projectId}/stories/${story.id}/tasks` }" class="muted-link-override">
                 Tasks
               </nuxt-link>
-              <span 
+              <span
                 v-if="story.numUnfinishedTasks"
                 :id="`story-tasks-hours-${story.id}`"
               >({{ getTasksRemainingHours(getStoryUnfinishedFilteredTasks(story)) }}/{{ getTasksTotalSpentHours(getStoryAllFilteredTasks(story)) }}h)</span>
@@ -128,19 +128,19 @@
           </b-card-text>
 
           <!-- Unfinished tasks list -->
-          <task-list 
+          <task-list
             :project="project"
-            :story="story" 
-            :tasks="getStoryUnfinishedFilteredTasks(story)" 
+            :story="story"
+            :tasks="getStoryUnfinishedFilteredTasks(story)"
             @taskUpdated="onTaskUpdate"
             @taskDeleted="onTaskDelete"
           />
           <!-- Finished tasks list -->
           <b-collapse :id="`story-tasks-collapse-${story.id}`">
             <small>Finished</small>
-            <task-list 
+            <task-list
               :project="project"
-              :story="story" 
+              :story="story"
               :tasks="getStoryFinishedFilteredTasks(story)"
               @taskUpdated="onTaskUpdate"
               @taskDeleted="onTaskDelete"
@@ -180,7 +180,7 @@ export default {
     getProgressLabel() {
       if (!this.allStories.length) return null;
       if (this.totalRemainingHours === 0) return "All done!";
-      return `${totalSpentHours.toFixed(1)}h`;
+      return `${this.totalSpentHours.toFixed(1)}h`;
     },
     getProgressVariant() {
       if (!this.allStories.length) return null;
@@ -295,7 +295,7 @@ export default {
     setDisplayForTasks(check) {
       for (const story of this.stories) {
         for (const task of story.Task) {
-          this.tasksDisplayDict.set(task.id, check(task));              
+          this.tasksDisplayDict.set(task.id, check(task));
         }
       }
     },
