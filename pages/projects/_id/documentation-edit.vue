@@ -1,6 +1,7 @@
 <template>
     <div>
-        <h1>Edit documentation</h1>
+        <h1><back-btn /> Edit documentation</h1>
+        
         <div class="d-flex justify-content-end mb-3">
             <b-button class="mr-3" @click="updateDocumentation()">Save</b-button>
             <b-button @click="downloadDocumentation()"><h4><b-icon icon="download"></b-icon></h4></b-button>
@@ -10,7 +11,13 @@
             placeholder="Enter documentation"
             v-model="markdown"
             />
-        
+        <div class="d-flex justify-content-end mt-3">
+        <form>
+            <div class="input_container">
+                <input type="file" @change="onFileChange">
+            </div>
+        </form>
+        </div>
     </div>
 </template>
 
@@ -33,6 +40,23 @@ export default {
     this.getProject();
   },
   methods: {
+    onFileChange(e){
+        const files = event.target.files
+        const fileReader = new FileReader()
+        fileReader.addEventListener(
+            "load",
+            () => {
+            // this will then display a text file
+            this.markdown = fileReader.result;
+            },
+            false
+        );
+
+        if (files[0]) {
+            fileReader.readAsText(files[0]);
+        }
+        
+    },
     downloadDocumentation(){
         let text = (this.markdown);
         let filename = 'documentation.md';
@@ -89,3 +113,28 @@ export default {
 }
   
 </script>
+
+<style scoped>
+textarea {
+  height: 300px;
+}
+.input_container {
+  border: 1px solid #e5e5e5;
+}
+
+input[type=file]::file-selector-button {
+  background-color: #fff;
+  color: #000;
+  border: 0px;
+  border-right: 1px solid #e5e5e5;
+  padding: 10px 15px;
+  margin-right: 20px;
+  transition: .5s;
+}
+
+input[type=file]::file-selector-button:hover {
+  background-color: #eee;
+  border: 0px;
+  border-right: 1px solid #e5e5e5;
+}
+</style>
