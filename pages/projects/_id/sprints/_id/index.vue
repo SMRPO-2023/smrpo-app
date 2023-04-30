@@ -23,7 +23,7 @@
     <div>
       <!---------------------  Unrealized stories  ------------------------------------>
       <div>
-      <h2 class="pt-3">Stories in <span v-if="isSprintActive(sprint)">current</span> sprint</h2>
+      <h2 class="pt-3">Stories in <span v-if="isSprintActive(sprint)">the current</span> sprint</h2>
 
       <div class="table-responsive">
         <table class="table table-hover mt-3">
