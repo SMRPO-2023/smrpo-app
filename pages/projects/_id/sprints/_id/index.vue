@@ -103,7 +103,7 @@
       <h2
         @click="realizedToggle = !realizedToggle"
         class="pt-3 cursor-pointer">
-        <span>Realized stories in sprint</span>
+        <span>Finished stories in sprint</span>
         <b-icon
           :icon="realizedToggle ? 'caret-up-fill' : 'caret-down-fill'"
           font-scale="0.75"
